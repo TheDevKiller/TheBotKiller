@@ -13,7 +13,7 @@ import random
 
 with open("token.txt", "r") as tokenFile:
 	token = tokenFile.read()
-
+print(token)
 # /Token
 
 print("Chargement de </TheBotKiller> avec le token", token)
@@ -24,10 +24,11 @@ global prefixe
 prefixe = "&"
 
 @client.event
-async def on_ready:
+async def on_ready():
 	global thedevkiller
 	thedevkiller = await client.get_user_infos("436105272310759426")
 	print("</TheBotKiller est prêt à discuter avec les utilisateurs et à jouer avec eux !")
+	discord.Game("&help")
 
 @client.event
 async def on_message(message): # Dès qu'il y a un message
@@ -69,4 +70,4 @@ async def on_message(message): # Dès qu'il y a un message
 	elif message.content.startswith(prefixe + "help"):
 		await client.send_message(message.channel, embed=discord.Embed(title="Liste des commandes disponibles", description="`help`: Affiche cette page d'aide\n`code`: Mon code source (Github)\n`&shifumi <élément>`: Jouez avec moi à Shifumi !", color=0x0000ff)
 
-client.run(token)
+#client.run(token)
