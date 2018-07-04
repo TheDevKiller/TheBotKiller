@@ -13,7 +13,7 @@ import random
 
 with open("token.txt", "r") as tokenFile:
 	token = tokenFile.read()
-print(token)
+
 # /Token
 
 print("Chargement de </TheBotKiller> avec le token", token)
@@ -26,9 +26,9 @@ prefixe = "&"
 @client.event
 async def on_ready():
 	global thedevkiller
-	thedevkiller = await client.get_user_infos("436105272310759426")
+	thedevkiller = await client.get_user_info("436105272310759426")
 	print("</TheBotKiller est prêt à discuter avec les utilisateurs et à jouer avec eux !")
-	discord.Game("&help")
+	await client.change_presence(game=discord.Game(name="&help (ou prefixe + help)"))
 
 @client.event
 async def on_message(message): # Dès qu'il y a un message
@@ -68,6 +68,7 @@ async def on_message(message): # Dès qu'il y a un message
 		await client.send_message(message.channel, embed=discord.Embed(title="Résultat du Shifumi entre " + message.author.name + " et </TheBotKiller>", description="**Tu as joué: **\n" + jeuJoueur.capitalize() + "\n\n**J'ai joué: **\n" + jeuBot.capitalize() + "\n\n**Résultat: **\n" + resultat, color=0x00ff00))
 
 	elif message.content.startswith(prefixe + "help"):
-		await client.send_message(message.channel, embed=discord.Embed(title="Liste des commandes disponibles", description="`help`: Affiche cette page d'aide\n`code`: Mon code source (Github)\n`&shifumi <élément>`: Jouez avec moi à Shifumi !", color=0x0000ff))
+		await client.send_message(message.channel, embed=discord.Embed(title="Liste des commandes disponibles", description="`help`: Affiche cette page d'aide\n`code`: Mon code source (Github)\n`&shifumi <élément>`: Jouez avec moi à Shifumi !", color=0x0055FE))
+
 
 client.run(token)
