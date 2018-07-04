@@ -68,6 +68,6 @@ async def on_message(message): # Dès qu'il y a un message
 		await client.send_message(message.channel, embed=discord.Embed(title="Résultat du Shifumi entre " + message.author.name + " et </TheBotKiller>", description="**Tu as joué: **\n" + jeuJoueur.capitalize() + "\n\n**J'ai joué: **\n" + jeuBot.capitalize() + "\n\n**Résultat: **\n" + resultat, color=0x00ff00))
 
 	elif message.content.startswith(prefixe + "help"):
-		await client.send_message(message.channel, embed=discord.Embed(title="Liste des commandes disponibles", description="`help`: Affiche cette page d'aide\n`code`: Mon code source (Github)\n`&shifumi <élément>`: Jouez avec moi à Shifumi !", color=0x0000ff)
+		await client.send_message(message.channel, embed=discord.Embed(title="Liste des commandes disponibles", description="`help`: Affiche cette page d'aide\n`code`: Mon code source (Github)\n`&shifumi <élément>`: Jouez avec moi à Shifumi !", color=0x0000ff))
 
-#client.run(token)
+client.run(token)
