@@ -16,12 +16,26 @@ with open("token.txt", "r") as tokenFile:
 
 # /Token
 
-print("Chargement de </TheBotKiller> avec le token", token)
-
-client = discord.Client()
+# Variables
 
 global prefixe
 prefixe = "&"
+
+commandes = \
+"""
+`help`: Affiche cette page d'aide
+`code`: Envoie mon lien Github
+`shifumi <élément>`: Joue avec moi au shifumi !
+`+- <min> <max>`: Joue avec moi au plus ou moins !
+"""
+
+# / Variables
+
+# Connexion
+
+print("Chargement de </TheBotKiller> avec le token", token)
+
+client = discord.Client()
 
 plusoumoins = False
 
@@ -31,6 +45,8 @@ async def on_ready():
 	thedevkiller = await client.get_user_info("436105272310759426")
 	print("</TheBotKiller est prêt à discuter avec les utilisateurs et à jouer avec eux !")
 	await client.change_presence(game=discord.Game(name="&help (ou prefixe + help)"))
+
+# /Connexion
 
 @client.event
 async def on_message(message): # Dès qu'il y a un message
@@ -43,7 +59,7 @@ async def on_message(message): # Dès qu'il y a un message
 		await client.send_message(message.channel, "Mon préfixe est désormais" + " " + prefixe)
 		print("Le préfixe de </TheBotKiller> est désormais " + prefixe)
 
-	elif message.content.startswith(prefixe + "code"): # Renvoie le lien Github
+	elif message.content.startswith(prefixe + "code"): # Envoie le lien Github
 		await client.send_message(message.channel, "https://github.com/TheDevKiller/TheBotKiller")
 
 	elif message.content.startswith(prefixe + "shifumi"): # Commence une partie de Shifumi
@@ -56,40 +72,40 @@ async def on_message(message): # Dès qu'il y a un message
 		elif jeuJoueur == "pierre" and jeuBot == "feuille":     
 			resultat = "T'as perdu"
 		elif jeuJoueur == "pierre" and jeuBot == "ciseaux":
-			resultat = "T'as gagné"                                    # La deuxième personne du singulier
-		elif jeuJoueur == "feuille" and jeuBot == "pierre":            # c'est le joueur
+			resultat = "T'as gagné"                                # La deuxième personne du singulier
+		elif jeuJoueur == "feuille" and jeuBot == "pierre":        # c'est le joueur
 			resultat = "T'as gagné"
 		elif jeuJoueur == "ciseaux" and jeuBot == "pierre":
 			resultat = "T'as perdu"
 		elif jeuJoueur == "feuille" and jeuBot == "ciseaux":
 			resultat = "T'as perdu"
-		elif jeuJoueur == "ciseaux" and jeuBot == "Feuille":
+		elif jeuJoueur == "ciseaux" and jeuBot == "feuille":
 			resultat = "T'as gagné"
 		else:
-			await client.send_message(message.channel, "Entre un élément valide à la prochaine partie s'il te plaît :wink:")
+			await client.send_message(message.channel, "Entre un élément valide la prochaine fois s'il te plaît :wink:")
 
 		await client.send_message(message.channel, embed=discord.Embed(title="Résultat du Shifumi entre " + message.author.name + " et </TheBotKiller>", description="**Tu as joué: **\n" + jeuJoueur.capitalize() + "\n\n**J'ai joué: **\n" + jeuBot.capitalize() + "\n\n**Résultat: **\n" + resultat, color=0x00ff00))
 
 	elif message.content.startswith(prefixe + "help"):
-		await client.send_message(message.channel, embed=discord.Embed(title="Liste des commandes disponibles", description="`help`: Affiche cette page d'aide\n`code`: Mon code source (Github)\n`shifumi <élément>`: Joue avec moi à Shifumi !\n`+- <min> <max>`: Joue avec moi au plus ou moins !", color=0x0055FE))
+		await client.send_message(message.channel, embed=discord.Embed(title="Liste des commandes disponibles", description=commandes, color=0x0055FE))
 
 	elif message.content.startswith(prefixe + "+-"):
 		try:
 			min = int(message.content.split(" ")[1])
 			max = int(message.content.split(" ")[2])
-			await client.send_message(message.channel, "Devine à quel nombre je pense entre " + min + " et " + max)
+			await client.send_message(message.channel, "Devine à quel nombre je pense entre " + str(min) + " et " + str(max))
 			global nombre
 			nombre = random.randint(min, max)
-			global chan 
-			chan = message.channel
+			global plusoumoinschan 
+			plusoumoinschan = message.channel
 			plusoumoins = True
 			global essais
-			essais = 0
+			essais = 1
 		except Exception as ex:
 			await client.send_message(message.channel, "```python\n" + str(ex) + "\n```")
 			await client.send_message(message.channel, "Entre des nombres valides s'il te plaît :wink:")
 
-	elif plusoumoins == True and message.author != client.user and message.channel == chan:
+	elif plusoumoins == True and message.author != client.user and message.channel == plusoumoinschan:
 		try:
 			nombreJoueur = int(message.content)
 			if nombreJoueur < nombre:
@@ -99,14 +115,16 @@ async def on_message(message): # Dès qu'il y a un message
 				await client.send_message(message.channel, "C'est moins !")
 				essais += 1
 			elif nombreJoueur == nombre:
-				await client.send_message(message.channel, "C'est ça, bien joué " + message.author.mention + " ! Tu as réussi en " + str(essais) + " essais")
+				if essais <= 1:
+					await client.send_message(message.channel, "C'est ça, bien joué " + message.author.mention + " ! Tu as réussi en " + str(essais) + " essai")
+				else:
+					await client.send_message(message.channel, "C'est ça, bien joué " + message.author.mention + " ! Tu as réussi en " + str(essais) + " essais")
+
 				plusoumoins = False
 			else:
 				await client.send_message(message.channel, "Entre des nombres valides s'il te plaît :wink:")
 		except Exception as ex:
 			await client.send_message(message.channel, "```python\n" + str(ex) + "\n```")
 			await client.send_message(message.channel, "Entre des nombres valides s'il te plaît :wink:")
-
-
 
 client.run(token)
