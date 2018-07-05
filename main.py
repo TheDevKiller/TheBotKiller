@@ -77,6 +77,7 @@ async def on_message(message): # Dès qu'il y a un message
 		try:
 			min = int(message.content.split(" ")[1])
 			max = int(message.content.split(" ")[2])
+			await client.send_message(message.channel, "Devine à quel nombre je pense entre " + min + " et " + max)
 			global nombre
 			nombre = random.randint(min, max)
 			global chan 
