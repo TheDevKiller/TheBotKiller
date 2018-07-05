@@ -51,13 +51,13 @@ async def on_message(message): # Dès qu'il y a un message
 		jeuJoueur = message.content.split(" ")[1].lower()
 		jeuBot = random.choice(elements)
 
-		if jeuJoueur == jeuBot:                                 # La deuxième personne
-			resultat = "Égalité"                                # du singulier signifie
-		elif jeuJoueur == "pierre" and jeuBot == "feuille":     # le joueur
+		if jeuJoueur == jeuBot:                                 
+			resultat = "Égalité"                                
+		elif jeuJoueur == "pierre" and jeuBot == "feuille":     
 			resultat = "T'as perdu"
 		elif jeuJoueur == "pierre" and jeuBot == "ciseaux":
-			resultat = "T'as gagné"
-		elif jeuJoueur == "feuille" and jeuBot == "pierre":
+			resultat = "T'as gagné"                                    # La deuxième personne du singulier
+		elif jeuJoueur == "feuille" and jeuBot == "pierre":            # c'est le joueur
 			resultat = "T'as gagné"
 		elif jeuJoueur == "ciseaux" and jeuBot == "pierre":
 			resultat = "T'as perdu"
@@ -71,7 +71,7 @@ async def on_message(message): # Dès qu'il y a un message
 		await client.send_message(message.channel, embed=discord.Embed(title="Résultat du Shifumi entre " + message.author.name + " et </TheBotKiller>", description="**Tu as joué: **\n" + jeuJoueur.capitalize() + "\n\n**J'ai joué: **\n" + jeuBot.capitalize() + "\n\n**Résultat: **\n" + resultat, color=0x00ff00))
 
 	elif message.content.startswith(prefixe + "help"):
-		await client.send_message(message.channel, embed=discord.Embed(title="Liste des commandes disponibles", description="`help`: Affiche cette page d'aide\n`code`: Mon code source (Github)\nshifumi <élément>`: Jouez avec moi à Shifumi !", color=0x0055FE))
+		await client.send_message(message.channel, embed=discord.Embed(title="Liste des commandes disponibles", description="`help`: Affiche cette page d'aide\n`code`: Mon code source (Github)\n`shifumi <élément>`: Joue avec moi à Shifumi !\n`+- <min> <max>`: Joue avec moi au plus ou moins !", color=0x0055FE))
 
 	elif message.content.startswith(prefixe + "+-"):
 		try:
@@ -82,9 +82,10 @@ async def on_message(message): # Dès qu'il y a un message
 			global chan 
 			chan = message.channel
 			plusoumoins = True
+			global essais
 			essais = 0
 		except Exception as ex:
-			print(ex)
+			await client.send_message(message.channel, "```python\n" + str(ex) + "\n```")
 			await client.send_message(message.channel, "Entre des nombres valides s'il te plaît :wink:")
 
 	elif plusoumoins == True and message.author != client.user and message.channel == chan:
@@ -92,14 +93,17 @@ async def on_message(message): # Dès qu'il y a un message
 			nombreJoueur = int(message.content)
 			if nombreJoueur < nombre:
 				await client.send_message(message.channel, "C'est plus !")
+				essais += 1
 			elif nombreJoueur > nombre:
 				await client.send_message(message.channel, "C'est moins !")
+				essais += 1
 			elif nombreJoueur == nombre:
-				await client.send_message(message.channel, "C'est ça, bien joué !")
+				await client.send_message(message.channel, "C'est ça, bien joué " + message.author.mention + " ! Tu as réussi en " + str(essais) + " essais")
 				plusoumoins = False
 			else:
 				await client.send_message(message.channel, "Entre des nombres valides s'il te plaît :wink:")
 		except Exception as ex:
+			await client.send_message(message.channel, "```python\n" + str(ex) + "\n```")
 			await client.send_message(message.channel, "Entre des nombres valides s'il te plaît :wink:")
 
 
