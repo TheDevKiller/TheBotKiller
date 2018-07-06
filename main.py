@@ -43,10 +43,16 @@ plusoumoins = False
 async def on_ready():
 	global thedevkiller
 	thedevkiller = await client.get_user_info("436105272310759426")
-	print("</TheBotKiller est prêt à discuter avec les utilisateurs et à jouer avec eux !")
+	print("</TheBotKiller> est prêt à discuter avec les utilisateurs et à jouer avec eux !")
 	await client.change_presence(game=discord.Game(name="&help (ou prefixe + help)"))
 
 # /Connexion
+
+# Fonctions
+
+
+
+# /Fonctions
 
 @client.event
 async def on_message(message): # Dès qu'il y a un message
@@ -126,5 +132,27 @@ async def on_message(message): # Dès qu'il y a un message
 		except Exception as ex:
 			await client.send_message(message.channel, "```python\n" + str(ex) + "\n```")
 			await client.send_message(message.channel, "Entre des nombres valides s'il te plaît :wink:")
+
+	elif message.content.startswith(prefixe + "dilemme"):
+
+		try:
+			premierChoixListe = message.content.split(",")[0]
+			premierChoixListe = premierChoixListe.split(" ")
+			del premierChoixListe[0]
+			premierChoix = ""
+			deuxiemeChoix = ""
+			for elements in premierChoixListe:
+				premierChoix += elements + " "
+			deuxiemeChoixListe = message.content.split(",")[1].strip()
+			for elements in deuxiemeChoixListe:
+				deuxiemeChoix += elements
+			premierChoix = premierChoix.strip()
+			listeChoix = [premierChoix, deuxiemeChoix]
+			choix = str(random.choice(listeChoix))
+			await client.send_message(message.channel, "Je dirais " + choix.lower())
+
+		except Exception as ex:
+			await client.send_message(message.channel,"```\n" + str(ex) + "\n```")
+
 
 client.run(token)
