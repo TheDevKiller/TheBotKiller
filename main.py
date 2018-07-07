@@ -6,6 +6,7 @@
 import discord
 import asyncio
 import random
+import re
 
 # /Imports
 
@@ -21,8 +22,12 @@ with open("token.txt", "r") as tokenFile:
 global prefixe
 prefixe = "&"
 
+questioncava = False
+
 commandes = \
 """
+Si vous voulez, vous pouvez discuter avec moi :smiley:. Mentionnez-moi et si je ne suis pas trop occupé, je vous répondrais peut-être :wink:)
+
 `help`: Affiche cette page d'aide
 `code`: Envoie mon lien Github
 `shifumi <élément>`: Joue avec moi au shifumi !
@@ -307,5 +312,60 @@ async def on_message(message): # Dès qu'il y a un message
 		except Exception as ex:
 
 			await client.send_message(message.channel, "```python\n" + str(ex) + "\n```")
+
+	elif client.user.mentioned_in(message):
+
+		global demarreur
+		demarreur = message.author
+
+		global discussionChan
+		discussionChan = message.channel
+
+		if re.match(".*(ça|sa|ca|Ça|Sa|Ca) va.{0,2} " + client.user.mention + ".*", message.content):
+			await client.send_message(message.channel, "Ça va :smiley:, et toi ?")
+			questioncava = True
+		elif re.match(".*" + client.user.mention + ".{0,2} (ça|sa|ca|Ça|Sa|Ca) va.*", message.content):
+			await client.send_message(message.channel, "Ça va :smiley:, et toi ?")
+			questioncava = True
+		elif re.match(".*(Salut|salut|slt|Slt|Bonjour|bonjour|Salutations|Bien le bonjour|Hello|Hi|salutations|bien le bonjour|hello|hi).? " + client.user.mention + ".*", message.content) != None:
+			await client.send_message(message.channel, "Salut " + message.author.mention + " !")
+		elif re.match(".*" + client.user.mention + ".? (Salut|salut|slt|Slt|Bonjour|bonjour|Salutations|Bien le bonjour|Hello|Hi|salutations|bien le bonjour|hello|hi).*", message.content) != None:
+			await client.send_message(message.channel, "Salut " + message.author.mention + " !")
+
+		elif re.match(".*" + client.user.mention + ".* (Quel|quel|quelle|Quelle|Kel|kel) (est|et) ton (prefixe|préfixe|prefix|préfix) .*", message.content):
+			await client.send_message(message.channel, "Mon préfixe est " + prefixe + ", n'hésite pas à dire " + prefixe + "help pour plus d'informations :wink:")
+
+		elif re.match(".* (Quel|quel|quelle|Quelle) (est|et) ton (prefixe|préfixe|prefix|préfix) .*" + client.user.mention + ".*", message.content):
+			await client.send_message(message.channel, "Mon préfixe est " + prefixe + ", n'hésite pas à dire " + prefixe + "help pour plus d'informations :wink:")
+
+		elif re.match(".*" + client.user.mention + ".* (Tu|tu) (fais|fait|fai) (quoi|koi) .*", message.content):
+			await client.send_message(message.channel, "J'aide les gens, je joue et je discute avec eux :smiley:")
+
+		elif re.match(".* (Tu|tu) (fais|fait|fai) (quoi|koi) .*" + client.user.mention + ".*", message.content):
+			await client.send_message(message.channel, "J'aide les gens, je joue et je discute avec eux :smiley:")
+
+		elif re.match(".*(tg|ta gueule).*" + client.user.mention + ".*", message.content.lower()) or re.match(".*" + client.user.mention + ".*(tg|ta gueule).*", message.content.lower()) or re.match(".*" + client.user.mention + ".*(connard|conard|connar|conar).*", message.content.lower()) or re.match(".*(connard|conard|connar|conar).*" + client.user.mention + ".*", message.content.lower()) or re.match(".*" + client.user.mention + ".*(fils de pute|fdp).*", message.content.lower()) or re.match(".*(fils de pute|fdp).*" + client.user.mention + ".*", message.content.lower()) or re.match(".*" + client.user.mention + ".*(batard|batar|btr).*", message.content.lower()) or re.match(".*(batard|batar|btr).*" + client.user.mention + ".*", message.content.lower()) or re.match(".*" + client.user.mention + ".*enculé.*", message.content.lower()) or re.match(".*enculé.*" + client.user.mention + ".*", message.content.lower()) or re.match(".*" + client.user.mention + ".*fils de chien.*", message.content.lower()) or re.match(".*fils de chien.*" + client.user.mention + ".*", message.content.lower()):
+			await client.send_message(message.channel, "Pourquoi tu m'insulte ? :frowning:")
+
+		else:
+			await client.send_message(message.channel, "Tu peux répéter ? Je n'ai pas très bien compris :neutral_face:")
+
+	elif re.match(".*(tg|ta gueule).*", message.content.lower()) or re.match(".*(connard|conard|connar|conar).*", message.content.lower()) or re.match(".*(fils de pute|fdp).*", message.content.lower()) or re.match(".*(batard|batar|btr).*", message.content.lower()) or re.match(".*enculé.*", message.content.lower()) or re.match(".*fils de chien.*", message.content.lower()):
+			await client.send_message(message.channel, "C'est pas bien de dire des gros mots :stuck_out_tongue_winking_eye: !")
+			print("Y'a " + message.author + " il a dit un gros mot. C'est pas bien")
+
+	elif questioncava == True and message.author == demarreur and message.channel == discussionChan:
+
+		if re.match(".*(Non|non|mal|pas|Mal|Pas|^Pas mal|^pas mal).*", message.content):
+			await client.send_message(message.channel, "Ah mince :frowning:... On va te réconforter sur ce serveur :smiley:")
+			questioncava = False
+
+		elif re.match(".*(Oui|oui|Tranquille|tranquille|Bien|bien|Super|super).*", message.content):
+			await client.send_message(message.channel, "Parfait !")
+			questioncava = False
+
+		else:
+			await client.send_message(message.chanel, "Ok !")
+			questioncava = False
 
 client.run(token)
