@@ -50,7 +50,18 @@ async def on_ready():
 
 # Fonctions
 
+def messageGrille(grilleListe):
+			
+	grille = "\n" 
+	for index, elements in enumerate(grilleListe):
+		if index != 0:
+			grille += "\n**－－＋－－＋－－**\n"
+		for index, elements2 in enumerate(elements):
+			grille += elements2
+			if index != 2:
+				grille += " ｜ "
 
+	return grille
 
 # /Fonctions
 
@@ -154,5 +165,147 @@ async def on_message(message): # Dès qu'il y a un message
 		except Exception as ex:
 			await client.send_message(message.channel,"```\n" + str(ex) + "\n```")
 
+	elif message.content.startswith(prefixe + "morpion"):
+
+		try:
+
+			enPartie = True
+
+			symboles = [":x:", ":o:"]
+
+			symboleJoueur = random.choice(symboles)
+
+			grilleListe = [[":one:", ":two:", ":three:"],  [":four:", ":five:", ":six:"], [":seven:", ":eight:", ":nine:"]] # Création de la grille vide
+
+			await client.send_message(message.channel, "Commence, tu joue avec les " + symboleJoueur + " !")
+			messageEnvoyeGrille = await client.send_message(message.channel, embed=discord.Embed(title="Morpion", description=messageGrille(grilleListe)))
+
+			await client.add_reaction(messageEnvoyeGrille, "1⃣")
+			await client.add_reaction(messageEnvoyeGrille, "2⃣")
+			await client.add_reaction(messageEnvoyeGrille, "3⃣")
+			await client.add_reaction(messageEnvoyeGrille, "4⃣")
+			await client.add_reaction(messageEnvoyeGrille, "5⃣")
+			await client.add_reaction(messageEnvoyeGrille, "6⃣")
+			await client.add_reaction(messageEnvoyeGrille, "7⃣")
+			await client.add_reaction(messageEnvoyeGrille, "8⃣")
+			await client.add_reaction(messageEnvoyeGrille, "9⃣")
+
+			while enPartie == True:
+
+				reaction = await client.wait_for_reaction(user=message.author)
+
+				casesInterdites = [0]
+
+				if reaction.reaction.emoji == "1⃣":
+					grilleListe[0][0] = symboleJoueur
+					casesInterdites.append(1)
+				elif reaction.reaction.emoji == "⃣":
+					grilleListe[0][1] = symboleJoueur
+					casesInterdites.append(2)
+				elif reaction.reaction.emoji == "3⃣":
+					grilleListe[0][2] = symboleJoueur
+					casesInterdites.append(3)
+				elif reaction.reaction.emoji == "4⃣":
+					grilleListe[1][0] = symboleJoueur
+					casesInterdites.append(4)
+				elif reaction.reaction.emoji == "5⃣":
+					grilleListe[1][1] = symboleJoueur
+					casesInterdites.append(5)
+				elif reaction.reaction.emoji == "6⃣":
+					grilleListe[1][2] = symboleJoueur
+					casesInterdites.append(6)
+				elif reaction.reaction.emoji == "7⃣":
+					grilleListe[2][0] = symboleJoueur
+					casesInterdites.append(7)
+				elif reaction.reaction.emoji == "8⃣":
+					grilleListe[2][1] = symboleJoueur
+					casesInterdites.append(8)
+				elif reaction.reaction.emoji == "9⃣":
+					grilleListe[2][2] = symboleJoueur
+					casesInterdites.append(9)
+				else:
+					await client.send_message(message.channel, "Réagis avec un nombre valide entre 1 et 9 s'il te plaît :wink:")
+				
+				choixCaseBot = random.randint(1, 9)
+
+				if symboleJoueur == ":x:":
+					symboleBot = ":o:"
+				elif symboleJoueur == ":o:":
+					symboleBot = ":x:"
+				else:
+					symboleBot = "Aucun symbole"
+
+				if grilleListe[0][0] == symboleBot and grilleListe[0][1] == ":two:":
+					grilleListe[0][1] = symboleBot
+				elif grilleListe[0][0] == symboleBot and grilleListe[1][0] == ":four:":
+					grilleListe[1][0] = symboleBot
+				elif grilleListe[0][0] == symboleBot and grilleList[1][1] == ":five:":
+					grilleListe[1][1] = symboleBot
+				elif grilleListe[0][1] == symboleBot and grilleListe[0][0] == ":one:":
+					grilleListe[0][0] = symboleBot
+				elif grilleListe[0][1] == symboleBot and grilleListe[1][0] == ":four:":
+					grilleListe[1][0] = symboleBot
+				elif grilleListe[0][1] == symboleBot and grilleListe[1][1] == ":five:":
+					grilleListe[1][1] = symboleBot
+				elif grilleListe[0][1] == symboleBot and grilleListe[1][2] == ":six:":
+					grilleListe[1][2] = symboleBot
+				elif grilleListe[0][1] == symboleBot and grilleListe[0][2] == ":three:":
+					grilleListe[0][2] = symboleBot
+				elif grilleListe[0][2] == symboleBot and grilleListe[0][1] == ":two:":
+					grilleListe[0][1] = symboleBot
+				elif grilleListe[0][2] == symboleBot and grilleListe[1][1] == ":five:":
+					grilleListe[1][1] = symboleBot
+				elif grilleListe[0][2] == symboleBot and grilleListe[1][2] == ":six:":
+					grilleListe[1][2] = symboleBot
+				elif grilleListe[1][0] == symboleBot and grilleListe[0][0] == ":one:":
+					grilleListe[0][0] = symboleBot
+				elif grilleListe[1][0] == symboleBot and grilleListe[0][1] == ":two:":
+					grilleListe[0][1] = symboleBot
+
+##                               0       1       2
+##                          0 -[0|0]- -[0|1]- -[0|2]-		[1] [2] [3]
+##
+##                          1  [1|0]   [1|1]   [1|2]		[4] [5] [6]
+##
+##                          2  [2|0]   [2|1]   [2|2]		[7] [8] [9]
+##
+
+				elif symboleBot not in grilleListe:
+
+					if choixCaseBot == 1:
+						grilleListe[0][0] = symboleBot
+						casesInterdites.append(1)
+					elif choixCaseBot == 2:
+						grilleListe[0][1] = symboleBot
+						casesInterdites.append(2)
+					elif choixCaseBot == 3:
+						grilleListe[0][2] = symboleBot
+						casesInterdites.append(3)
+					elif choixCaseBot == 4:
+						grilleListe[1][0] = symboleBot
+						casesInterdites.append(4)
+					elif choixCaseBot == 5:
+						grilleListe[1][1] = symboleBot
+						casesInterdites.append(5)
+					elif choixCaseBot == 6:
+						grilleListe[1][2] = symboleBot
+						casesInterdites.append(6)
+					elif choixCaseBot == 7:
+						grilleListe[2][0] = symboleBot
+						casesInterdites.append(7)
+					elif choixCaseBot == 8:
+						grilleListe[2][1] = symboleBot
+						casesInterdites.append(8)
+					elif choixCaseBot == 9:
+						grilleListe[2][2] = symboleBot
+						casesInterdites.append(9)
+
+
+
+				await client.edit_message(messageEnvoyeGrille, embed=discord.Embed(title="Morpion", description=messageGrille(grilleListe)))
+
+		except Exception as ex:
+
+			await client.send_message(message.channel, "```python\n" + str(ex) + "\n```")
 
 client.run(token)
