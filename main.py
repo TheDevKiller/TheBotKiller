@@ -321,21 +321,19 @@ async def on_message(message): # Dès qu'il y a un message
 		global discussionChan
 		discussionChan = message.channel
 
-		if re.match(".*(ça|sa|ca|Ça|Sa|Ca) va.{0,2} " + client.user.mention + ".*", message.content):
+		if re.match(".*(ça|sa|ca) va.{0,2} " + client.user.mention + ".*", message.content.lower()) or re.match(".*" + client.user.mention + ".{0,2} (ça|sa|ca) va.*", message.content.lower()):
 			await client.send_message(message.channel, "Ça va :smiley:, et toi ?")
 			questioncava = True
-		elif re.match(".*" + client.user.mention + ".{0,2} (ça|sa|ca|Ça|Sa|Ca) va.*", message.content):
-			await client.send_message(message.channel, "Ça va :smiley:, et toi ?")
-			questioncava = True
-		elif re.match(".*(Salut|salut|slt|Slt|Bonjour|bonjour|Salutations|Bien le bonjour|Hello|Hi|salutations|bien le bonjour|hello|hi).? " + client.user.mention + ".*", message.content) != None:
-			await client.send_message(message.channel, "Salut " + message.author.mention + " !")
-		elif re.match(".*" + client.user.mention + ".? (Salut|salut|slt|Slt|Bonjour|bonjour|Salutations|Bien le bonjour|Hello|Hi|salutations|bien le bonjour|hello|hi).*", message.content) != None:
+
+		elif re.match(".*(salut|slt|bonjour|salutations|bien le bonjour|hello|hi).? " + client.user.mention + ".*", message.content.lower()) != None or re.match(".*" + client.user.mention + ".? (salut|slt|bonjour|bien le bonjour|hello|hi).*", message.content.lower()) != None:
 			await client.send_message(message.channel, "Salut " + message.author.mention + " !")
 
-		elif re.match(".*" + client.user.mention + ".* (Quel|quel|quelle|Quelle|Kel|kel) (est|et) ton (prefixe|préfixe|prefix|préfix) .*", message.content):
-			await client.send_message(message.channel, "Mon préfixe est " + prefixe + ", n'hésite pas à dire " + prefixe + "help pour plus d'informations :wink:")
+						# CONTINUER DE SUPPRIMER LES DOUBLONS EN MAJ ET DE RASSEMBLER LES CONDITIONS ÉQUIVALENTES
 
-		elif re.match(".* (Quel|quel|quelle|Quelle) (est|et) ton (prefixe|préfixe|prefix|préfix) .*" + client.user.mention + ".*", message.content):
+		elif :
+			await client.send_message(message.channel, "Salut " + message.author.mention + " !")
+
+		elif re.match(".*" + client.user.mention + ".* (quel|quelle|kel|c'est|c) (est|et) ton (prefixe|préfixe) .*", message.content.lower()) or re.match(".* (quel|quelle|c'est) (est|et|koi|quoi) .* ton (prefixe|préfixe) .*" + client.user.mention + ".*", message.content.lower()):
 			await client.send_message(message.channel, "Mon préfixe est " + prefixe + ", n'hésite pas à dire " + prefixe + "help pour plus d'informations :wink:")
 
 		elif re.match(".*" + client.user.mention + ".* (Tu|tu) (fais|fait|fai) (quoi|koi) .*", message.content):
@@ -345,7 +343,7 @@ async def on_message(message): # Dès qu'il y a un message
 			await client.send_message(message.channel, "J'aide les gens, je joue et je discute avec eux :smiley:")
 
 		elif re.match(".*(tg|ta gueule).*" + client.user.mention + ".*", message.content.lower()) or re.match(".*" + client.user.mention + ".*(tg|ta gueule).*", message.content.lower()) or re.match(".*" + client.user.mention + ".*(connard|conard|connar|conar).*", message.content.lower()) or re.match(".*(connard|conard|connar|conar).*" + client.user.mention + ".*", message.content.lower()) or re.match(".*" + client.user.mention + ".*(fils de pute|fdp).*", message.content.lower()) or re.match(".*(fils de pute|fdp).*" + client.user.mention + ".*", message.content.lower()) or re.match(".*" + client.user.mention + ".*(batard|batar|btr).*", message.content.lower()) or re.match(".*(batard|batar|btr).*" + client.user.mention + ".*", message.content.lower()) or re.match(".*" + client.user.mention + ".*enculé.*", message.content.lower()) or re.match(".*enculé.*" + client.user.mention + ".*", message.content.lower()) or re.match(".*" + client.user.mention + ".*fils de chien.*", message.content.lower()) or re.match(".*fils de chien.*" + client.user.mention + ".*", message.content.lower()):
-			await client.send_message(message.channel, "Pourquoi tu m'insulte ? :frowning:")
+			await client.send_message(message.channel, "Pourquoi tu m'insulte ? :cry:")
 
 		else:
 			await client.send_message(message.channel, "Tu peux répéter ? Je n'ai pas très bien compris :neutral_face:")
