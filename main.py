@@ -7,6 +7,7 @@ import discord
 import asyncio
 import random
 import re
+import speedtest
 
 # /Imports
 
@@ -194,321 +195,7 @@ async def on_message(message): # Dès qu'il y a un message
 
 
 			# Morpion
-	elif message.content.startswith(prefixe + "morpion") or re.match(".*morpion.? " + client.user.mention + ".*", message.content.lower()) and message.author != client.user:
-
-		try:
-
-				# Variables
-			enPartieMorpion = True
-
-			ligneBot = 0
-
-			symboles = [":x:", ":o:"]
-
-			symboleJoueur = random.choice(symboles)
-
-			leBotAGagné = False
-
-				# Symbole Bot
-			if symboleJoueur == ":x:":
-				symboleBot = ":o:"
-			elif symboleJoueur == ":o:":
-				symboleBot = ":x:"
-
-
-			grilleListe = [[":one:", ":two:", ":three:"],  [":four:", ":five:", ":six:"], [":seven:", ":eight:", ":nine:"]] # Création de la grille vide
-
-				# Jeu
-			await client.send_message(message.channel, "Commence, tu joue avec les " + symboleJoueur + " !")
-			messageEnvoyeGrille = await client.send_message(message.channel, embed=discord.Embed(title="Morpion", description=messageGrille(grilleListe)))
-
-			await client.add_reaction(messageEnvoyeGrille, "1⃣")
-			await client.add_reaction(messageEnvoyeGrille, "2⃣")
-			await client.add_reaction(messageEnvoyeGrille, "3⃣")
-			await client.add_reaction(messageEnvoyeGrille, "4⃣")
-			await client.add_reaction(messageEnvoyeGrille, "5⃣")
-			await client.add_reaction(messageEnvoyeGrille, "6⃣")
-			await client.add_reaction(messageEnvoyeGrille, "7⃣")
-			await client.add_reaction(messageEnvoyeGrille, "8⃣")
-			await client.add_reaction(messageEnvoyeGrille, "9⃣")
-
-			casesInterdites19 = []
-			casesInterditesEmo = []
-			choixJoueur = None
-			caseBot = 0
-			ligneBot = 0
-			colonneBot = 0
-
-			print(message.author.name, "a commencé une partie de morpion")
-
-			while enPartieMorpion == True:
-
-				reaction = await client.wait_for_reaction(user=message.author, message=messageEnvoyeGrille)
-
-					# Choix du joueur avec la réaction
-				if reaction.reaction.emoji == "1⃣":
-					choixJoueur = ":one:"
-				elif reaction.reaction.emoji == "2⃣":
-					choixJoueur = ":two:"
-				elif reaction.reaction.emoji == "3⃣":
-					choixJoueur = ":three:"
-				elif reaction.reaction.emoji == "4⃣":
-					choixJoueur = ":four:"
-				elif reaction.reaction.emoji == "5⃣":
-					choixJoueur = ":five:"
-				elif reaction.reaction.emoji == "6⃣":
-					choixJoueur = ":six:"
-				elif reaction.reaction.emoji == "7⃣":
-					choixJoueur = ":seven:"
-				elif reaction.reaction.emoji == "8⃣":
-					choixJoueur = ":eight:"
-				elif reaction.reaction.emoji == "9⃣":
-					choixJoueur = ":nine:"
-				print(choixJoueur)
-				print(str(casesInterditesEmo))
-
-					# Boucle pour les cases interdites
-				if choixJoueur in casesInterditesEmo:
-					print(str(casesInterditesEmo))
-					await client.send_message(message.channel, "Cette case est déjà prise !")
-					print(message.author.name, "a essayé de jouer une case déjà prise, la choixJoueur")
-					while choixJoueur in casesInterditesEmo:
-						reaction = await client.wait_for_reaction(user=message.author, message=messageEnvoyeGrille)
-						await client.send_message(message.channel, "Cette case est déjà prise !")
-						print(message.author.name, "a essayé de jouer une case déjà prise, la",  choixJoueur)
-
-
-							# Deuxième choix avec les réactions
-						if reaction.reaction.emoji == "1⃣":
-							choixJoueur = ":one:"
-						elif reaction.reaction.emoji == "⃣":
-							choixJoueur = ":two:"
-						elif reaction.reaction.emoji == "3⃣":
-							choixJoueur = ":three:"
-						elif reaction.reaction.emoji == "4⃣":
-							choixJoueur = ":four:"
-						elif reaction.reaction.emoji == "5⃣":
-							choixJoueur = ":five:"
-						elif reaction.reaction.emoji == "6⃣":
-							choixJoueur = ":six:"
-						elif reaction.reaction.emoji == "7⃣":
-							choixJoueur = ":seven:"
-						elif reaction.reaction.emoji == "8⃣":
-							choixJoueur = ":eight:"
-						elif reaction.reaction.emoji == "9⃣":
-							choixJoueur = ":nine:"
-
-
-
-					# Placement du symbole du joueur
-				if choixJoueur == ":one:":
-					grilleListe[0][0] = symboleJoueur
-					casesInterditesEmo.append(":one:")
-					casesInterdites19.append(1)
-				elif choixJoueur == ":two:":
-					grilleListe[0][1] = symboleJoueur
-					casesInterditesEmo.append(":two:")
-					casesInterdites19.append(2)
-				elif choixJoueur == ":three:":
-					grilleListe[0][2] = symboleJoueur
-					casesInterditesEmo.append(":three:")
-					casesInterdites19.append(3)
-				elif choixJoueur == ":four:":
-					grilleListe[1][0] = symboleJoueur
-					casesInterditesEmo.append(":four:")
-					casesInterdites19.append(4)
-				elif choixJoueur == ":five:":
-					grilleListe[1][1] = symboleJoueur
-					casesInterditesEmo.append(":five:")
-					casesInterdites19.append(5)
-				elif choixJoueur == ":six:":
-					grilleListe[1][2] = symboleJoueur
-					casesInterditesEmo.append(":six:")
-					casesInterdites19.append(6)
-				elif choixJoueur == ":seven:":
-					grilleListe[2][0] = symboleJoueur
-					casesInterditesEmo.append(":seven:")
-					casesInterdites19.append(7)
-				elif choixJoueur == ":eight:":
-					grilleListe[2][1] = symboleJoueur
-					casesInterditesEmo.append(":eight:")
-					casesInterdites19.append(8)
-				elif choixJoueur == ":nine:":
-					grilleListe[2][2] = symboleJoueur
-					casesInterditesEmo.append(":nine:")
-					casesInterdites19.append(9)
-				else:
-					await client.send_message(message.channel, "Réagis avec un nombre valide entre 1 et 9 s'il te plaît :wink:")
-				
-					# Check si le bot a joué
-				symboleBotPasDansGrilleListe = True
-				for elements in grilleListe:
-					for elements2 in elements:
-						if symboleBot in elements2:
-							symboleBotPasDansGrilleListe = False
-
-					# Diagonales
-				diagonaleGD = [grilleListe[0][0], grilleListe[1][1], grilleListe[2][2]]
-				diagonaleDG = [grilleListe[0][2], grilleListe[1][1], grilleListe[2][0]]
-
-					# Vérification de la grille pour 2 éléments côtes à côtes
-
-					# Vérification horizontale
-				for index, elements in enumerate(grilleListe):
-					if elements == [r":(o|x){1}:", r":(o|x){1}:", r":.*:"]:
-						colonneBot = 3
-						leBotAGagné = True
-						ligneBot = index
-					elif elements == [r":(o|x){1}:", r":.*:", r":(o|x){1}:"]:
-						colonneBot = 2
-						leBotAGagné = True
-						ligneBot = index
-					elif elements == [r":.*:", r":(o|x){1}:", r":(o|x){1}:"]:
-						colonneBot = 1
-						leBotAGagné = True
-						ligneBot = index
-					else:
-						if symboleBotPasDansGrilleListe == True:
-							caseBot = random.randint(1, 9)
-							if caseBot in casesInterdites19:
-								while caseBot in casesInterdites19:
-									caseBot = random.randint(1, 9)
-
-					grilleListeCopieVerticale = [elements[0] for elements in grilleListe]
-					grilleListeCopieVerticale.append([elements[1] for elements in grilleListe])
-					grilleListeCopieVerticale.append([elements[2] for elements in grilleListe])
-
-						# Vérification verticale
-					for index, elements in enumerate(grilleListeCopieVerticale):
-						if elements == [r":(o|x){1}:", r":(o|x){1}:", r":.*:"]:
-							ligneBot = 2
-							leBotAGagné = True
-							colonneBot = index
-						elif elements == [r":(o|x){1}:", r":.*:", r":(o|x){1}:"]:
-							ligneBot = 1
-							leBotAGagné = True
-							colonneBot = index
-						elif elements == [r":.*:", r":(o|x){1}:", r":(o|x){1}:"]:
-							ligneBot = 0
-							leBotAGagné = True
-							colonneBot = index
-						else:
-							if symboleBotPasDansGrilleListe == True:
-								caseBot = random.randint(1, 9)
-								if caseBot in casesInterdites19:
-									while caseBot in casesInterdites19:
-										caseBot = random.randint(1, 9)
-				
-					# Vérification des diagonales pour 2 éléments côtes à côtes
-				if diagonaleGD == [":one:", r":(o|x){1}:", r":(o|x){1}:"]:
-					colonneBot = 0
-					ligneBot = 0
-				elif diagonaleGD == [r":(o|x){1}:", ":five:", r":(o|x){1}:"]:
-					colonneBot = 1
-					ligneBot = 1
-				elif diagonaleGD == [r":(o|x){1}:", r":(o|x){1}:", ":nine:"]:
-					colonneBot = 2
-					ligneBot = 2
-				elif diagonaleDG == [":three:", r":(o|x){1}:", r":(o|x){1}:"]:
-					colonneBot = 2
-					ligneBot = 0
-				elif diagonaleDG == [r":(o|x){1}:", ":five:", r":(o|x){1}:"]:
-					colonneBot = 1
-					ligneBot = 1
-				elif diagonaleDG == [r":(o|x){1}:", r":(o|x){1}:", ":seven:"]:
-					colonneBot = 0
-					ligneBot = 2
-				else:
-					if symboleBotPasDansGrilleListe == True:
-						caseBot = random.randint(1, 9)
-						if caseBot in casesInterdites19:
-							while caseBot in casesInterdites19:
-								caseBot = random.randint(1, 9)
-
-				if caseBot == 1:
-					colonneBot = 0
-					ligneBot = 0
-				elif caseBot == 2:
-					colonneBot = 1
-					ligneBot = 0
-				elif caseBot == 3:
-					colonneBot = 2
-					ligneBot = 0
-				elif caseBot == 4:
-					colonneBot = 0
-					ligneBot = 1
-				elif caseBot == 5:
-					colonneBot = 1
-					ligneBot = 1
-				elif caseBot == 6:
-					colonneBot = 2
-					ligneBot = 1
-				elif caseBot == 7:
-					colonneBot = 0
-					ligneBot = 2
-				elif caseBot == 8:
-					colonneBot = 1
-					ligneBot = 2
-				elif caseBot == 9:
-					colonneBot = 2
-					ligneBot = 2
-
-					# Le bot joue
-				grilleListe[ligneBot][colonneBot] = symboleBot
-
-					# Ajout des cases interdites quand le bot joue
-				if ligneBot == 0 and colonneBot == 0:
-					casesInterdites19.append(1)
-					casesInterditesEmo.append(":one:")
-				elif ligneBot == 0 and colonneBot == 1:
-					casesInterdites19.append(2)
-					casesInterditesEmo.append(":two:")
-				elif ligneBot == 0 and colonneBot == 2:
-					casesInterdites19.append(3)
-					casesInterditesEmo.append(":three:")
-				elif ligneBot == 1 and colonneBot == 0:
-					casesInterdites19.append(4)
-					casesInterditesEmo.append(":four:")
-				elif ligneBot == 1 and colonneBot == 1:
-					casesInterdites19.append(5)
-					casesInterditesEmo.append(":five:")
-				elif ligneBot == 1 and colonneBot == 2:
-					casesInterdites19.append(6)
-					casesInterditesEmo.append(":six:")
-				elif ligneBot == 2 and colonneBot == 0:
-					casesInterdites19.append(7)
-					casesInterditesEmo.append(":seven:")
-				elif ligneBot == 2 and colonneBot == 1:
-					casesInterdites19.append(8)
-					casesInterditesEmo.append(":eight:")
-				elif ligneBot == 2 and colonneBot == 2:
-					casesInterdites19.append(9)
-					casesInterditesEmo.append(":nine:")
-
-
-
-					# Si le bot a gagné, la partie est finie !
-				if leBotAGagné == True:
-					enPartieMorpion = False
-					await client.edit_message(messageEnvoyeGrille, embed=discord.Embed(title="Morpion", description=messageGrille(grilleListe), footer="J'ai gagné :smiley:"))
-
-
-##                               0       1       2
-##                          0 -[0|0]- -[0|1]- -[0|2]-		[1] [2] [3]
-##
-##                          1  [1|0]   [1|1]   [1|2]		[4] [5] [6]
-##
-##                          2  [2|0]   [2|1]   [2|2]		[7] [8] [9]
-##
-
-
-				await client.edit_message(messageEnvoyeGrille, embed=discord.Embed(title="Morpion", description=messageGrille(grilleListe)))
-
-		except Exception as ex:
-
-			await client.send_message(message.channel, "```python\n" + str(ex) + "\n```")
-
-	elif message.content.startswith(client.user.mention + " dit"):
+	elif message.content.startswith(client.user.mention + " dis"):
 		messageADireListe = message.content.split(" ")[2:]
 		messageADire = ""
 		for elements in messageADireListe:
@@ -525,6 +212,18 @@ async def on_message(message): # Dès qu'il y a un message
 		with open("reports.txt", "a") as reportsFile:
 			reportsFile.write(strReport + "\n")
 		await client.send_message(thedevkiller, strReport)
+
+	elif message.content.startswith(prefixe + "speedtest"):
+		messageChargement = await client.send_message(message.channel, "Recherche du meilleur serveur ...")
+		test = speedtest.Speedtest()
+		test.get_best_server()
+		await client.edit_message(messageChargement, "Mesure du débit descendant")
+		test.download()
+		await client.edit_message(messageChargement, "Mesure du débit montant")
+		test.upload()
+		url = test.results.share()
+		await client.delete_message(messageChargement)
+		await client.send_message(message.channel, "Voilà ma bonne connexion de campagnard\n" + url)
 
 
 		#Si on mentionne le bot
