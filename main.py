@@ -225,7 +225,6 @@ async def on_message(message): # Dès qu'il y a un message
 		await client.delete_message(messageChargement)
 		await client.send_message(message.channel, "Voilà ma bonne connexion de campagnard\n" + url)
 
-
 		#Si on mentionne le bot
 	elif client.user.mentioned_in(message) and message.author != client.user:
 
@@ -255,6 +254,8 @@ async def on_message(message): # Dès qu'il y a un message
 			# Insultes
 		elif re.match(".*(tg|ta gueule|connard|connasse| con |taggle|fils de chien|enculé|batard|bâtard|pute|emmerde|stupide|salope|salaud|nique ta mère).{0,10}" + client.user.mention + ".*", message.content.lower()) or re.match(".*" + client.user.mention + ".{0,15}(tg|ta gueule|connard| con |fils de chien|enculé|batard|bâtard|pute|emmerde|stupide|salope|salaud|nique ta mère).*", message.content.lower()) or re.match(".*" + client.user.mention + ".{0,2} .{0,11} con$", message.content.lower()):
 			await client.send_message(message.channel, "Pourquoi tu m'insulte ? :cry:")
+			global insulte
+			insulte = True
 
 			# C'est quoi ton code ?
 		elif re.match(".*(c|c'est) (koi|quoi) ton (code|cod).*" + client.user.mention + ".*", message.content.lower()) or re.match(".*" + client.user.mention + ".*(c|c'est) (koi|quoi) ton (code|cod).*", message.content.lower()):
@@ -314,6 +315,10 @@ async def on_message(message): # Dès qu'il y a un message
 		else: # Aucun des deux
 			await client.send_message(message.chanel, "Ok")
 			questioncava = False
+
+	elif insulte == True and message.author != client.user:
+		await client.send_message(message.channel, "C'est pas une raison ! :rage:")
+		insulte = False
 
 client.run(token)
 
