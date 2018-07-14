@@ -224,6 +224,10 @@ async def on_message(message): # Dès qu'il y a un message
 		url = test.results.share()
 		await client.delete_message(messageChargement)
 		await client.send_message(message.channel, "Voilà ma bonne connexion de campagnard\n" + url)
+<<<<<<< HEAD
+=======
+
+>>>>>>> d24a96f903d5832125f3f548ac3d0965dc1559c2
 
 		#Si on mentionne le bot
 	elif client.user.mentioned_in(message) and message.author != client.user:
