@@ -30,13 +30,14 @@ Si vous voulez, vous pouvez discuter avec moi :smiley:. Mentionnez-moi et si je 
 `code`: Mon code sur Github
 `shifumi <élément>`: Joue avec moi au shifumi !
 `+- <min> <max>`: Joue avec moi au plus ou moins !
+`speedtest`: Ma bonne connexion à la campagne :stuck_out_tongue:
 """
 
-# / Variables
+# /Variables
 
 # Connexion
 
-print("Chargement de </TheBotKiller>")
+print("\nConnection: Chargement de </TheBotKiller> ...")
 
 client = discord.Client()
 
@@ -46,7 +47,7 @@ plusoumoins = False
 async def on_ready():
 	global thedevkiller
 	thedevkiller = await client.get_user_info("436105272310759426")
-	print("</TheBotKiller> est prêt à discuter avec les utilisateurs et à jouer avec eux !\n\n")
+	print("Connexion: </TheBotKiller> est prêt à discuter avec les utilisateurs et à jouer avec eux !\n")
 	await client.change_presence(game=discord.Game(name="&help (ou prefixe + help)"))
 
 # /Connexion
@@ -54,8 +55,8 @@ async def on_ready():
 # Fonctions
 
 def messageGrille(grilleListe):
-			
-	grille = "\n" 
+
+	grille = "\n"
 	for index, elements in enumerate(grilleListe):
 		if index != 0:
 			grille += "\n\n"
@@ -75,6 +76,13 @@ async def on_message(message): # Dès qu'il y a un message
 
 	global questioncava
 
+	global insulte
+
+	try:
+		insulte
+	except:
+		insulte = False
+
 	try:
 		questioncava
 	except:
@@ -90,10 +98,13 @@ async def on_message(message): # Dès qu'il y a un message
 		# Code
 	if message.content.startswith(prefixe + "code"): # Envoie le lien Github
 		await client.send_message(message.channel, "https://github.com/TheDevKiller/TheBotKiller")
+		print("Code: demandé par " + message.author.name + "\n")
 
 		# Shifumi
 
 	elif message.content.startswith(prefixe + "shifumi"): # Commence une partie de Shifumi
+
+		print("Shifumi: partie commencée entre " + message.author.name + " et </TheBotKiller>")
 
 		messageJoue = await client.send_message(message.channel, embed=discord.Embed(title="Shifumi", description="Joue :wink:", color=0xff7400))
 
@@ -127,15 +138,29 @@ async def on_message(message): # Dès qu'il y a un message
 
 		await client.edit_message(messageJoue, embed=discord.Embed(title="Résultat du Shifumi entre " + message.author.name + " et </TheBotKiller>", description="** **\n**Tu as joué: **\n\n" + jeuJoueur.capitalize() + "\n\n**J'ai joué: **\n\n" + elementBot.capitalize() + "\n\n**Résultat: **\n\n" + resultat, color=0xff7400))
 
+		if resultat == "Égalité :neutral_face:":
+			gagnant = "Aucun"
+		elif resultat == "T'as gagné :frowning:":
+			gagnant = message.author.name
+		else:
+			 gagnant = "</TheBotKiller>"
+
+		jeuJoueur = jeuJoueur.split(" ")[0]
+		elementBot = elementBot.split(" ")[0]
+
+		print(message.author.name + " a joué " + jeuJoueur + " et </TheBotKiller> a joué " + elementBot + ". " + gagnant + " a gagné\n")
+
 		# Help
 	elif message.content.startswith(prefixe + "help"):
 		await client.send_message(message.channel, embed=discord.Embed(title="Liste des commandes disponibles", description=commandes, color=0x0055FE))
+		print("Aide: demandée par " + message.author.name + "\n")
 
 		# Plus Ou Moins
 	elif message.content.startswith(prefixe + "+-"):
 		try:
 			min = int(message.content.split(" ")[1])
 			max = int(message.content.split(" ")[2])
+			print("Plus ou moins: partie commencée par " + message.author.name + " avec un nombre entre " + str(min) + " et " + str(max))
 			await client.send_message(message.channel, "Devine à quel nombre je pense entre " + str(min) + " et " + str(max))
 			global nombre
 			nombre = random.randint(min, max)
@@ -144,13 +169,13 @@ async def on_message(message): # Dès qu'il y a un message
 			plusoumoins = True
 			global essais
 			essais = 1
+
 		except Exception as ex:
 			await client.send_message(message.channel, "```python\n" + str(ex) + "\n```")
 			await client.send_message(message.channel, "Entre des nombres valides s'il te plaît :wink:")
 
 			# Plus Ou Moins
 	elif plusoumoins == True and message.author != client.user and message.channel == plusoumoinschan:
-		try:
 			nombreJoueur = int(message.content)
 			if nombreJoueur < nombre:
 				await client.send_message(message.channel, "C'est plus !")
@@ -161,19 +186,15 @@ async def on_message(message): # Dès qu'il y a un message
 			elif nombreJoueur == nombre:
 				if essais <= 1:
 					await client.send_message(message.channel, "C'est ça, bien joué " + message.author.mention + " ! Tu as réussi en " + str(essais) + " essai")
+					print("Plus ou moins: " + message.author.name + " a trouvé le nombre en 1 essai. Le nombre était " + str(nombre) + "\n")
 				else:
 					await client.send_message(message.channel, "C'est ça, bien joué " + message.author.mention + " ! Tu as réussi en " + str(essais) + " essais")
+					print("Plus ou moins: " + message.author.name + " a trouvé le nombre en " + str(essais) + " essais. Le nombre était " + str(nombre) + "\n")
 
 				plusoumoins = False
-			else:
-				await client.send_message(message.channel, "Entre des nombres valides s'il te plaît :wink:")
-		except Exception as ex:
-			await client.send_message(message.channel, "```python\n" + str(ex) + "\n```")
-			await client.send_message(message.channel, "Entre des nombres valides s'il te plaît :wink:")
 
 			# Dilemme
 	elif message.content.startswith(prefixe + "dilemme"):
-
 		try:
 			premierChoixListe = message.content.split(",")[0]
 			premierChoixListe = premierChoixListe.split(" ")
@@ -189,18 +210,20 @@ async def on_message(message): # Dès qu'il y a un message
 			listeChoix = [premierChoix, deuxiemeChoix]
 			choix = str(random.choice(listeChoix))
 			await client.send_message(message.channel, "Je dirais " + choix.lower())
+			print("Dilemme: dans cette liste " + listeChoix + ", </TheBotKiller> a choisi " + choix + "\n")
 
 		except Exception as ex:
 			await client.send_message(message.channel,"```\n" + str(ex) + "\n```")
 
 
-			# Morpion
+			# Dire un message
 	elif message.content.startswith(client.user.mention + " dis"):
 		messageADireListe = message.content.split(" ")[2:]
 		messageADire = ""
 		for elements in messageADireListe:
 			messageADire += elements + " "
 		await client.send_message(message.channel, messageADire)
+		print('Discussion: </TheBotKiller> a dit "' + messageADire + '"\n')
 
 			# Report
 	elif message.content.startswith(prefixe + "report") and message.author != client.user:
@@ -212,6 +235,7 @@ async def on_message(message): # Dès qu'il y a un message
 		with open("reports.txt", "a") as reportsFile:
 			reportsFile.write(strReport + "\n")
 		await client.send_message(thedevkiller, strReport)
+		print("Report: fait par " + message.author.name + ". Voir reports.txt.\n")
 
 	elif message.content.startswith(prefixe + "speedtest"):
 		messageChargement = await client.send_message(message.channel, "Recherche du meilleur serveur ...")
@@ -224,9 +248,12 @@ async def on_message(message): # Dès qu'il y a un message
 		url = test.results.share()
 		await client.delete_message(messageChargement)
 		await client.send_message(message.channel, "Voilà ma bonne connexion de campagnard\n" + url)
+		print("Speedtest: fait par " + message.author.name + ". Les résultats sont " + test.results.share() + "\n")
 
 		#Si on mentionne le bot
 	elif client.user.mentioned_in(message) and message.author != client.user:
+
+		print("Discussion:" + message.author.name + " discute avec </TheBotKiller>.\n")
 
 		global demarreur
 		demarreur = message.author
@@ -254,7 +281,6 @@ async def on_message(message): # Dès qu'il y a un message
 			# Insultes
 		elif re.match(".*(tg|ta gueule|connard|connasse| con |taggle|fils de chien|enculé|batard|bâtard|pute|emmerde|stupide|salope|salaud|nique ta mère).{0,10}" + client.user.mention + ".*", message.content.lower()) or re.match(".*" + client.user.mention + ".{0,15}(tg|ta gueule|connard| con |fils de chien|enculé|batard|bâtard|pute|emmerde|stupide|salope|salaud|nique ta mère).*", message.content.lower()) or re.match(".*" + client.user.mention + ".{0,2} .{0,11} con$", message.content.lower()):
 			await client.send_message(message.channel, "Pourquoi tu m'insulte ? :cry:")
-			global insulte
 			insulte = True
 
 			# C'est quoi ton code ?
@@ -291,11 +317,11 @@ async def on_message(message): # Dès qu'il y a un message
 
 		else: # J'ai pas compris
 			await client.send_message(message.channel, "Tu peux répéter ? Je n'ai pas très bien compris :neutral_face:")
+			print("Discussion: " + message.author.name + " a dit " + message.content + ". </TheBotKiller> n'a pas compris :/\n")
 
 			# Insultes
 	elif re.match(".*(taggle|ta geule|tg|conar|connar|conard|connard|connasse|conase|connase|conasse|bâtard|batard|batar| con |emmerde|pute|fils de chien|stupide|salope|salaud|nique ta mère|putain|merde|enculé).*", message.content.lower()) or re.match("^con .*", message.content.lower()) or re.match(".* con$", message.content.lower()) or re.match("^con$", message.content.lower()):
 			await client.send_message(message.channel, "C'est pas bien de dire des gros mots :stuck_out_tongue_winking_eye: !")
-			print("Y'a " + str(message.author.name) + " il a dit un gros mot. C'est pas bien")
 
 			# Cheh !
 	elif re.match(".*cheh.*", message.content.lower()) and message.author == thedevkiller:
@@ -321,27 +347,3 @@ async def on_message(message): # Dès qu'il y a un message
 		insulte = False
 
 client.run(token)
-
-
-'''
-1
-2
-3
-4
-5
-6
-7
-8
-9
-
-":one:"
-":two:"
-":three:"
-	":four:"
-	":five:"
-	":six:"
-	":seven:"
-	":eight:"
-	":nine:"
-
-'''
