@@ -8,7 +8,8 @@ import asyncio
 import random
 import re
 import speedtest
-
+import pickle
+scoresPom = {}
 # /Imports
 
 # Token
@@ -35,9 +36,57 @@ Si vous voulez, vous pouvez discuter avec moi :smiley:. Mentionnez-moi et si je 
 
 # /Variables
 
+# Fonctions
+
+def chargerscorespom():
+    global scoresPom
+    scoresPom = {}
+    try:
+        with open("db/scoresPom.db", "rb") as fichierScoresPom:
+            unpickler = pickle.Unpickler(fichierScoresPom)
+            scoresPom = unpickler.load()
+            print("Chargement: scoresPom chargé avec succès")
+    except:
+        scoresPom = {}
+        print("Chargement: base de données scoresPom vide")
+    return scoresPom
+
+def sauverscorespom():
+    global scoresPom
+    with open("db/scoresPom.db", "wb") as fichierScoresPom:
+        pickler = pickle.Pickler(fichierScoresPom)
+        pickler.dump(scoresPom)
+
+def ajouterscorespom(min, max, joueur, score):
+    global scoresPom
+
+    print(scoresPom)
+
+    if str(min) + "-" + str(max) not in scoresPom:
+    	scoresPom[str(min) + "-" + str(max)] = {}
+    	scoresPom[str(min) + "-" + str(max)][joueur] = score
+    	print("le premier if")
+    elif joueur not in scoresPom[str(min) + "-" + str(max)]:
+    	scoresPom[str(min) + "-" + str(max)][joueur] = score     # TODO
+    elif score < scoresPom[str(min) + "-" + str(max)][joueur]:   # Checker si la clé existe
+    	scoresPom[str(min) + "-" + str(max)][joueur] = score
+
+def print_scores():
+    global scoresPom
+    message = ""
+    print(scoresPom)
+    for minmax, scoreitems in scoresPom.items():
+        message += "**" + minmax + "**\n"
+        for player, score in scoreitems.items(): 
+            message += str(player) + ": " + str(score) + " essais\n"
+    return message
+
+
+# /Fonctions
+
 # Connexion
 
-print("\nConnection: Chargement de </TheBotKiller> ...")
+print("\nConnexion: Chargement de </TheBotKiller> ...")
 
 client = discord.Client()
 
@@ -46,28 +95,13 @@ plusoumoins = False
 @client.event
 async def on_ready():
 	global thedevkiller
+	global scoresPom
 	thedevkiller = await client.get_user_info("436105272310759426")
 	print("Connexion: </TheBotKiller> est prêt à discuter avec les utilisateurs et à jouer avec eux !\n")
 	await client.change_presence(game=discord.Game(name="&help (ou prefixe + help)"))
+	chargerscorespom()
 
-# /Connexion
-
-# Fonctions
-
-def messageGrille(grilleListe):
-
-	grille = "\n"
-	for index, elements in enumerate(grilleListe):
-		if index != 0:
-			grille += "\n\n"
-		for index, elements2 in enumerate(elements):
-			grille += elements2
-			if index != 2:
-				grille += "    "
-
-	return grille
-
-# /Fonctions
+# /ConnexionCheh !
 
 @client.event
 async def on_message(message): # Dès qu'il y a un message
@@ -77,6 +111,8 @@ async def on_message(message): # Dès qu'il y a un message
 	global questioncava
 
 	global insulte
+	
+	global scoresPom
 
 	try:
 		insulte
@@ -156,10 +192,16 @@ async def on_message(message): # Dès qu'il y a un message
 		print("Aide: demandée par " + message.author.name + "\n")
 
 		# Plus Ou Moins
-	elif message.content.startswith(prefixe + "+-"):
+	elif message.content.startswith(prefixe + "+- "):
 		try:
+			global joueurPom
+			joueurPom = message.author
+			global min
+			global max
 			min = int(message.content.split(" ")[1])
 			max = int(message.content.split(" ")[2])
+			if(min > max):
+				min, max = max, min
 			print("Plus ou moins: partie commencée par " + message.author.name + " avec un nombre entre " + str(min) + " et " + str(max))
 			await client.send_message(message.channel, "Devine à quel nombre je pense entre " + str(min) + " et " + str(max))
 			global nombre
@@ -175,23 +217,30 @@ async def on_message(message): # Dès qu'il y a un message
 			await client.send_message(message.channel, "Entre des nombres valides s'il te plaît :wink:")
 
 			# Plus Ou Moins
-	elif plusoumoins == True and message.author != client.user and message.channel == plusoumoinschan:
-			nombreJoueur = int(message.content)
-			if nombreJoueur < nombre:
-				await client.send_message(message.channel, "C'est plus !")
-				essais += 1
-			elif nombreJoueur > nombre:
-				await client.send_message(message.channel, "C'est moins !")
-				essais += 1
-			elif nombreJoueur == nombre:
-				if essais <= 1:
-					await client.send_message(message.channel, "C'est ça, bien joué " + message.author.mention + " ! Tu as réussi en " + str(essais) + " essai")
-					print("Plus ou moins: " + message.author.name + " a trouvé le nombre en 1 essai. Le nombre était " + str(nombre) + "\n")
-				else:
-					await client.send_message(message.channel, "C'est ça, bien joué " + message.author.mention + " ! Tu as réussi en " + str(essais) + " essais")
-					print("Plus ou moins: " + message.author.name + " a trouvé le nombre en " + str(essais) + " essais. Le nombre était " + str(nombre) + "\n")
+	elif plusoumoins == True and message.author == joueurPom and message.channel == plusoumoinschan:
+		nombreJoueur = int(message.content)
+		if nombreJoueur < nombre:
+			await client.send_message(message.channel, "C'est plus !")
+			essais += 1
+		elif nombreJoueur > nombre:
+			await client.send_message(message.channel, "C'est moins !")
+			essais += 1
+		elif nombreJoueur == nombre:
+			if essais <= 1:
+				await client.send_message(message.channel, "C'est ça, bien joué " + message.author.mention + " ! Tu as réussi en " + str(essais) + " essai")
+				print("Plus ou moins: " + message.author.name + " a trouvé le nombre en 1 essai. Le nombre était " + str(nombre) + "\n")
+				ajouterscorespom(min, max, message.author.name, essais)
+				sauverscorespom()
+			else:
+				await client.send_message(message.channel, "C'est ça, bien joué " + message.author.mention + " ! Tu as réussi en " + str(essais) + " essais")
+				print("Plus ou moins: " + message.author.name + " a trouvé le nombre en " + str(essais) + " essais. Le nombre était " + str(nombre) + "\n")
+				ajouterscorespom(min, max, message.author.name, essais)
+				sauverscorespom()
+			plusoumoins = False
 
-				plusoumoins = False
+			# Scores Plus Ou Moins
+	elif message.content.startswith(prefixe + "+-scores"):
+		await client.send_message(message.channel, embed=discord.Embed(title="Classement du Plus Ou Moins", description=print_scores(), color=0x17a81c))
 
 			# Dilemme
 	elif message.content.startswith(prefixe + "dilemme"):
@@ -210,7 +259,7 @@ async def on_message(message): # Dès qu'il y a un message
 			listeChoix = [premierChoix, deuxiemeChoix]
 			choix = str(random.choice(listeChoix))
 			await client.send_message(message.channel, "Je dirais " + choix.lower())
-			print("Dilemme: dans cette liste " + listeChoix + ", </TheBotKiller> a choisi " + choix + "\n")
+			print("Dilemme: dans cette liste " + str(listeChoix) + ", </TheBotKiller> a choisi " + choix + "\n")
 
 		except Exception as ex:
 			await client.send_message(message.channel,"```\n" + str(ex) + "\n```")
@@ -236,7 +285,6 @@ async def on_message(message): # Dès qu'il y a un message
 			reportsFile.write(strReport + "\n")
 		await client.send_message(thedevkiller, strReport)
 		print("Report: fait par " + message.author.name + ". Voir reports.txt.\n")
-
 	elif message.content.startswith(prefixe + "speedtest"):
 		messageChargement = await client.send_message(message.channel, "Recherche du meilleur serveur ...")
 		test = speedtest.Speedtest()
@@ -279,7 +327,7 @@ async def on_message(message): # Dès qu'il y a un message
 			await client.send_message(message.channel, "J'aide les gens, je joue et je discute avec eux :smiley:")
 
 			# Insultes
-		elif re.match(".*(tg|ta gueule|connard|connasse| con |taggle|fils de chien|enculé|batard|bâtard|pute|emmerde|stupide|salope|salaud|nique ta mère).{0,10}" + client.user.mention + ".*", message.content.lower()) or re.match(".*" + client.user.mention + ".{0,15}(tg|ta gueule|connard| con |fils de chien|enculé|batard|bâtard|pute|emmerde|stupide|salope|salaud|nique ta mère).*", message.content.lower()) or re.match(".*" + client.user.mention + ".{0,2} .{0,11} con$", message.content.lower()):
+		elif re.match(".*(tg|ta gueule|connard|connasse| con |taggle|fils de chien|enculé|batard|bâtard|pute|emmerde|salope|salaud|nique ta mère).{0,10}" + client.user.mention + ".*", message.content.lower()) or re.match(".*" + client.user.mention + ".{0,15}(tg|ta gueule|connard| con |fils de chien|enculé|batard|bâtard|pute|emmerde|stupide|salope|salaud|nique ta mère).*", message.content.lower()) or re.match(".*" + client.user.mention + ".{0,2} .{0,11} con$", message.content.lower()):
 			await client.send_message(message.channel, "Pourquoi tu m'insulte ? :cry:")
 			insulte = True
 
@@ -345,5 +393,11 @@ async def on_message(message): # Dès qu'il y a un message
 	elif insulte == True and message.author != client.user:
 		await client.send_message(message.channel, "C'est pas une raison ! :rage:")
 		insulte = False
+
+	elif re.match(".*je vais manger.*", message.content.lower()):
+		await client.send_message(client.get_channel(401676021469937667), "Bon appétit " + message.author.mention)
+
+async def on_member_join(member):
+	await client.send_message(401668766683103233, )
 
 client.run(token)
