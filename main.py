@@ -328,7 +328,9 @@ async def on_message(message): # Dès qu'il y a un message
 		test.upload()
 		url = test.results.share()
 		await client.delete_message(messageChargement)
-		await client.send_message(message.channel, "Voilà ma bonne connexion de campagnard\n" + url)
+		em = discord.Embed(title="** **Voilà ma bonne connexion de campagnard", color=0x012ea0)
+		em.set_image(url=test.results.share())
+		await client.send_message(message.channel, embed=em)
 		print("Speedtest: fait par " + message.author.name + ". Les résultats sont " + test.results.share() + "\n")
 
 		# Chat
@@ -336,8 +338,8 @@ async def on_message(message): # Dès qu'il y a un message
 		chaturl = "http://thecatapi.com/api/images/get?api_key=" + catkey
 		req = Request(chaturl, headers={'User-Agent': "Bot"})
 		resultchat = urlopen(req).geturl()
-		em = discord.Embed()
-		em.set_image(resultchat)
+		em = discord.Embed(color=0xFF9100)
+		em.set_image(url=resultchat)
 		await client.send_message(message.channel, embed=em)
 		print("Chat: " + message.author.name + " a demandé un chat\n")
 
