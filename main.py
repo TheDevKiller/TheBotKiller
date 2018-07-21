@@ -48,11 +48,11 @@ Si vous voulez, vous pouvez discuter avec moi :smiley:. Mentionnez-moi et si je 
 
 # Fonctions
 
-def dlimg(url, filename):
-	headers = {'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36"}
-	image = requests.Session().get(url, headers=headers).content
-	with open(filename, "w+b") as fichierImage:
-		fichierImage.write(image)
+# def dlimg(url, filename):
+# 	headers = {'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36"}
+# 	image = requests.Session().get(url, headers=headers).content
+# 	with open(filename, "w+b") as fichierImage:
+# 		fichierImage.write(image)
 
 
 def chargerscorespom():
@@ -328,10 +328,7 @@ async def on_message(message): # Dès qu'il y a un message
 		test.upload()
 		url = test.results.share()
 		await client.delete_message(messageChargement)
-		await client.send_message(message.channel, "Voilà ma bonne connexion de campagnard")
-		dlimg(test.results.share(), "speedtest.png")
-		await client.send_file(message.channel, "speedtest.png")
-		os.remove("speedtest.png")
+		await client.send_message(message.channel, "Voilà ma bonne connexion de campagnard\n" + url)
 		print("Speedtest: fait par " + message.author.name + ". Les résultats sont " + test.results.share() + "\n")
 
 		# Chat
@@ -339,10 +336,10 @@ async def on_message(message): # Dès qu'il y a un message
 		chaturl = "http://thecatapi.com/api/images/get?api_key=" + catkey
 		req = Request(chaturl, headers={'User-Agent': "Bot"})
 		resultchat = urlopen(req).geturl()
-		dlimg(resultchat, "resultchat.png")
-		await client.send_file(message.channel, "resultchat.png")
-		os.remove("resultchat.png")
-		print("Chat: " + message.author.name + " a demandé un chat")
+		em = discord.Embed()
+		em.set_image(resultchat)
+		await client.send_message(message.channel, embed=em)
+		print("Chat: " + message.author.name + " a demandé un chat\n")
 
 		# Si on mentionne le bot
 	elif client.user.mentioned_in(message) and message.author != client.user:
