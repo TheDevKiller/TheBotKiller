@@ -9,7 +9,9 @@ import random
 import re
 import speedtest
 import pickle
-scoresPom = {}
+from functools import cmp_to_key
+from urllib.request import urlopen, Request
+
 # /Imports
 
 # Token
@@ -18,6 +20,11 @@ with open("token.txt", "r") as tokenFile:
 	token = tokenFile.read()
 
 # /Token
+
+# TheCatApiKey
+
+with open("catapikey.txt", "r") as catapikeyFile:
+	catkey = catapikeyFile.read()
 
 # Variables
 
@@ -45,10 +52,10 @@ def chargerscorespom():
         with open("db/scoresPom.db", "rb") as fichierScoresPom:
             unpickler = pickle.Unpickler(fichierScoresPom)
             scoresPom = unpickler.load()
-            print("Chargement: scoresPom chargé avec succès")
+            print("Chargement: scoresPom chargé avec succès\n")
     except:
         scoresPom = {}
-        print("Chargement: base de données scoresPom vide")
+        print("Chargement: base de données scoresPom vide\n")
     return scoresPom
 
 def sauverscorespom():
@@ -60,12 +67,16 @@ def sauverscorespom():
 def ajouterscorespom(min, max, joueur, score):
     global scoresPom
 
-    print(scoresPom)
+    for elements in scoresPom:
+    	scorePomSplit = scoresPom.split("-")
+    	scoresPomATrier = scorePomSplit[0] + scoresPomSplit[2]
+    	scoresPomTries = sorted(scoresPomATrier)
+
+    print(scoresPomTries)
 
     if str(min) + "-" + str(max) not in scoresPom:
     	scoresPom[str(min) + "-" + str(max)] = {}
     	scoresPom[str(min) + "-" + str(max)][joueur] = score
-    	print("le premier if")
     elif joueur not in scoresPom[str(min) + "-" + str(max)]:
     	scoresPom[str(min) + "-" + str(max)][joueur] = score     # TODO
     elif score < scoresPom[str(min) + "-" + str(max)][joueur]:   # Checker si la clé existe
@@ -74,12 +85,22 @@ def ajouterscorespom(min, max, joueur, score):
 def print_scores():
     global scoresPom
     message = ""
-    print(scoresPom)
+
+    scoresPom = sorted(scoresPom, key=cmp_to_key(comparer))
+
     for minmax, scoreitems in scoresPom.items():
         message += "**" + minmax + "**\n"
         for player, score in scoreitems.items(): 
             message += str(player) + ": " + str(score) + " essais\n"
-    return message
+    return 
+
+def comparer(arg1, arg2):
+	if int(arg1.split("-")[0] + arg1.split("-")[1]) > int(arg2.split("-")[0] + arg2.split("-")[0]):
+		return 1
+	elif int(arg1.split("-")[0] + arg1.split("-")[1]) > int(arg2.split("-")[0] + arg2.split("-")[0]):
+		return -1
+	else:
+		return 0
 
 
 # /Fonctions
@@ -285,6 +306,8 @@ async def on_message(message): # Dès qu'il y a un message
 			reportsFile.write(strReport + "\n")
 		await client.send_message(thedevkiller, strReport)
 		print("Report: fait par " + message.author.name + ". Voir reports.txt.\n")
+
+		# Speedtest
 	elif message.content.startswith(prefixe + "speedtest"):
 		messageChargement = await client.send_message(message.channel, "Recherche du meilleur serveur ...")
 		test = speedtest.Speedtest()
@@ -298,7 +321,14 @@ async def on_message(message): # Dès qu'il y a un message
 		await client.send_message(message.channel, "Voilà ma bonne connexion de campagnard\n" + url)
 		print("Speedtest: fait par " + message.author.name + ". Les résultats sont " + test.results.share() + "\n")
 
-		#Si on mentionne le bot
+		# Chat
+	elif message.content.startswith(prefixe + "chat"):
+		chaturl = "http://thecatapi.com/api/images/get?api_key=" + catkey
+		req = Request(chaturl, headers={'User-Agent': "Bot"})
+		resultchat = urlopen(req).geturl()
+		await client.send_message(message.channel, resultchat)
+
+		# Si on mentionne le bot
 	elif client.user.mentioned_in(message) and message.author != client.user:
 
 		print("Discussion:" + message.author.name + " discute avec </TheBotKiller>.\n")
@@ -400,4 +430,14 @@ async def on_message(message): # Dès qu'il y a un message
 async def on_member_join(member):
 	await client.send_message(401668766683103233, )
 
+# try:
+# 	client.run(token)
+# except:
+# 	leBotEstCo = False
+# 	while leBotEstCo == False:
+# 		try:
+# 			client.run(token)
+# 			leBotEstCo = True
+# 		except:
+# 			pass
 client.run(token)
