@@ -11,6 +11,8 @@ import speedtest
 import pickle
 from functools import cmp_to_key
 from urllib.request import urlopen, Request
+import requests
+import os
 
 # /Imports
 
@@ -39,11 +41,19 @@ Si vous voulez, vous pouvez discuter avec moi :smiley:. Mentionnez-moi et si je 
 `shifumi <élément>`: Joue avec moi au shifumi !
 `+- <min> <max>`: Joue avec moi au plus ou moins !
 `speedtest`: Ma bonne connexion à la campagne :stuck_out_tongue:
+`chat`: Des chats trop mignons :heart_eyes:
 """
 
 # /Variables
 
 # Fonctions
+
+def dlimg(url, filename):
+	headers = {'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36"}
+	image = requests.Session().get(url, headers=headers).content
+	with open(filename, "w+b") as fichierImage:
+		fichierImage.write(image)
+
 
 def chargerscorespom():
     global scoresPom
@@ -318,7 +328,10 @@ async def on_message(message): # Dès qu'il y a un message
 		test.upload()
 		url = test.results.share()
 		await client.delete_message(messageChargement)
-		await client.send_message(message.channel, "Voilà ma bonne connexion de campagnard\n" + url)
+		await client.send_message(message.channel, "Voilà ma bonne connexion de campagnard")
+		dlimg(test.results.share(), "speedtest.png")
+		await client.send_file(message.channel, "speedtest.png")
+		os.remove("speedtest.png")
 		print("Speedtest: fait par " + message.author.name + ". Les résultats sont " + test.results.share() + "\n")
 
 		# Chat
@@ -326,7 +339,10 @@ async def on_message(message): # Dès qu'il y a un message
 		chaturl = "http://thecatapi.com/api/images/get?api_key=" + catkey
 		req = Request(chaturl, headers={'User-Agent': "Bot"})
 		resultchat = urlopen(req).geturl()
-		await client.send_message(message.channel, resultchat)
+		dlimg(resultchat, "resultchat.png")
+		await client.send_file(message.channel, "resultchat.png")
+		os.remove("resultchat.png")
+		print("Chat: " + message.author.name + " a demandé un chat")
 
 		# Si on mentionne le bot
 	elif client.user.mentioned_in(message) and message.author != client.user:
