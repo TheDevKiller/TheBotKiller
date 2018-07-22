@@ -39,7 +39,7 @@ Si vous voulez, vous pouvez discuter avec moi :smiley:. Mentionnez-moi et si je 
 
 :tools: **Utilitaires** :tools:
 
-`report`: Je bug ? Je vous envoie une erreur ? Je triche ? Faites-le moi savoir grâce à cette commande avec l'erreur si il y en a une :wink:
+`report`: Reporter les bugs
 `help`: Affiche cette page d'aide
 `code`: Mon code sur Github
 `speedtest`: Ma bonne connexion à la campagne :stuck_out_tongue:
@@ -434,7 +434,7 @@ async def on_message(message): # Dès qu'il y a un message
 
 	elif message.content.startswith(prefixe + "neko"):
 		arg = message.content.split(" ")[1]
-		await client.send_message(message.channel, nekos.img((agr)))
+		await client.send_message(message.channel, nekos.img((arg)))
 
 	elif re.match(".*mraw.*", message.content.lower()) and message.author != client.user:
 		await client.send_message(message.channel, "MRAW !!!")
@@ -470,11 +470,6 @@ async def on_message(message): # Dès qu'il y a un message
 			# Tu fais quoi ?
 		elif re.match(".*" + client.user.mention + ".? tu (fais|fait|fai) (quoi|koi).*", message.content) or re.match(".*tu (fais|fait|fai) (quoi|koi).? " + client.user.mention + ".*", message.content.lower()):
 			await client.send_message(message.channel, "J'aide les gens, je joue et je discute avec eux :smiley:")
-
-			# Insultes
-		elif re.match(".*(tg|ta gueule|connard|connasse| con |taggle|fils de chien|enculé|batard|bâtard|pute|emmerde|salope|salaud|nique ta mère).{0,10}" + client.user.mention + ".*", message.content.lower()) or re.match(".*" + client.user.mention + ".{0,15}(tg|ta gueule|connard| con |fils de chien|enculé|batard|bâtard|pute|emmerde|stupide|salope|salaud|nique ta mère).*", message.content.lower()) or re.match(".*" + client.user.mention + ".{0,2} .{0,11} con$", message.content.lower()):
-			await client.send_message(message.channel, "Pourquoi tu m'insulte ? :cry:")
-			insulte = True
 
 			# C'est quoi ton code ?
 		elif re.match(".*(c|c'est) (koi|quoi) ton (code|cod).*" + client.user.mention + ".*", message.content.lower()) or re.match(".*" + client.user.mention + ".*(c|c'est) (koi|quoi) ton (code|cod).*", message.content.lower()):
@@ -512,10 +507,6 @@ async def on_message(message): # Dès qu'il y a un message
 			await client.send_message(message.channel, "Tu peux répéter ? Je n'ai pas très bien compris :neutral_face:")
 			print("Discussion: " + message.author.name + " a dit " + message.content + ". </TheBotKiller> n'a pas compris :/\n")
 
-			# Insultes
-	elif re.match(".*(taggle|ta geule|tg|conar|connar|conard|connard|connasse|conase|connase|conasse|bâtard|batard|batar| con |emmerde|pute|fils de chien|stupide|salope|salaud|nique ta mère|putain|merde|enculé).*", message.content.lower()) or re.match("^con .*", message.content.lower()) or re.match(".* con$", message.content.lower()) or re.match("^con$", message.content.lower()):
-			await client.send_message(message.channel, "C'est pas bien de dire des gros mots :stuck_out_tongue_winking_eye: !")
-
 			# Cheh !
 	elif re.match(".*cheh.*", message.content.lower()) and message.author == thedevkiller:
 		await client.send_message(message.channel, "Cheh !")
@@ -545,14 +536,4 @@ async def on_message(message): # Dès qu'il y a un message
 async def on_member_join(member):
 	await client.send_message(401668766683103233, )
 
-# try:
-# 	client.run(token)
-# except:
-# 	leBotEstCo = False
-# 	while leBotEstCo == False:
-# 		try:
-# 			client.run(token)
-# 			leBotEstCo = True
-# 		except:
-# 			pass
 client.run(token)
