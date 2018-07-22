@@ -37,13 +37,26 @@ commandes = \
 """
 Si vous voulez, vous pouvez discuter avec moi :smiley:. Mentionnez-moi et si je ne suis pas trop occupé, je vous répondrais peut-être :wink:)
 
-`report`: Je bug ? Je vous envoie une erreur ? Je triche ? Faites-le moi savoir grâce à cette commande avec l'erreur si il y en a une :wink:
+:tools: **Utilitaires** :tools:
 
+`report`: Je bug ? Je vous envoie une erreur ? Je triche ? Faites-le moi savoir grâce à cette commande avec l'erreur si il y en a une :wink:
 `help`: Affiche cette page d'aide
 `code`: Mon code sur Github
+`speedtest`: Ma bonne connexion à la campagne :stuck_out_tongue:
+
+:ping_pong: **Jeux** :ping_pong:
+
 `shifumi <élément>`: Joue avec moi au shifumi !
 `+- <min> <max>`: Joue avec moi au plus ou moins !
-`speedtest`: Ma bonne connexion à la campagne :stuck_out_tongue:
+
+:notes: **Musique** :notes:
+
+`play <recherche>`: Me connect au salon et joue de la musique
+`stop`: Arrête la musique
+`disconnect`: Me déconnecte du canal audio
+
+:question: **Inutile** :question:
+
 `chat`: Des chats trop mignons :heart_eyes:
 """
 
