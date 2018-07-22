@@ -16,6 +16,7 @@ import os
 import nekos
 from html import unescape
 import json
+from subprocess import call
 
 # /Imports
 
@@ -365,6 +366,7 @@ async def on_message(message): # Dès qu'il y a un message
 		strReport = ""
 		for elements in report:
 		 	strReport += elements + " "
+		strReport += "\n" + message.author.name
 		strReport = strReport.capitalize()
 		with open("reports.txt", "a") as reportsFile:
 			reportsFile.write(strReport + "\n")
@@ -439,7 +441,9 @@ async def on_message(message): # Dès qu'il y a un message
 	elif re.match(".*mraw.*", message.content.lower()) and message.author != client.user:
 		await client.send_message(message.channel, "MRAW !!!")
 
-	# elif message.content.startswith(message.channel, "reboot"):
+	elif message.content.startswith(prefixe + "reboot"):
+		print("Connexion: Redémarre ...")
+		call(["./reboot.sh"])
 
 		
 
