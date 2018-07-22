@@ -13,6 +13,9 @@ from functools import cmp_to_key
 from urllib.request import urlopen, Request
 import requests
 import os
+import nekos
+from html import unescape
+import json
 
 # /Imports
 
@@ -23,10 +26,10 @@ with open("token.txt", "r") as tokenFile:
 
 # /Token
 
-# TheCatApiKey
+# Youtube API
 
-with open("catapikey.txt", "r") as catapikeyFile:
-	catkey = catapikeyFile.read()
+with open("youtubeapikey.txt", "r") as ytKeyFile:
+	ytkey = ytKeyFile.read()
 
 # Variables
 
@@ -44,6 +47,8 @@ Si vous voulez, vous pouvez discuter avec moi :smiley:. Mentionnez-moi et si je 
 `chat`: Des chats trop mignons :heart_eyes:
 """
 
+queue = []
+
 # /Variables
 
 # Fonctions
@@ -53,6 +58,12 @@ Si vous voulez, vous pouvez discuter avec moi :smiley:. Mentionnez-moi et si je 
 # 	image = requests.Session().get(url, headers=headers).content
 # 	with open(filename, "w+b") as fichierImage:
 # 		fichierImage.write(image)
+
+def getUrl(url) :
+	req = Request(url, headers={'User-Agent': "Bot"})
+	result = urlopen(req)
+	result = unescape(result.read().decode("utf-8"))
+	return json.loads(result)
 
 
 def chargerscorespom():
@@ -121,6 +132,8 @@ print("\nConnexion: Chargement de </TheBotKiller> ...")
 
 client = discord.Client()
 
+voiceclient = discord.VoiceClient
+
 plusoumoins = False
 
 @client.event
@@ -132,7 +145,7 @@ async def on_ready():
 	await client.change_presence(game=discord.Game(name="&help (ou prefixe + help)"))
 	chargerscorespom()
 
-# /ConnexionCheh !
+# /Connexion
 
 @client.event
 async def on_message(message): # Dès qu'il y a un message
@@ -144,6 +157,34 @@ async def on_message(message): # Dès qu'il y a un message
 	global insulte
 	
 	global scoresPom
+
+	global speedtestEnCours
+
+	global player
+
+	global voice
+
+	global queue
+
+	try:
+		queue
+	except:
+		queue = []
+
+	try:
+		voice
+	except:
+		voice = None
+
+	try:
+		player
+	except:
+		player = None
+
+	try:
+		speedtestEnCours
+	except:
+		speedtestEnCours = False
 
 	try:
 		insulte
@@ -319,29 +360,75 @@ async def on_message(message): # Dès qu'il y a un message
 
 		# Speedtest
 	elif message.content.startswith(prefixe + "speedtest"):
-		messageChargement = await client.send_message(message.channel, "Recherche du meilleur serveur ...")
-		test = speedtest.Speedtest()
-		test.get_best_server()
-		await client.edit_message(messageChargement, "Mesure du débit descendant")
-		test.download()
-		await client.edit_message(messageChargement, "Mesure du débit montant")
-		test.upload()
-		url = test.results.share()
-		await client.delete_message(messageChargement)
-		em = discord.Embed(title="** **Voilà ma bonne connexion de campagnard", color=0x012ea0)
-		em.set_image(url=test.results.share())
-		await client.send_message(message.channel, embed=em)
-		print("Speedtest: fait par " + message.author.name + ". Les résultats sont " + test.results.share() + "\n")
+		if speedtestEnCours == False:
+			speedtestEnCours = True
+			messageChargement = await client.send_message(message.channel, "Recherche du meilleur serveur ...")
+			test = speedtest.Speedtest()
+			test.get_best_server()
+			await client.edit_message(messageChargement, "Mesure du débit descendant")
+			test.download()
+			await client.edit_message(messageChargement, "Mesure du débit montant")
+			test.upload()
+			url = test.results.share()
+			await client.delete_message(messageChargement)
+			em = discord.Embed(title="** **Voilà ma bonne connexion de campagnard", color=0x012ea0)
+			em.set_image(url=test.results.share())
+			await client.send_message(message.channel, embed=em)
+			print("Speedtest: fait par " + message.author.name + ". Les résultats sont " + test.results.share() + "\n")
+			speedtestEnCours = False
+		else:
+			await client.send_message(message.channel, "Vous avez essayé de faire un speedtest, mais un autre était déjà en cours. Veuillez réessayer")
 
 		# Chat
 	elif message.content.startswith(prefixe + "chat"):
-		chaturl = "http://thecatapi.com/api/images/get?api_key=" + catkey
+		chaturl = nekos.cat()
 		req = Request(chaturl, headers={'User-Agent': "Bot"})
 		resultchat = urlopen(req).geturl()
 		em = discord.Embed(color=0xFF9100)
 		em.set_image(url=resultchat)
 		await client.send_message(message.channel, embed=em)
 		print("Chat: " + message.author.name + " a demandé un chat\n")
+
+		# Musique
+	elif message.content.startswith(prefixe + "play"):
+
+		global lanceurmusique
+		lanceurmusique = message.author
+
+		recherchelist = message.content.split(" ")[1:]
+		recherche = ""
+		for index, elements in enumerate(recherchelist):
+			if index != 0:
+				recherche += "+" + elements
+			else:
+				recherche += elements
+		jsonyt = getUrl("https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&q=" + recherche + "&key=" + ytkey)["items"][0]["id"]
+		try:
+			videoId = jsonyt["videoId"]
+		except:
+			await client.send_message(message.channel, "Le résultat trouvé n'est pas une vidéo.")
+		url = "https://www.youtube.com/watch?v=" + videoId
+		try:
+			voice = await client.join_voice_channel(message.author.voice.voice_channel)
+		except:
+			pass
+		player = await voice.create_ytdl_player(url=url)
+		player.start()
+
+	elif message.content.startswith(prefixe + "stop"): player.stop()
+		
+	elif message.content.startswith(prefixe + "disconnect"): await voice.disconnect()
+
+	elif message.content.startswith(prefixe + "neko"):
+		arg = message.content.split(" ")[1]
+		await client.send_message(message.channel, nekos.img((agr)))
+
+	elif re.match(".*mraw.*", message.content.lower()) and message.author != client.user:
+		await client.send_message(message.channel, "MRAW !!!")
+
+	# elif message.content.startswith(message.channel, "reboot"):
+
+		
 
 		# Si on mentionne le bot
 	elif client.user.mentioned_in(message) and message.author != client.user:
@@ -393,7 +480,7 @@ async def on_message(message): # Dès qu'il y a un message
 			await client.send_message(message.channel, "Bon allez je te pardonne :wink:")
 
 			# Dis un message
-		elif re.match('.*' + client.user.mention + '.? dis ".*', message.content.lower()):
+		elif re.match('.*' + client.user.mention + '.? dis ".*', message.content.lower()) and message.author != client.user:
 			if re.match('.*dis ".*" à .* en privé.*', message.content.lower()):
 				recherche = re.search('.*dis "(.*)" à (.*) ', message.content.lower())
 				for elements in recherche:
