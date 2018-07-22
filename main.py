@@ -471,6 +471,11 @@ async def on_message(message): # Dès qu'il y a un message
 		elif re.match(".*" + client.user.mention + ".? tu (fais|fait|fai) (quoi|koi).*", message.content) or re.match(".*tu (fais|fait|fai) (quoi|koi).? " + client.user.mention + ".*", message.content.lower()):
 			await client.send_message(message.channel, "J'aide les gens, je joue et je discute avec eux :smiley:")
 
+			# Insultes
+		elif re.match(".*(tg|ta gueule|connard|connasse| con |taggle|fils de chien|enculé|batard|bâtard|pute|emmerde|salope|salaud|nique ta mère).{0,10}" + client.user.mention + ".*", message.content.lower()) or re.match(".*" + client.user.mention + ".{0,15}(tg|ta gueule|connard| con |fils de chien|enculé|batard|bâtard|pute|emmerde|stupide|salope|salaud|nique ta mère).*", message.content.lower()) or re.match(".*" + client.user.mention + ".{0,2} .{0,11} con$", message.content.lower()):
+			await client.send_message(message.channel, "Pourquoi tu m'insulte ? :cry:")
+			insulte = True
+
 			# C'est quoi ton code ?
 		elif re.match(".*(c|c'est) (koi|quoi) ton (code|cod).*" + client.user.mention + ".*", message.content.lower()) or re.match(".*" + client.user.mention + ".*(c|c'est) (koi|quoi) ton (code|cod).*", message.content.lower()):
 			await client.send_message(message.channel, "https://github.com/TheDevKiller/TheBotKiller")
