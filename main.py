@@ -44,6 +44,7 @@ Si vous voulez, vous pouvez discuter avec moi :smiley:. Mentionnez-moi et si je 
 `help`: Affiche cette page d'aide
 `code`: Mon code sur Github
 `speedtest`: Ma bonne connexion à la campagne :stuck_out_tongue:
+`translate <langue source> <langue cible> <texte>`: Traduction
 
 :ping_pong: **Jeux** :ping_pong:
 
@@ -61,7 +62,11 @@ Si vous voulez, vous pouvez discuter avec moi :smiley:. Mentionnez-moi et si je 
 `chat`: Des chats trop mignons :heart_eyes:
 """
 
+flags = ['ac', 'ad', 'ae', 'af', 'ag', 'ai', 'al', 'am', 'ao', 'aq', 'ar', 'as', 'at', 'au', 'aw', 'ax', 'az', 'ba', 'bb', 'bd', 'be', 'bf', 'bg', 'bh', 'bi', 'bj', 'bm', 'bn', 'bo', 'br', 'bs', 'bt', 'bw', 'by', 'bz', 'ca', 'cc', 'cd', 'cf', 'cg', 'ch', 'ci', 'ck', 'cl', 'cm', 'cn', 'co', 'cr', 'cu', 'cv', 'cw', 'cx', 'cy', 'cz', 'de', 'dj', 'dk', 'dm', 'do', 'dz', 'ec', 'ee', 'eg', 'er', 'es', 'et', 'eu', 'fi', 'fj', 'fm', 'fo', 'fr', 'ga', 'gb', 'gd', 'ge', 'gg', 'gh', 'gi', 'gl', 'gm', 'gn', 'gq', 'gr', 'gt', 'gu', 'gw', 'gy', 'hk', 'hn', 'hr', 'ht', 'hu', 'ic', 'id', 'ie', 'il', 'im', 'in', 'io', 'iq', 'ir', 'is', 'it', 'je', 'jm', 'jo', 'jp', 'ke', 'kg', 'kh', 'ki', 'km', 'kn', 'kp', 'kr', 'kw', 'ky', 'kz', 'la', 'lb', 'lc', 'li', 'lk', 'lr', 'ls', 'lt', 'lu', 'lv', 'ly', 'ma', 'mc', 'md', 'me', 'mg', 'mh', 'mk', 'ml', 'mm', 'mn', 'mo', 'mp', 'mr', 'ms', 'mt', 'mu', 'mv', 'mw', 'mx', 'my', 'mz', 'na', 'ne', 'nf', 'ng', 'ni', 'nl', 'no', 'np', 'nr', 'nu', 'nz', 'om', 'pa', 'pe', 'pf', 'pg', 'ph', 'pk', 'pl', 'pn', 'pr', 'ps', 'pt', 'pw', 'py', 'qa', 'ro', 'rs', 'ru', 'rw', 'sa', 'sb', 'sc', 'sd', 'se', 'sg', 'sh', 'si', 'sk', 'sl', 'sm', 'sn', 'so', 'sr', 'ss', 'st', 'sv']
+
 queue = []
+
+headers = {"User-Agent": "Je suis un gentil bot qui vient en paix ^^"}
 
 # /Variables
 
@@ -74,7 +79,7 @@ queue = []
 # 		fichierImage.write(image)
 
 def getUrl(url) :
-	req = Request(url, headers={'User-Agent': "Bot"})
+	req = Request(url, headers=headers)
 	result = urlopen(req)
 	result = unescape(result.read().decode("utf-8"))
 	return json.loads(result)
@@ -137,6 +142,12 @@ def comparer(arg1, arg2):
 	else:
 		return 0
 
+def translate(source, cible, chaine):
+	url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=" + source + "&tl=" + cible + "&dt=t&q=" + chaine
+	print(url)
+	tradlist = requests.get(url, headers=headers).json()
+	trad = tradlist[0][0][0]
+	return trad
 
 # /Fonctions
 
@@ -163,6 +174,8 @@ async def on_ready():
 
 @client.event
 async def on_message(message): # Dès qu'il y a un message
+
+	if message.author == client.user: return
 
 	global plusoumoins
 
@@ -223,7 +236,6 @@ async def on_message(message): # Dès qu'il y a un message
 		print("Code: demandé par " + message.author.name + "\n")
 
 		# Shifumi
-
 	elif message.content.startswith(prefixe + "shifumi"): # Commence une partie de Shifumi
 
 		print("Shifumi: partie commencée entre " + message.author.name + " et </TheBotKiller>")
@@ -361,7 +373,7 @@ async def on_message(message): # Dès qu'il y a un message
 		print('Discussion: </TheBotKiller> a dit "' + messageADire + '"\n')
 
 			# Report
-	elif message.content.startswith(prefixe + "report") and message.author != client.user:
+	elif message.content.startswith(prefixe + "report"):
 		report = message.content.split(" ")[1:]
 		strReport = ""
 		for elements in report:
@@ -397,7 +409,7 @@ async def on_message(message): # Dès qu'il y a un message
 		# Chat
 	elif message.content.startswith(prefixe + "chat"):
 		chaturl = nekos.cat()
-		req = Request(chaturl, headers={'User-Agent': "Bot"})
+		req = Request(chaturl, headers=headers)
 		resultchat = urlopen(req).geturl()
 		em = discord.Embed(color=0xFF9100)
 		em.set_image(url=resultchat)
@@ -430,25 +442,46 @@ async def on_message(message): # Dès qu'il y a un message
 		player = await voice.create_ytdl_player(url=url)
 		player.start()
 
+		# Stop
 	elif message.content.startswith(prefixe + "stop"): player.stop()
 		
+		# Disconnect
 	elif message.content.startswith(prefixe + "disconnect"): await voice.disconnect()
 
+		# Neko
 	elif message.content.startswith(prefixe + "neko"):
 		arg = message.content.split(" ")[1]
 		await client.send_message(message.channel, nekos.img((arg)))
 
-	elif re.match(".*mraw.*", message.content.lower()) and message.author != client.user:
+		# MRAW !!!
+	elif re.match(".*mraw.*", message.content.lower()):
 		await client.send_message(message.channel, "MRAW !!!")
 
-	elif message.content.startswith(prefixe + "reboot"):
+		# Reboot
+	elif message.content.startswith(prefixe + "reboot") and message.author == thedevkiller:
 		print("Connexion: Redémarre ...")
 		call(["./reboot.sh"])
 
-		
+		# Translate
+	elif message.content.startswith(prefixe + "translate"):
+		langue1 = message.content.split(" ")[1]
+		langue2 = message.content.split(" ")[2]
+		chaineListe = message.content.split(" ")[3:]
+		chaine = ""
+		for elements in chaineListe:
+			chaine += elements + " "
+		try:
+			await client.send_message(message.channel, embed=discord.Embed(title="Traduction", description=langue1.capitalize() + ": " + chaine.capitalize() + "\n" + langue2.capitalize() + ": " + translate(langue1, langue2, chaine).capitalize(), colour=0xffffff))
+			# if langue1 in flags and langue2 in flags:
+			# 	em = discord.Embed(title="Traduction", description=":flag_" + langue1 + ":: " + chaine + "\n" + ":flag_" + langue2 + ":: " + translate(langue1, langue2, chaine))
+			# 	await client.send_message(message.channel, embed=em)
+			# else:
+			# 	await client.send_message(message.channel, embed=discord.Embed(title="Traduction", ))
+		except:
+		 	await client.send_message(message.channel, "Spécifie une langue correcte avec ses deux premiers caractères (exemple: french => fr, english => en) s'il te plaît :wink:")
 
 		# Si on mentionne le bot
-	elif client.user.mentioned_in(message) and message.author != client.user:
+	elif client.user.mentioned_in(message):
 
 		print("Discussion:" + message.author.name + " discute avec </TheBotKiller>.\n")
 
@@ -497,7 +530,7 @@ async def on_message(message): # Dès qu'il y a un message
 			await client.send_message(message.channel, "Bon allez je te pardonne :wink:")
 
 			# Dis un message
-		elif re.match('.*' + client.user.mention + '.? dis ".*', message.content.lower()) and message.author != client.user:
+		elif re.match('.*' + client.user.mention + '.? dis ".*', message.content.lower()):
 			if re.match('.*dis ".*" à .* en privé.*', message.content.lower()):
 				recherche = re.search('.*dis "(.*)" à (.*) ', message.content.lower())
 				for elements in recherche:
@@ -535,7 +568,7 @@ async def on_message(message): # Dès qu'il y a un message
 			await client.send_message(message.chanel, "Ok")
 			questioncava = False
 
-	elif insulte == True and message.author != client.user:
+	elif insulte == True:
 		await client.send_message(message.channel, "C'est pas une raison ! :rage:")
 		insulte = False
 
@@ -543,6 +576,6 @@ async def on_message(message): # Dès qu'il y a un message
 		await client.send_message(client.get_channel(401676021469937667), "Bon appétit " + message.author.mention)
 
 async def on_member_join(member):
-	await client.send_message(401668766683103233, )
+	await client.send_message("401668766683103233", "Bienvenue " + member.mention)
 
 client.run(token)
