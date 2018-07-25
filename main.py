@@ -17,6 +17,8 @@ import nekos
 from html import unescape
 import json
 from subprocess import call
+import base64
+import qrcode
 
 # /Imports
 
@@ -44,7 +46,9 @@ Si vous voulez, vous pouvez discuter avec moi :smiley:. Mentionnez-moi et si je 
 `help`: Affiche cette page d'aide
 `code`: Mon code sur Github
 `speedtest`: Ma bonne connexion à la campagne :stuck_out_tongue:
-`translate <langue source> <langue cible> <texte>`: Traduction
+`traduire <langue source> <langue cible> <texte>`: Traduction
+`convertir <unité> <unité> <chaine>`: Converti la chaine de la première unité en la deuxième. Encode et decode aussi.
+`qr <chaine>`: Génère un QR Code avec la chaine. Peut être
 
 :ping_pong: **Jeux** :ping_pong:
 
@@ -53,9 +57,9 @@ Si vous voulez, vous pouvez discuter avec moi :smiley:. Mentionnez-moi et si je 
 
 :notes: **Musique** :notes:
 
-`play <recherche>`: Me connect au salon et joue de la musique
+`play <recherche>`: Me connecte à votre salon et joue de la musique
 `stop`: Arrête la musique
-`disconnect`: Me déconnecte du canal audio
+`disconnect`: Me déconnecte des salons vocaux
 
 :question: **Inutile** :question:
 
@@ -69,6 +73,13 @@ queue = []
 headers = {"User-Agent": "Je suis un gentil bot qui vient en paix ^^"}
 
 # /Variables
+
+qr = qrcode.QRCode(
+	version=1,
+	error_correction=qrcode.constants.ERROR_CORRECT_L,
+	box_size=10,
+	border=2
+)
 
 # Fonctions
 
@@ -463,7 +474,7 @@ async def on_message(message): # Dès qu'il y a un message
 		call(["./reboot.sh"])
 
 		# Translate
-	elif message.content.startswith(prefixe + "translate"):
+	elif message.content.startswith(prefixe + "traduire"):
 		langue1 = message.content.split(" ")[1]
 		langue2 = message.content.split(" ")[2]
 		chaineListe = message.content.split(" ")[3:]
@@ -479,6 +490,53 @@ async def on_message(message): # Dès qu'il y a un message
 			# 	await client.send_message(message.channel, embed=discord.Embed(title="Traduction", ))
 		except:
 		 	await client.send_message(message.channel, "Spécifie une langue correcte avec ses deux premiers caractères (exemple: french => fr, english => en) s'il te plaît :wink:")
+
+		 	# Convertir
+	elif message.content.startswith(prefixe + "convertir"):
+		unite1 = message.content.split(" ")[1]
+		unite2 = message.content.split(" ")[2]
+		chaine = ""
+		for elements in message.content.split(" ")[3:]:
+			chaine += elements + " "
+		if unite1 == "ascii" and unite2 == "base64":
+			encode = base64.b64encode(str.encode(chaine))
+			await client.send_message(message.channel, encode.decode())
+		elif unite1 == "base64" and unite2 == "ascii":
+			decode = base64.b64decode(str.encode(chaine))
+			await client.send_message(message.channel, decode.decode().capitalize())
+		elif unite1 == "ascii" and unite2 == "bin":
+			encode = ' '.join(format(ord(x), 'b') for x in chaine)
+			await client.send_message(message.channel, encode)
+		elif unite1 == "bin" and unite2 == "ascii":
+			chaine = int(chaine, 2)
+			chaine.to_bytes((chaine.bit_length() + 7) // 8, "big").decode("utf-8", "surogatepass") or "\0"
+			msg = ""
+			for elements in chaine:
+				for element in elements[::2]:
+					msg += chr(element)
+		else:
+			await client.send_message(message.channel, "Désolé mais je ne connais pas ces unités :confused:")
+
+			# QR Code
+	elif message.content.startswith(prefixe + "qr"):
+		chaineListe = message.content.split(" ")[1:]
+		chaine = ""
+		for elements in chaineListe:
+			chaine += elements + " "
+		qr.add_data(chaine)
+		qr.make(fit=True)
+		img = qr.make_image(fill_color="black", back_color="white")
+		img.save("qr.png")
+		await client.send_file(message.channel, "qr.png")
+		await client.send_message(message.channel, chaine)
+		os.remove("qr.png")
+
+		# OCR
+	elif message.content.startswith(prefixe + "ocr"):
+		url = message.attachments[0]["url"]
+		image = requests.Session().get(url).content
+		with open("ocr.png", "wb") as ocrimage:
+			ocrimage.write(image)
 
 		# Si on mentionne le bot
 	elif client.user.mentioned_in(message):
