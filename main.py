@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-#coding: utf8
+# -*- coding: utf8 -*-
 
 # Imports
 
@@ -16,9 +16,14 @@ import os
 import nekos
 from html import unescape
 import json
-from subprocess import call
+from subprocess import call, run
 import base64
 import qrcode
+import pytesseract
+from PIL import Image
+from pydub import AudioSegment
+import sys
+import traceback
 
 # /Imports
 
@@ -49,6 +54,12 @@ Si vous voulez, vous pouvez discuter avec moi :smiley:. Mentionnez-moi et si je 
 `traduire <langue source> <langue cible> <texte>`: Traduction
 `convertir <unité> <unité> <chaine>`: Converti la chaine de la première unité en la deuxième. Encode et decode aussi.
 `qr <chaine>`: Génère un QR Code avec la chaine. Peut être
+`ocr`: Poster une image avec la commande en commentaire. Vous donne son 
+`tts <chaine>`: Dis votre texte grâce à la synthèse vocale :smiley:
+`lower <chaine`: Passe le texte en minuscules
+`upper <chaine`: Passe le texte en majuscules
+`capitalize <chaine>`: Ajoute la majuscule à la première lettre et le reste en minuscules
+`title <chaine>`: Ajoute une majuscule à chaque mot
 
 :ping_pong: **Jeux** :ping_pong:
 
@@ -179,14 +190,26 @@ async def on_ready():
 	thedevkiller = await client.get_user_info("436105272310759426")
 	print("Connexion: </TheBotKiller> est prêt à discuter avec les utilisateurs et à jouer avec eux !\n")
 	await client.change_presence(game=discord.Game(name="&help (ou prefixe + help)"))
+	# try:
+	# if sys.argv[1] == "reboot": await client.send_message(sys.argv[2], "Je suis réveillé :grin:")
+	# except:
+	# 	pass
 	chargerscorespom()
 
 # /Connexion
+
+# Erreurs
+
+@client.event
+async def on_error(event, *args, **kwargs):
+	await client.send_message(message.channel, traceback.format_exc())
+
 
 @client.event
 async def on_message(message): # Dès qu'il y a un message
 
 	if message.author == client.user: return
+	if "Bot" in [role.name for role in message.author.roles]: return
 
 	global plusoumoins
 
@@ -446,12 +469,14 @@ async def on_message(message): # Dès qu'il y a un message
 		except:
 			await client.send_message(message.channel, "Le résultat trouvé n'est pas une vidéo.")
 		url = "https://www.youtube.com/watch?v=" + videoId
+		queue.append(url)
 		try:
 			voice = await client.join_voice_channel(message.author.voice.voice_channel)
 		except:
 			pass
 		player = await voice.create_ytdl_player(url=url)
 		player.start()
+		print("\n")
 
 		# Stop
 	elif message.content.startswith(prefixe + "stop"): player.stop()
@@ -467,11 +492,6 @@ async def on_message(message): # Dès qu'il y a un message
 		# MRAW !!!
 	elif re.match(".*mraw.*", message.content.lower()):
 		await client.send_message(message.channel, "MRAW !!!")
-
-		# Reboot
-	elif message.content.startswith(prefixe + "reboot") and message.author == thedevkiller:
-		print("Connexion: Redémarre ...")
-		call(["./reboot.sh"])
 
 		# Translate
 	elif message.content.startswith(prefixe + "traduire"):
@@ -535,13 +555,108 @@ async def on_message(message): # Dès qu'il y a un message
 	elif message.content.startswith(prefixe + "ocr"):
 		url = message.attachments[0]["url"]
 		image = requests.Session().get(url).content
-		with open("ocr.png", "wb") as ocrimage:
+		fichier = message.attachments[0]["filename"]
+		with open(fichier, "wb") as ocrimage:
 			ocrimage.write(image)
+		texte = pytesseract.image_to_string(Image.open(fichier))
+		await client.send_message(message.channel, texte)
+		os.remove(fichier)
+
+		# TTS
+	elif message.content.startswith(prefixe + "tts"):
+		chaineliste = message.content.split(" ")[1:]
+		chaine = ""
+		for elements in chaineliste:
+			chaine += elements + "%20"
+		url = "http://api.voicerss.org/?key=c98f46f4fd494a07b3b64a021218b81c&hl=fr-fr&src=" + chaine
+		audio = requests.Session().get(url, headers=headers).content
+		with open("tts.mpga", "wb") as fichier:
+			fichier.write(audio)
+		#son = from_mpga("tts.mpga")
+		#son.export("tts.mp3", format="mp3")
+		await client.send_file(message.channel, "tts.mpga")
+
+		# Lower
+	elif message.content.startswith(prefixe + "lower"):
+		chaineliste = message.content.split(" ")[1:]
+		chaine = ""
+		for elements in chaineliste:
+			chaine += elements + " "
+		chaine = chaine.lower()
+		print(chaine)
+		await client.send_message(message.channel, chaine) 
+
+		# Upper
+	elif message.content.startswith(prefixe + "upper"):
+		chaineliste = message.content.split(" ")[1:]
+		chaine = ""
+		for elements in chaineliste:
+			chaine += elements + " "
+		chaine = chaine.upper()
+		print(chaine)
+		await client.send_message(message.channel, chaine)
+
+		# Capitalize
+	elif message.content.startswith(prefixe + "capitalize"):
+		chaineliste = message.content.split(" ")[1:]
+		chaine = ""
+		for elements in chaineliste:
+			chaine += elements + " "
+		chaine = chaine.capitalize()
+		print(chaine)
+		await client.send_message(message.channel, chaine)
+
+		# Title
+	elif message.content.startswith(prefixe + "title"):
+		chaineliste = message.content.split(" ")[1:]
+		chaine = ""
+		for elements in chaineliste:
+			chaine += elements + " "
+		chaine = chaine.title()
+		print(chaine)
+		await client.send_message(message.channel, chaine)
+
+		# Halt
+	elif message.content.startswith(prefixe + "halt"):
+		if message.author == thedevkiller:
+			await client.send_message(message.channel, "Arrêt du bot ...")
+			print("*Se couche* ...\n")
+			client.logout()
+			sys.exit(0)
+			await client.send_message(message.channel, "Le bot est censé être arrêté donc si tu vois ce message, c'est pas normal")
+		else:
+			await client.send_message(message.channel, "Nan, j'ai pas trop envie de dormir là :neutral_face:")
+
+		# Reboot
+	elif message.content.startswith(prefixe + "reboot"):
+		if message.author == thedevkiller:
+			await client.send_message(message.channel, "Je reviens vite :wave:")
+			await client.logout()
+			run(["./reboot.sh", "401676021469937667"], shell=True)
+			sys.exit(0)
+		else:
+			await client.send_message(message.channel, "Nope, je reste :smirk:")
+
+		# Erreur
+	elif message.content.startswith(prefixe + "erreur"):
+		await client.send_message(erreur, xD)
+
+		# Ah !
+	elif message.content.startswith(prefixe + "ah"):
+		await client.send_message(message.channel, "http://s-www.lejsl.com/images/F9B1E1C0-CEA5-47E2-B55E-2835C0B17765/COM_01/photo-1503481946.jpg")
+
+		# Obvious
+	elif message.content.startswith(prefixe + "obvious"):
+		await client.send_message(message.channel, "https://memegenerator.net/img/instances/66806969/thank-you-captain-obvious.jpg")
+
+		# Joke
+	elif message.content.startswith(prefixe + "joke"):
+		await client.send_message(message.channel, requests.Session().get("https://icanhazdadjoke.com/", headers={"Accept": "text/plain"}).content.decode("utf-8"))
 
 		# Si on mentionne le bot
 	elif client.user.mentioned_in(message):
 
-		print("Discussion:" + message.author.name + " discute avec </TheBotKiller>.\n")
+		print("Discussion: " + message.author.name + " discute avec </TheBotKiller>.\n")
 
 		global demarreur
 		demarreur = message.author
@@ -594,6 +709,7 @@ async def on_message(message): # Dès qu'il y a un message
 				for elements in recherche:
 					print(str(elements))
 
+			# Oui ?
 		elif message == client.user.mention or message == client.user.mention + " ?":
 			await client.send_message("Oui ?")
 
