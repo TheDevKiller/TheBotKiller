@@ -27,33 +27,8 @@ import traceback
 # Secret #
 ##########
 
-with open("token.txt", "r") as tokenFile:
-	token = tokenFile.read()
-
-with open("youtubeapikey.txt", "r") as ytKeyFile:
-	ytkey = ytKeyFile.read()
-
-############
-# Globales #
-############
-
-global plusoumoins
-
-global questioncava
-
-global insulte
-	
-global scoresPom
-
-global speedtestEnCours
-
-global player
-
-global voice
-
-global queue
-
-global prefixe
+with open("secrets.json", "r") as fichier:
+	secrets = json.load(fichier)
 
 #############
 # Variables #
@@ -102,6 +77,9 @@ Si vous voulez, vous pouvez discuter avec moi :smiley:. Mentionnez-moi et si je 
 
 `dilemme <choix 1>, <choix 2>`: Si vous avez un dilemme ^^
 `chat`: Des chats trop mignons :heart_eyes:
+`ah`: Denis Brogniart
+`obvious`: Merci captain obvious !
+`non`: Mario qui dit non
 
 :notes: **Musique** :notes:
 
@@ -165,9 +143,9 @@ def getUrl(url) :
 	result = unescape(result.read().decode("utf-8"))
 	return json.loads(result)
 
-	##########
-	# + OU - #
-	##########
+	#################
+	# Scores + OU - #
+	#################
 
 def chargerscorespom():
     global scoresPom
@@ -250,24 +228,16 @@ async def on_ready():
 	thedevkiller = await client.get_user_info("436105272310759426")
 	print("Connexion: </TheBotKiller> est prêt à discuter avec les utilisateurs et à jouer avec eux !\n")
 	await client.change_presence(game=discord.Game(name="&help (ou prefixe + help)"))
-	# try:
-	# if sys.argv[1] == "reboot": await client.send_message(sys.argv[2], "Je suis de retour, pour vous jouer un mauvais tour :smiling_imp:")
-	# except:
-	# 	pass
+	try:
+		if sys.argv[1] == "reboot": await client.send_message(sys.argv[2], "Je suis de retour, pour vous jouer un mauvais tour :smiling_imp:")
+	except:
+		pass
 	chargerscorespom()
-
-####################
-# Autres fonctions #
-####################
 
 @client.event
 async def on_error(event, *args, **kwargs):
  	print(event)
  	await client.send_message(message.channel, traceback.format_exc())
-
-# Bienvenue #
-async def on_member_join(member):
-	await client.send_message(client.get_channel("401668766683103233"), "Bienvenue " + member.mention + " !")
 
 #############
 # Commandes #
@@ -275,6 +245,10 @@ async def on_member_join(member):
 
 @client.event
 async def on_message(message):
+
+	############
+	# Globales #
+	############
 
 	global plusoumoins
 
@@ -423,6 +397,15 @@ async def on_message(message):
 			#son.export("tts.mp3", format="mp3")
 			await client.send_file(message.channel, "tts.mpga")
 
+			# Flip
+		elif message.content.startswith(prefixe + "flip"):
+			dico = {"pile": "https://avocat-pau-lipsos.fr/wp-content/uploads/2016/08/250px-1_euro_pile.png",
+			"face": "http://fracademic.com/pictures/frwiki/49/1_euro_France.png"}
+			choix = random.choice(list(dico.keys()))
+			em = discord.Embed(title=choix.capitalize() + " !")
+			em.set_image(dico[choix])
+			await client.send_message(message.channel, embed=em)
+
 			########
 			# Jeux #
 			########
@@ -533,15 +516,25 @@ async def on_message(message):
 
 			# Ah !
 		elif message.content.startswith(prefixe + "ah"):
-			await client.send_message(message.channel, "http://s-www.lejsl.com/images/F9B1E1C0-CEA5-47E2-B55E-2835C0B17765/COM_01/photo-1503481946.jpg")
+			await client.send_file(message.channel, "img/ah.jpg")
+			print("Discussion: " + message.author.name + ": ah !")
 
 			# Obvious
 		elif message.content.startswith(prefixe + "obvious"):
-			await client.send_message(message.channel, "https://memegenerator.net/img/instances/66806969/thank-you-captain-obvious.jpg")
+			await client.send_file(message.channel, "img/obvious.jpg")
+			print("Discussion: " + message.author.name + ": Merci captain obvious !")
+
+			# Non
+		elif message.content.startswith(prefixe + "non"):
+			await client.send_file(message.channel, "img/non.jpg")
+			print("Discussion: " + message.author.name + ": Non")
+
+
 
 			# Joke
 		elif message.content.startswith(prefixe + "joke"):
 			await client.send_message(message.channel, requests.Session().get("https://icanhazdadjoke.com/", headers={"Accept": "text/plain"}).content.decode("utf-8"))
+			print("Joke: " + message.author.name + " a demandé une blague")
 
 			# Dilemme
 		elif message.content.startswith(prefixe + "dilemme"):
@@ -592,7 +585,7 @@ async def on_message(message):
 					recherche += "+" + elements
 				else:
 					recherche += elements
-			jsonyt = getUrl("https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&q=" + recherche + "&key=" + ytkey)["items"][0]["id"]
+			jsonyt = getUrl("https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&q=" + recherche + "&key=" + secrets["youtube"])["items"][0]["id"]
 			try:
 				videoId = jsonyt["videoId"]
 			except:
@@ -837,4 +830,4 @@ async def on_message(message):
 			arg = message.content.split(" ")[1]
 			await client.send_message(message.channel, nekos.img((arg)))
 
-client.run(token)
+client.run(secrets["discord"])

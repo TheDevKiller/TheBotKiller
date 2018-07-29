@@ -2,3 +2,4 @@ token.txt
 __pycache__
 db
 reports.txt
+secrets.json
