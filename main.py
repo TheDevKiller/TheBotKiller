@@ -34,6 +34,12 @@ with open("secrets.json", "r") as fichier:
 # Variables #
 #############
 
+	########
+	# Jeux #
+	########
+
+reactionsValides = ["🌑", "📄", "✂"]
+
 	###########
 	# Musique #
 	###########
@@ -63,8 +69,8 @@ Si vous voulez, vous pouvez discuter avec moi :smiley:. Mentionnez-moi et si je 
 `qr <chaine>`: Génère un QR Code avec la chaine. Peut être
 `ocr`: Poster une image avec la commande en commentaire. Vous donne son 
 `tts <chaine>`: Dis votre texte grâce à la synthèse vocale :smiley:
-`lower <chaine`: Passe le texte en minuscules
-`upper <chaine`: Passe le texte en majuscules
+`lower <chaine>`: Passe le texte en minuscules
+`upper <chaine>`: Passe le texte en majuscules
 `capitalize <chaine>`: Ajoute la majuscule à la première lettre et le reste en minuscules
 `title <chaine>`: Ajoute une majuscule à chaque mot
 
@@ -80,6 +86,7 @@ Si vous voulez, vous pouvez discuter avec moi :smiley:. Mentionnez-moi et si je 
 `ah`: Denis Brogniart
 `obvious`: Merci captain obvious !
 `non`: Mario qui dit non
+`canyrcmeyrb`: C'est à n'y rien comprendre, même en y réfléchissant bien !
 
 :notes: **Musique** :notes:
 
@@ -221,23 +228,25 @@ print("\nConnexion: Chargement de </TheBotKiller> ...")
 # Coroutines #
 ##############
 
+	# Prêt
 @client.event
 async def on_ready():
 	global thedevkiller
 	global scoresPom
-	thedevkiller = await client.get_user_info("436105272310759426")
+	thedevkiller = await client.get_user_info(436105272310759426)
 	print("Connexion: </TheBotKiller> est prêt à discuter avec les utilisateurs et à jouer avec eux !\n")
-	await client.change_presence(game=discord.Game(name="&help (ou prefixe + help)"))
-	try:
-		if sys.argv[1] == "reboot": await client.send_message(sys.argv[2], "Je suis de retour, pour vous jouer un mauvais tour :smiling_imp:")
-	except:
-		pass
+	await client.change_presence(status=discord.Status.online, activity=discord.Game(name="&help (ou prefixe + help)"))
+#	try:
+#		if sys.argv[1] == "reboot": await client.send(sys.argv[2], "Je suis de retour, pour vous jouer un mauvais tour :smiling_imp:")
+#	except:
+#		pass
 	chargerscorespom()
 
+	# Erreurs
 @client.event
 async def on_error(event, *args, **kwargs):
- 	print(event)
- 	await client.send_message(message.channel, traceback.format_exc())
+	message = args[0]
+	await message.channel.send(embed=discord.Embed(title="C'est con !", description="```python\n" + traceback.format_exc() + "\n```", color=0xff0000))
 
 #############
 # Commandes #
@@ -283,23 +292,23 @@ async def on_message(message):
 	if message.content.startswith(prefixe + "reboot"):
 		if message.author == thedevkiller:
 			print("Redémarrage ...")
-			await client.send_message(message.channel, "Je reviens vite :wave:")
+			await message.channel.send("Je reviens vite :wave:")
 			await client.logout()
 			run(["./reboot.sh", "401676021469937667"], shell=True)
 			sys.exit(0)
 		else:
-			await client.send_message(message.channel, "Nope, je reste :smirk:")
+			await message.channel.send("Nope, je reste :smirk:")
+			print(message.author.name + " a voulu redémarré </TheBotKiller>. Vilain !")
 
 		# Halt
 	elif message.content.startswith(prefixe + "halt"):
 		if message.author == thedevkiller:
-			await client.send_message(message.channel, "Arrêt du bot ...")
+			await message.channel.send("Arrêt du bot ...")
 			print("*Se couche* ...\n")
 			client.logout()
 			sys.exit(0)
-			await client.send_message(message.channel, "Le bot est censé être arrêté donc si tu vois ce message, c'est pas normal")
 		else:
-			await client.send_message(message.channel, "Nan, j'ai pas trop envie de dormir là :neutral_face:")
+			await message.channel.send("Nan, j'ai pas trop envie de dormir là :neutral_face:")
 	else:
 
 		#############
@@ -312,12 +321,12 @@ async def on_message(message):
 
 			# Code
 		if message.content.startswith(prefixe + "code"): # Envoie le lien Github
-			await client.send_message(message.channel, "https://github.com/TheDevKiller/TheBotKiller")
+			await message.channel.send("https://github.com/TheDevKiller/TheBotKiller")
 			print("Code: demandé par " + message.author.name + "\n")
 
 			# Help
 		elif message.content.startswith(prefixe + "help"):
-			await client.send_message(message.channel, embed=discord.Embed(title="Liste des commandes disponibles", description=commandes, color=0x0055FE))
+			await message.channel.send(embed=discord.Embed(title="Liste des commandes disponibles", description=commandes, color=0x0055FE))
 			print("Aide: demandée par " + message.author.name + "\n")
 
 			# Report
@@ -330,29 +339,29 @@ async def on_message(message):
 			strReport = strReport.capitalize()
 			with open("reports.txt", "a") as reportsFile:
 				reportsFile.write(strReport + "\n")
-			await client.send_message(thedevkiller, strReport)
+			await thedevkiller.send(strReport)
 			print("Report: fait par " + message.author.name + ". Voir reports.txt.\n")
 
 			# Speedtest
 		elif message.content.startswith(prefixe + "speedtest"):
 			if speedtestEnCours == False:
 				speedtestEnCours = True
-				messageChargement = await client.send_message(message.channel, "Recherche du meilleur serveur ...")
+				messageChargement = await message.channel.send("Recherche du meilleur serveur ...")
 				test = speedtest.Speedtest()
 				test.get_best_server()
-				await client.edit_message(messageChargement, "Mesure du débit descendant")
+				await messageChargement.edit("Mesure du débit descendant")
 				test.download()
-				await client.edit_message(messageChargement, "Mesure du débit montant")
+				await messageChargement.edit("Mesure du débit montant")
 				test.upload()
 				url = test.results.share()
-				await client.delete_message(messageChargement)
+				await messageChargement.delete_message()
 				em = discord.Embed(title="** **Voilà ma bonne connexion de campagnard", color=0x012ea0)
 				em.set_image(url=test.results.share())
-				await client.send_message(message.channel, embed=em)
+				await message.channel.send(embed=em)
 				print("Speedtest: fait par " + message.author.name + ". Les résultats sont " + test.results.share() + "\n")
 				speedtestEnCours = False
 			else:
-				await client.send_message(message.channel, "Vous avez essayé de faire un speedtest, mais un autre était déjà en cours. Veuillez réessayer")
+				await message.channel.send(message.channel, "Vous avez essayé de faire un speedtest, mais un autre était déjà en cours. Veuillez réessayer")
 			
 			# Translate
 		elif message.content.startswith(prefixe + "traduire"):
@@ -363,24 +372,25 @@ async def on_message(message):
 			for elements in chaineListe:
 				chaine += elements + " "
 			try:
-				await client.send_message(message.channel, embed=discord.Embed(title="Traduction", description=langue1.capitalize() + ": " + chaine.capitalize() + "\n" + langue2.capitalize() + ": " + translate(langue1, langue2, chaine).capitalize(), colour=0xffffff))
+				await message.channel.send(embed=discord.Embed(title="Traduction", description=langue1.capitalize() + ": " + chaine.capitalize() + "\n" + langue2.capitalize() + ": " + translate(langue1, langue2, chaine).capitalize(), colour=0xffffff))
 				# if langue1 in flags and langue2 in flags:
 				# 	em = discord.Embed(title="Traduction", description=":flag_" + langue1 + ":: " + chaine + "\n" + ":flag_" + langue2 + ":: " + translate(langue1, langue2, chaine))
-				# 	await client.send_message(message.channel, embed=em)
+				# 	await client.send(message.channel, embed=em)
 				# else:
-				# 	await client.send_message(message.channel, embed=discord.Embed(title="Traduction", ))
+				# 	await client.send(message.channel, embed=discord.Embed(title="Traduction", ))
 			except:
-			 	await client.send_message(message.channel, "Spécifie une langue correcte avec ses deux premiers caractères (exemple: french => fr, english => en) s'il te plaît :wink:")
+			 	await message.channel.send("Spécifie une langue correcte avec ses deux premiers caractères (exemple: french => fr, english => en) s'il te plaît :wink:")
 
 			# OCR
 		elif message.content.startswith(prefixe + "ocr"):
+			print(message.attachments)
 			url = message.attachments[0]["url"]
 			image = requests.Session().get(url).content
 			fichier = message.attachments[0]["filename"]
 			with open(fichier, "wb") as ocrimage:
 				ocrimage.write(image)
 			texte = pytesseract.image_to_string(Image.open(fichier))
-			await client.send_message(message.channel, texte)
+			await message.channel.send(texte)
 			os.remove(fichier)
 
 			# TTS
@@ -395,7 +405,7 @@ async def on_message(message):
 				fichier.write(audio)
 			#son = from_mpga("tts.mpga")
 			#son.export("tts.mp3", format="mp3")
-			await client.send_file(message.channel, "tts.mpga")
+			await message.channel.send_file("tts.mpga")
 
 			# Flip
 		elif message.content.startswith(prefixe + "flip"):
@@ -403,8 +413,9 @@ async def on_message(message):
 			"face": "http://fracademic.com/pictures/frwiki/49/1_euro_France.png"}
 			choix = random.choice(list(dico.keys()))
 			em = discord.Embed(title=choix.capitalize() + " !")
-			em.set_image(dico[choix])
-			await client.send_message(message.channel, embed=em)
+			em.set_image(url=dico[choix])
+			await message.channel.send(embed=em)
+			print("Flip: " + message.author.name + " a lancé une pièce. Elle est retombée sur " + choix)
 
 			########
 			# Jeux #
@@ -415,19 +426,29 @@ async def on_message(message):
 
 			print("Shifumi: partie commencée entre " + message.author.name + " et </TheBotKiller>")
 
-			messageJoue = await client.send_message(message.channel, embed=discord.Embed(title="Shifumi", description="Joue :wink:", color=0xff7400))
+			messageJoue = await message.channel.send(embed=discord.Embed(title="Shifumi", description="Joue :wink:", color=0xff7400))
 
-			await client.add_reaction(messageJoue, "🌑")
-			await client.add_reaction(messageJoue, "📄")
-			await client.add_reaction(messageJoue, "✂")
+			await messageJoue.add_reaction("🌑")
+			await messageJoue.add_reaction("📄")
+			await messageJoue.add_reaction("✂")
 
-			reaction = await client.wait_for_reaction(user=message.author)
+			reaction = await client.wait_for("reaction_add", check=lambda r, u: u.id == message.author.id)
 
-			if reaction.reaction.emoji == "🌑":
+			print(reaction[1].id)
+
+			while reaction[0].emoji not in reactionsValides:
+				await message.channel.send("Réagis avec pierre, feuille ou ciseaux :wink:")
+				reaction = await client.wait_for("reaction_add", check=lambda r, u: u.id == message.author.id)
+
+			while reaction[1].id != message.author.id:
+				await message.channel.send("C'est là je vais mettre le nom du joueur logiquement qui a lancé la partie, pas toi ! :stuck_out_tongue_winking_eye:")
+				reaction = await client.wait_for("reaction_add", check=lambda r, u: u.id == message.author.id)
+
+			if reaction[0].emoji == "🌑":
 				jeuJoueur = "pierre :new_moon:"
-			elif reaction.reaction.emoji == "📄":
+			elif reaction[0].emoji == "📄":
 				jeuJoueur = "feuille :page_facing_up:"
-			elif reaction.reaction.emoji == "✂":
+			elif reaction[0].emoji == "✂":
 				jeuJoueur = "ciseaux :scissors:"
 
 			elements = ["pierre :new_moon:", "feuille :page_facing_up:", "ciseaux :scissors:"]
@@ -445,7 +466,7 @@ async def on_message(message):
 			else:
 				resultat = "T'as perdu :smiley:"
 
-			await client.edit_message(messageJoue, embed=discord.Embed(title="Résultat du Shifumi entre " + message.author.name + " et </TheBotKiller>", description="** **\n**Tu as joué: **\n\n" + jeuJoueur.capitalize() + "\n\n**J'ai joué: **\n\n" + elementBot.capitalize() + "\n\n**Résultat: **\n\n" + resultat, color=0xff7400))
+			await messageJoue.edit(embed=discord.Embed(title="Résultat du Shifumi entre " + message.author.name + " et </TheBotKiller>", description="** **\n**Tu as joué: **\n\n" + jeuJoueur.capitalize() + "\n\n**J'ai joué: **\n\n" + elementBot.capitalize() + "\n\n**Résultat: **\n\n" + resultat, color=0xff7400))
 
 			if resultat == "Égalité :neutral_face:":
 				gagnant = "Aucun"
@@ -461,46 +482,41 @@ async def on_message(message):
 
 			# Plus Ou Moins
 		elif message.content.startswith(prefixe + "+- "):
-			try:
-				global joueurPom
-				joueurPom = message.author
-				global min
-				global max
-				min = int(message.content.split(" ")[1])
-				max = int(message.content.split(" ")[2])
-				if(min > max):
-					min, max = max, min
-				print("Plus ou moins: partie commencée par " + message.author.name + " avec un nombre entre " + str(min) + " et " + str(max))
-				await client.send_message(message.channel, "Devine à quel nombre je pense entre " + str(min) + " et " + str(max))
-				global nombre
-				nombre = random.randint(min, max)
-				global plusoumoinschan 
-				plusoumoinschan = message.channel
-				plusoumoins = True
-				global essais
-				essais = 1
-
-			except Exception as ex:
-				await client.send_message(message.channel, "```python\n" + str(ex) + "\n```")
-				await client.send_message(message.channel, "Entre des nombres valides s'il te plaît :wink:")
+			global joueurPom
+			joueurPom = message.author
+			global min
+			global max
+			min = int(message.content.split(" ")[1])
+			max = int(message.content.split(" ")[2])
+			if(min > max):
+				min, max = max, min
+			print("Plus ou moins: partie commencée par " + message.author.name + " avec un nombre entre " + str(min) + " et " + str(max))
+			await message.channel.send("Devine à quel nombre je pense entre " + str(min) + " et " + str(max))
+			global nombre
+			nombre = random.randint(min, max)
+			global plusoumoinschan 
+			plusoumoinschan = message.channel
+			plusoumoins = True
+			global essais
+			essais = 1
 
 			# Plus Ou Moins
 		elif plusoumoins == True and message.author == joueurPom and message.channel == plusoumoinschan:
 			nombreJoueur = int(message.content)
 			if nombreJoueur < nombre:
-				await client.send_message(message.channel, "C'est plus !")
+				await message.channel.send("C'est plus !")
 				essais += 1
 			elif nombreJoueur > nombre:
-				await client.send_message(message.channel, "C'est moins !")
+				await message.channel.send("C'est moins !")
 				essais += 1
 			elif nombreJoueur == nombre:
 				if essais <= 1:
-					await client.send_message(message.channel, "C'est ça, bien joué " + message.author.mention + " ! Tu as réussi en " + str(essais) + " essai")
+					await message.channel.send("C'est ça, bien joué " + message.author.mention + " ! Tu as réussi en " + str(essais) + " essai")
 					print("Plus ou moins: " + message.author.name + " a trouvé le nombre en 1 essai. Le nombre était " + str(nombre) + "\n")
 					ajouterscorespom(min, max, message.author.name, essais)
 					sauverscorespom()
 				else:
-					await client.send_message(message.channel, "C'est ça, bien joué " + message.author.mention + " ! Tu as réussi en " + str(essais) + " essais")
+					await message.channel.send("C'est ça, bien joué " + message.author.mention + " ! Tu as réussi en " + str(essais) + " essais")
 					print("Plus ou moins: " + message.author.name + " a trouvé le nombre en " + str(essais) + " essais. Le nombre était " + str(nombre) + "\n")
 					ajouterscorespom(min, max, message.author.name, essais)
 					sauverscorespom()
@@ -508,7 +524,7 @@ async def on_message(message):
 
 			# Scores Plus Ou Moins
 		elif message.content.startswith(prefixe + "+-scores"):
-			await client.send_message(message.channel, embed=discord.Embed(title="Classement du Plus Ou Moins", description=print_scores(), color=0x17a81c))
+			await message.channel.send(embed=discord.Embed(title="Classement du Plus Ou Moins", description=print_scores(), color=0x17a81c))
 
 			#######
 			# Fun #
@@ -516,47 +532,45 @@ async def on_message(message):
 
 			# Ah !
 		elif message.content.startswith(prefixe + "ah"):
-			await client.send_file(message.channel, "img/ah.jpg")
+			await message.channel.send_file("img/ah.jpg")
 			print("Discussion: " + message.author.name + ": ah !")
 
 			# Obvious
 		elif message.content.startswith(prefixe + "obvious"):
-			await client.send_file(message.channel, "img/obvious.jpg")
+			await message.channel.send_file("img/obvious.jpg")
 			print("Discussion: " + message.author.name + ": Merci captain obvious !")
 
 			# Non
 		elif message.content.startswith(prefixe + "non"):
-			await client.send_file(message.channel, "img/non.jpg")
+			await message.channel.send_file("img/non.jpg")
 			print("Discussion: " + message.author.name + ": Non")
 
+			# C'est à n'y rien comprendre
+		#elif message.content.startswith(prefixe + "canyrcmeyrb"):
 
 
 			# Joke
 		elif message.content.startswith(prefixe + "joke"):
-			await client.send_message(message.channel, requests.Session().get("https://icanhazdadjoke.com/", headers={"Accept": "text/plain"}).content.decode("utf-8"))
+			await message.channel.send(requests.Session().get("https://icanhazdadjoke.com/", headers={"Accept": "text/plain"}).content.decode("utf-8"))
 			print("Joke: " + message.author.name + " a demandé une blague")
 
 			# Dilemme
 		elif message.content.startswith(prefixe + "dilemme"):
-			try:
-				premierChoixListe = message.content.split(",")[0]
-				premierChoixListe = premierChoixListe.split(" ")
-				del premierChoixListe[0]
-				premierChoix = ""
-				deuxiemeChoix = ""
-				for elements in premierChoixListe:
-					premierChoix += elements + " "
-				deuxiemeChoixListe = message.content.split(",")[1].strip()
-				for elements in deuxiemeChoixListe:
-					deuxiemeChoix += elements
-				premierChoix = premierChoix.strip()
-				listeChoix = [premierChoix, deuxiemeChoix]
-				choix = str(random.choice(listeChoix))
-				await client.send_message(message.channel, "Je dirais " + choix.lower())
-				print("Dilemme: dans cette liste " + str(listeChoix) + ", </TheBotKiller> a choisi " + choix + "\n")
-
-			except Exception as ex:
-				await client.send_message(message.channel,"```\n" + str(ex) + "\n```")
+			premierChoixListe = message.content.split(",")[0]
+			premierChoixListe = premierChoixListe.split(" ")
+			del premierChoixListe[0]
+			premierChoix = ""
+			deuxiemeChoix = ""
+			for elements in premierChoixListe:
+				premierChoix += elements + " "
+			deuxiemeChoixListe = message.content.split(",")[1].strip()
+			for elements in deuxiemeChoixListe:
+				deuxiemeChoix += elements
+			premierChoix = premierChoix.strip()
+			listeChoix = [premierChoix, deuxiemeChoix]
+			choix = str(random.choice(listeChoix))
+			await message.channel.send("Je dirais " + choix.lower())
+			print("Dilemme: dans cette liste " + str(listeChoix) + ", </TheBotKiller> a choisi " + choix + "\n")
 
 			# Chat
 		elif message.content.startswith(prefixe + "chat"):
@@ -565,46 +579,8 @@ async def on_message(message):
 			resultchat = urlopen(req).geturl()
 			em = discord.Embed(color=0xFF9100)
 			em.set_image(url=resultchat)
-			await client.send_message(message.channel, embed=em)
+			await message.channel.send(embed=em)
 			print("Chat: " + message.author.name + " a demandé un chat\n")
-
-		###########
-		# Musique #
-		###########
-
-			# Play
-		elif message.content.startswith(prefixe + "play"):
-
-			global lanceurmusique
-			lanceurmusique = message.author
-
-			recherchelist = message.content.split(" ")[1:]
-			recherche = ""
-			for index, elements in enumerate(recherchelist):
-				if index != 0:
-					recherche += "+" + elements
-				else:
-					recherche += elements
-			jsonyt = getUrl("https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&q=" + recherche + "&key=" + secrets["youtube"])["items"][0]["id"]
-			try:
-				videoId = jsonyt["videoId"]
-			except:
-				await client.send_message(message.channel, "Le résultat trouvé n'est pas une vidéo.")
-			url = "https://www.youtube.com/watch?v=" + videoId
-			queue.append(url)
-			try:
-				voice = await client.join_voice_channel(message.author.voice.voice_channel)
-			except:
-				pass
-			player = await voice.create_ytdl_player(url=url)
-			player.start()
-			print("\n")
-
-			# Stop
-		elif message.content.startswith(prefixe + "stop"): player.stop()
-			
-			# Disconnect
-		elif message.content.startswith(prefixe + "disconnect"): await voice.disconnect()
 
 			 	# Convertir
 		elif message.content.startswith(prefixe + "convertir"):
@@ -615,13 +591,13 @@ async def on_message(message):
 				chaine += elements + " "
 			if unite1 == "ascii" and unite2 == "base64":
 				encode = base64.b64encode(str.encode(chaine))
-				await client.send_message(message.channel, encode.decode())
+				await message.channel.send(encode.decode())
 			elif unite1 == "base64" and unite2 == "ascii":
 				decode = base64.b64decode(str.encode(chaine))
-				await client.send_message(message.channel, decode.decode().capitalize())
+				await message.channel.send(decode.decode().capitalize())
 			elif unite1 == "ascii" and unite2 == "bin":
 				encode = ' '.join(format(ord(x), 'b') for x in chaine)
-				await client.send_message(message.channel, encode)
+				await message.channel.send(encode)
 			elif unite1 == "bin" and unite2 == "ascii":
 				chaine = int(chaine, 2)
 				chaine.to_bytes((chaine.bit_length() + 7) // 8, "big").decode("utf-8", "surogatepass") or "\0"
@@ -630,7 +606,7 @@ async def on_message(message):
 					for element in elements[::2]:
 						msg += chr(element)
 			else:
-				await client.send_message(message.channel, "Désolé mais je ne connais pas ces unités :confused:")
+				await message.channel.send("Désolé mais je ne connais pas ces unités :confused:")
 
 				# QR Code
 		elif message.content.startswith(prefixe + "qr"):
@@ -642,8 +618,8 @@ async def on_message(message):
 			qr.make(fit=True)
 			img = qr.make_image(fill_color="black", back_color="white")
 			img.save("qr.png")
-			await client.send_file(message.channel, "qr.png")
-			await client.send_message(message.channel, chaine)
+			await message.channel.send_file("qr.png")
+			await message.channel.send(chaine)
 			os.remove("qr.png")
 
 		######################
@@ -658,7 +634,7 @@ async def on_message(message):
 				chaine += elements + " "
 			chaine = chaine.lower()
 			print(chaine)
-			await client.send_message(message.channel, chaine) 
+			await message.channel.send(chaine) 
 
 			# Upper
 		elif message.content.startswith(prefixe + "upper"):
@@ -668,7 +644,7 @@ async def on_message(message):
 				chaine += elements + " "
 			chaine = chaine.upper()
 			print(chaine)
-			await client.send_message(message.channel, chaine)
+			await message.channel.send(chaine)
 
 			# Capitalize
 		elif message.content.startswith(prefixe + "capitalize"):
@@ -678,7 +654,7 @@ async def on_message(message):
 				chaine += elements + " "
 			chaine = chaine.capitalize()
 			print(chaine)
-			await client.send_message(message.channel, chaine)
+			await message.channel.send(chaine)
 
 			# Title
 		elif message.content.startswith(prefixe + "title"):
@@ -688,12 +664,12 @@ async def on_message(message):
 				chaine += elements + " "
 			chaine = chaine.title()
 			print(chaine)
-			await client.send_message(message.channel, chaine)
+			await message.channel.send(chaine)
 
 			# Erreur
 		elif message.content.startswith(prefixe + "erreur"):
-			await client.send_message(erreur, xD)
-
+			raise NameError("Eh bah tu l'as ton erreur ! !")	
+		
 			##############
 			# Discussion #
 			##############
@@ -704,12 +680,12 @@ async def on_message(message):
 			messageADire = ""
 			for elements in messageADireListe:
 				messageADire += elements + " "
-			await client.send_message(message.channel, messageADire)
+			await message.channel.send(messageADire)
 			print('Discussion: </TheBotKiller> a dit "' + messageADire + '"\n')
 
 					# MRAW !!!
 		elif re.match(".*mraw.*", message.content.lower()):
-			await client.send_message(message.channel, "MRAW !!!")
+			await message.channel.send("MRAW !!!")
 
 			############
 			# Mentions #
@@ -728,97 +704,97 @@ async def on_message(message):
 
 				# Ça va ?
 			if re.match(".*(ça|sa|ca) va.? " + client.user.mention + ".*", message.content.lower()) or re.match(".*" + client.user.mention + ".? (ça|sa|ca) va.*", message.content.lower()):
-				await client.send_message(message.channel, "Ça va :smiley:, et toi ?")
+				await message.channel.send("Ça va :smiley:, et toi ?")
 				questioncava = True
 				print("Discussion: " + message.author.name + " a demandé à </TheBotKiller> si ça va\n")
 
 				# Salut !
 			elif re.match(".*(salut|slt|bonjour|salutations|hello|hi|hey|yo|coucou).? " + client.user.mention + ".*", message.content.lower()) != None or re.match(".*" + client.user.mention + ".? (salut|slt|bonjour|hello|hi|hey|yo).*", message.content.lower()) != None:
-				await client.send_message(message.channel, "Salut " + message.author.mention + " !")
+				await message.channel.send("Salut " + message.author.mention + " !")
 				print("Discussion: " + message.author.name + " a dis bonjour à </TheBotKiller>\n")
 
 				# Quel est ton préfixe ?
 			elif re.match(".*" + client.user.mention + ".? (quel|quelle|kel|c'est|c) (est|et) ton (prefixe|préfixe|prefix|préfixe) .*", message.content.lower()) or re.match(".*(quel|quelle|c'est) (est|et|koi|quoi) ton (prefixe|préfixe|prefix|préfix).? " + client.user.mention + ".*", message.content.lower()):
-				await client.send_message(message.channel, "Mon préfixe est " + prefixe + ", n'hésite pas à dire " + prefixe + "help pour plus d'informations :wink:")
+				await message.channel.send("Mon préfixe est " + prefixe + ", n'hésite pas à dire " + prefixe + "help pour plus d'informations :wink:")
 				print("Discussion: " + message.author.name + " a demandé le préfixe à </TheBotKiller>\n")
 
 				# Tu fais quoi ?
 			elif re.match(".*" + client.user.mention + ".? tu (fais|fait|fai) (quoi|koi).*", message.content) or re.match(".*tu (fais|fait|fai) (quoi|koi).? " + client.user.mention + ".*", message.content.lower()):
-				await client.send_message(message.channel, "J'aide les gens, je joue et je discute avec eux :smiley:")
+				await message.channel.send("J'aide les gens, je joue et je discute avec eux :smiley:")
 				print("Discussion: " + message.author.name + " a demandé à </TheBotKiller> ce qu'il fait\n")
 
 				# Insultes
 			elif re.match(".*(tg|ta gueule|connard|connasse| con |taggle|fils de chien|enculé|batard|bâtard|pute|emmerde|salope|salaud|nique ta mère).{0,10}" + client.user.mention + ".*", message.content.lower()) or re.match(".*" + client.user.mention + ".{0,15}(tg|ta gueule|connard| con |fils de chien|enculé|batard|bâtard|pute|emmerde|stupide|salope|salaud|nique ta mère).*", message.content.lower()) or re.match(".*" + client.user.mention + ".{0,2} .{0,11} con$", message.content.lower()):
-				await client.send_message(message.channel, "Pourquoi tu m'insulte ? :cry:")
+				await message.channel.send("Pourquoi tu m'insulte ? :cry:")
 				insulte = True
 				print("Discussion: " + message.author.name + " a insulté </TheBotKiller>")
 
 				# C'est quoi ton code ?
 			elif re.match(".*(c|c'est) (koi|quoi) ton (code|cod).*" + client.user.mention + ".*", message.content.lower()) or re.match(".*" + client.user.mention + ".*(c|c'est) (koi|quoi) ton (code|cod).*", message.content.lower()):
-				await client.send_message(message.channel, "https://github.com/TheDevKiller/TheBotKiller")
+				await message.channel.send("https://github.com/TheDevKiller/TheBotKiller")
 				print("Discussion: " + message.author.name + " a demandé à </TheBotKiller> son code")
 
 				# Je t'aime
 			elif re.match(".*je (t'aime|taime).? " + client.user.mention + ".*", message.content.lower()) or re.match(".*" + client.user.mention + ".? je (t'aime|taime)", message.content.lower()):
-				await client.send_message(message.channel, "Moi aussi je t'aime " + message.author.mention + " :kissing_smiling_eyes:")
+				await message.channel.send("Moi aussi je t'aime " + message.author.mention + " :kissing_smiling_eyes:")
 				print("Discussion: " + message.author.name + " aime </TheBotKiller>")
 
 				# Crève
 			elif re.match(".*(crève|meurt|meurts|crèves|buter).? " + client.user.mention + ".*", message.content.lower()):
-				await client.send_message(message.channel, "Pourquoi tu dis ça ? :frowning:")
+				await message.channel.send("Pourquoi tu dis ça ? :frowning:")
 				print("Discussion: " + message.author.name + " a dis à </TheBotKiller> de mourir :/")
 
 				# Je suis désolé
 			elif re.match(".*(désolé|désolée|pardon|excuse).{0,15} " + client.user.mention + ".*", message.content.lower()) or re.match(".*" + client.user.mention + ".{0,2} désolé.*", message.content.lower()):
-				await client.send_message(message.channel, "Bon allez je te pardonne :wink:")
+				await message.channel.send("Bon allez je te pardonne :wink:")
 				print("Discussion: " + message.author.name + " s'est excusé auprès de </TheBotKiller>")
 
 				# Oui ?
 			elif message == client.user.mention or message == client.user.mention + " ?":
-				await client.send_message("Oui ?")
+				await message.channel.send("Oui ?")
 
 				# Préfixe
 			elif message.author == thedevkiller and str(message.content.split(" ")[1]) == "préfixe": # Changement du préfixe
 				prefixe = str(message.content.split(" ")[2])
-				await client.send_message(message.channel, "Mon préfixe est désormais" + " " + prefixe)
+				await message.channel.send("Mon préfixe est désormais" + " " + prefixe)
 				print("Le préfixe de </TheBotKiller> est désormais " + prefixe)
 
 			else: # J'ai pas compris
-				await client.send_message(message.channel, "Tu peux répéter ? Je n'ai pas très bien compris :neutral_face:")
+				await message.channel.send("Tu peux répéter ? Je n'ai pas très bien compris :neutral_face:")
 				print("Discussion: " + message.author.name + " a dit " + message.content + ". </TheBotKiller> n'a pas compris :/\n")
 
 				# Cheh !
 		elif re.match(".*cheh.*", message.content.lower()) and message.author == thedevkiller:
-			await client.send_message(message.channel, "Cheh !")
+			await message.channel.send("Cheh !")
 			print("Discussion: " + message.author.name + " a dit cheh")
 
 				# Ça va ?
 		elif questioncava == True and message.author == demarreur and message.channel == discussionChan:
 			if re.match(".*(non|mal|pas|^pas mal).*", message.content.lower()):
-				await client.send_message(message.channel, "Ah mince :frowning:... On va te réconforter sur ce serveur :smiley:")
+				await message.content.send("Ah mince :frowning:... On va te réconforter sur ce serveur :smiley:")
 				questioncava = False
 				print("Discussion: " + message.author.name + " a demandé à </TheBotKiller> si ça va ")
 
 				# Oui
 			elif re.match(".*(oui|tranquille|bien|super).*", message.content.lower()):
-				await client.send_message(message.channel, "Parfait !")
+				await message.channel.send("Parfait !")
 				questioncava = False
 				print("Discussion: " + message.author.name + " va bien")
 
 			else: # Aucun des deux
-				await client.send_message(message.chanel, "Ok")
+				await message.channel.send("Ok")
 				questioncava = False
 				print("Discussion: " + message.author.name + " ne va pas bien")
 
 			# C'est pas une raison !
 		elif insulte == True:
-			await client.send_message(message.channel, "C'est pas une raison ! :rage:")
+			await message.content.send("C'est pas une raison ! :rage:")
 			insulte = False
 			print("Discussion: " + message.author.name + " </TheBotKiller> a dit que ce n'est pas uen raison !")
 
 			# Bon appétit
 		elif re.match(".*(je vais manger|je dois aller manger).*", message.content.lower()):
-			await client.send_message(message.channel, "Bon appétit " + message.author.mention)
+			await message.content.send("Bon appétit " + message.author.mention)
 			print("Discussion: " + message.author.name + " va manger. </TheBotKiller> lui souhaite bon appétit")
 
 		#########
@@ -828,6 +804,6 @@ async def on_message(message):
 			# Neko
 		elif message.content.startswith(prefixe + "neko"):
 			arg = message.content.split(" ")[1]
-			await client.send_message(message.channel, nekos.img((arg)))
+			await message.channel.send(nekos.img((arg)))
 
 client.run(secrets["discord"])
