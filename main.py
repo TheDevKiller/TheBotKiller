@@ -14,7 +14,7 @@ import os
 import nekos
 from html import unescape
 import json
-from subprocess import call, run
+import subprocess
 import base64
 import qrcode
 import pytesseract
@@ -90,9 +90,10 @@ Si vous voulez, vous pouvez discuter avec moi :smiley:. Mentionnez-moi et si je 
 
 :notes: **Musique** :notes:
 
-`play <recherche>`: Me connecte à votre salon et joue de la musique
+~~`play <recherche>`: Me connecte à votre salon et joue de la musique
 `stop`: Arrête la musique
-`disconnect`: Me déconnecte des salons vocaux
+`disconnect`: Me déconnecte des salons vocaux~~
+Indisponible suite au passage à discord.py rewrite. Veuillez patienter
 """
 
 	###########
@@ -246,8 +247,9 @@ async def on_ready():
 @client.event
 async def on_error(event, *args, **kwargs):
 	message = args[0]
-	await message.channel.send(embed=discord.Embed(title="C'est con !", description="```python\n" + traceback.format_exc() + "\n```", color=0xff0000))
-
+	if message.channel.name == "spam-bot" or message.channel.name == "spamme-botte":
+		await message.channel.send(embed=discord.Embed(title="C'est con !", description="```python\n" + traceback.format_exc() + "\n```", color=0xff0000))
+	await thedevkiller.send("```python\n" + traceback.format_exc() + "\n```")
 #############
 # Commandes #
 #############
@@ -294,7 +296,7 @@ async def on_message(message):
 			print("Redémarrage ...")
 			await message.channel.send("Je reviens vite :wave:")
 			await client.logout()
-			run(["./reboot.sh", "401676021469937667"], shell=True)
+			subprocess.run(["./reboot.sh", "401676021469937667"], shell=True)
 			sys.exit(0)
 		else:
 			await message.channel.send("Nope, je reste :smirk:")
@@ -319,8 +321,21 @@ async def on_message(message):
 			# Utilitaire #
 			##############
 
+			# Shell
+		if message.content.startswith(prefixe + "shell"):
+			if message.author == thedevkiller:
+				commandeliste = message.content.split(" ")[1:]
+				commande = " "
+				for elements in commandeliste:
+					commande += elements + " "
+				proc = subprocess.Popen(commandeliste, stdout=subprocess.PIPE)
+				output = proc.stdout.read()
+				await message.channel.send(output.decode())
+			else:
+				await message.channel.send("Tu veux faire n'importe quoi sur mon PC ! Nan mais tu t'es cru où là ?!")		
+
 			# Code
-		if message.content.startswith(prefixe + "code"): # Envoie le lien Github
+		elif message.content.startswith(prefixe + "code"): # Envoie le lien Github
 			await message.channel.send("https://github.com/TheDevKiller/TheBotKiller")
 			print("Code: demandé par " + message.author.name + "\n")
 
@@ -771,7 +786,7 @@ async def on_message(message):
 				# Ça va ?
 		elif questioncava == True and message.author == demarreur and message.channel == discussionChan:
 			if re.match(".*(non|mal|pas|^pas mal).*", message.content.lower()):
-				await message.content.send("Ah mince :frowning:... On va te réconforter sur ce serveur :smiley:")
+				await message.channel.send("Ah mince :frowning:... On va te réconforter sur ce serveur :smiley:")
 				questioncava = False
 				print("Discussion: " + message.author.name + " a demandé à </TheBotKiller> si ça va ")
 
@@ -788,13 +803,13 @@ async def on_message(message):
 
 			# C'est pas une raison !
 		elif insulte == True:
-			await message.content.send("C'est pas une raison ! :rage:")
+			await message.channel.send("C'est pas une raison ! :rage:")
 			insulte = False
 			print("Discussion: " + message.author.name + " </TheBotKiller> a dit que ce n'est pas uen raison !")
 
 			# Bon appétit
 		elif re.match(".*(je vais manger|je dois aller manger).*", message.content.lower()):
-			await message.content.send("Bon appétit " + message.author.mention)
+			await message.channel.send("Bon appétit " + message.author.mention)
 			print("Discussion: " + message.author.name + " va manger. </TheBotKiller> lui souhaite bon appétit")
 
 		#########
