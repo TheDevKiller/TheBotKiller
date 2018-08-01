@@ -283,8 +283,7 @@ async def on_message(message):
 	# Anti-Bots #
 	#############
 
-	if message.author == client.user: return
-	if "Bot" in [role.name for role in message.author.roles]: return
+	if message.author.bot: return
 
 	############################
 	# Extinction / Redémarrage #
