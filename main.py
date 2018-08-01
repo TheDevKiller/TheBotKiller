@@ -363,19 +363,19 @@ async def on_message(message):
 				messageChargement = await message.channel.send("Recherche du meilleur serveur ...")
 				test = speedtest.Speedtest()
 				test.get_best_server()
-				await messageChargement.edit("Mesure du débit descendant")
+				await messageChargement.edit(content = "Mesure du débit descendant")
 				test.download()
-				await messageChargement.edit("Mesure du débit montant")
+				await messageChargement.edit(content = "Mesure du débit montant")
 				test.upload()
 				url = test.results.share()
-				await messageChargement.delete_message()
+				await messageChargement.delete()
 				em = discord.Embed(title="** **Voilà ma bonne connexion de campagnard", color=0x012ea0)
 				em.set_image(url=test.results.share())
 				await message.channel.send(embed=em)
 				print("Speedtest: fait par " + message.author.name + ". Les résultats sont " + test.results.share() + "\n")
 				speedtestEnCours = False
 			else:
-				await message.channel.send(message.channel, "Vous avez essayé de faire un speedtest, mais un autre était déjà en cours. Veuillez réessayer")
+				await message.channel.send("Vous avez essayé de faire un speedtest, mais un autre était déjà en cours. Veuillez réessayer")
 			
 			# Translate
 		elif message.content.startswith(prefixe + "traduire"):
@@ -419,7 +419,7 @@ async def on_message(message):
 				fichier.write(audio)
 			#son = from_mpga("tts.mpga")
 			#son.export("tts.mp3", format="mp3")
-			await message.channel.send_file("tts.mpga")
+			await message.channel.send("tts.mpga")
 
 			# Flip
 		elif message.content.startswith(prefixe + "flip"):
@@ -546,17 +546,23 @@ async def on_message(message):
 
 			# Ah !
 		elif message.content.startswith(prefixe + "ah"):
-			await message.channel.send_file("img/ah.jpg")
+			file_path = "img/ah.jpg"
+			with open(file_path, "rb") as file:
+				await message.channel.send(file=file)
 			print("Discussion: " + message.author.name + ": ah !")
 
 			# Obvious
 		elif message.content.startswith(prefixe + "obvious"):
-			await message.channel.send_file("img/obvious.jpg")
+			file_path = "img/obvious.jpg"
+			with open(file_path, "rb") as file:
+				await message.channel.send(file=file)
 			print("Discussion: " + message.author.name + ": Merci captain obvious !")
 
 			# Non
 		elif message.content.startswith(prefixe + "non"):
-			await message.channel.send_file("img/non.jpg")
+			file_path = "img/non.jpg"
+			with open(file_path, "rb") as file:
+				await message.channel.send(file=file)
 			print("Discussion: " + message.author.name + ": Non")
 
 			# C'est à n'y rien comprendre
