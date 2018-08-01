@@ -419,7 +419,7 @@ async def on_message(message):
 				fichier.write(audio)
 			#son = from_mpga("tts.mpga")
 			#son.export("tts.mp3", format="mp3")
-			await message.channel.send_file("tts.mpga")
+			await message.channel.send("tts.mpga")
 
 			# Flip
 		elif message.content.startswith(prefixe + "flip"):
