@@ -546,17 +546,23 @@ async def on_message(message):
 
 			# Ah !
 		elif message.content.startswith(prefixe + "ah"):
-			await message.channel.send_file("img/ah.jpg")
+			file_path = "img/ah.jpg"
+			with open(file_path, "rb") as file:
+				await message.channel.send(file=file)
 			print("Discussion: " + message.author.name + ": ah !")
 
 			# Obvious
 		elif message.content.startswith(prefixe + "obvious"):
-			await message.channel.send_file("img/obvious.jpg")
+			file_path = "img/obvious.jpg"
+			with open(file_path, "rb") as file:
+				await message.channel.send(file=file)
 			print("Discussion: " + message.author.name + ": Merci captain obvious !")
 
 			# Non
 		elif message.content.startswith(prefixe + "non"):
-			await message.channel.send_file("img/non.jpg")
+			file_path = "img/non.jpg"
+			with open(file_path, "rb") as file:
+				await message.channel.send(file=file)
 			print("Discussion: " + message.author.name + ": Non")
 
 			# C'est à n'y rien comprendre
