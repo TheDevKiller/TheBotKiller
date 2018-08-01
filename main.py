@@ -375,7 +375,7 @@ async def on_message(message):
 				print("Speedtest: fait par " + message.author.name + ". Les résultats sont " + test.results.share() + "\n")
 				speedtestEnCours = False
 			else:
-				await message.channel.send(message.channel, "Vous avez essayé de faire un speedtest, mais un autre était déjà en cours. Veuillez réessayer")
+				await message.channel.send("Vous avez essayé de faire un speedtest, mais un autre était déjà en cours. Veuillez réessayer")
 			
 			# Translate
 		elif message.content.startswith(prefixe + "traduire"):
