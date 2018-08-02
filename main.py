@@ -22,6 +22,7 @@ from PIL import Image
 from pydub import AudioSegment
 import sys
 import traceback
+import psutil
 
 ##########
 # Secret #
@@ -320,18 +321,38 @@ async def on_message(message):
 			# Utilitaire #
 			##############
 
+			# PC
+		if message.content.startswith(prefixe + "pc"):
+			la = ""
+			for index, elements in enumerate(os.getloadavg()):
+				if index != 2: la += "**" + str(elements) + "**" + " | " 
+				elif index == 2: la += "**" + str(elements) + "**" 
+			em.add_field(name="<:level_slider:474325122904489984> Load Average", value=la) # Load Average
+			em.add_field(name="<:cpu:452823427137667089> CPU", value="**" + str(psutil.cpu_percent()) + "%**") # CPU Percent
+			em.add_field(name="<:computerram:452824190475698187> RAM", value="**" + str(psutil.virtual_memory().percent) + "% **") # RAM Percent
+			uptimeplst = subprocess.check_output(["uptime", "-p"]).decode().split(" ")[1:]
+			uptimep = ""
+			for elements in uptimeplst:
+				uptimep += elements + " "
+			uptimeEmoteNbre = subprocess.check_output("uptime").split(" ")[3]
+			em.add_field(name=":clock10: Uptime", value="**" + uptimep.replace("week", "semaine").replace("day","jour").replace("hour","heure") + "**") # Uptime
+			em.add_field(name="<:ubuntu:465194164548665345> OS", value="**Ubuntu 18.04 LTS**") # OS
+			await message.channel.send(embed=em)
+
 			# Shell
-		if message.content.startswith(prefixe + "shell"):
-			if message.author == thedevkiller:
-				commandeliste = message.content.split(" ")[1:]
-				commande = " "
-				for elements in commandeliste:
-					commande += elements + " "
-				proc = subprocess.Popen(commandeliste, stdout=subprocess.PIPE)
-				output = proc.stdout.read()
-				await message.channel.send(output.decode())
-			else:
-				await message.channel.send("Tu veux faire n'importe quoi sur mon PC ! Nan mais tu t'es cru où là ?!")		
+#		elif message.content.startswith(prefixe + "shell"):
+#			if message.author == thedevkiller:
+#				commandeliste = message.content.split(" ")[1:]
+#				commande = " "
+#				for elements in commandeliste:
+#					commande += elements + " "
+#				proc = subprocess.Popen(commandeliste, stdout=subprocess.PIPE)
+#				output = proc.stdout.read().decode()
+#				while len(output)>2000:
+#					await message.channel.send(output[0:1999])
+#					output = output[1990:]	
+#			else:
+#				await message.channel.send("Tu veux faire n'importe quoi sur mon PC ! Nan mais tu t'es cru où là ?!")		
 
 			# Code
 		elif message.content.startswith(prefixe + "code"): # Envoie le lien Github
@@ -823,7 +844,10 @@ async def on_message(message):
 
 			# Neko
 		elif message.content.startswith(prefixe + "neko"):
-			arg = message.content.split(" ")[1]
-			await message.channel.send(nekos.img((arg)))
+			if message.channel.is_nsfw():
+				arg = message.content.split(" ")[1]
+				await message.channel.send(nekos.img((arg)))
+			else:
+				await message.channel.send("Tu va choquer des gens:scream: ! Vas dans un salon NSFW enfin !")
 
 client.run(secrets["discord"])
