@@ -127,6 +127,67 @@ speedtestEnCours = False
 
 prefixe = "&"
 
+	########
+	# Neko #
+	########
+
+agrumentsNeko = \
+"""
+feet: Pour les amateurs de pieds
+yuri: Des bonnes lesbiennes
+trap: Pour ceux qui aiment le changement de sexe x)
+futanari: Pour ceux qui aiment le changement de sexe mais en gardant les bases :wink:
+hololewd:
+lewdkemo:
+solog:
+feetg:
+cum:
+erokemo:
+les:
+lewdk:
+ngif:
+tickle:
+lewd: Pour ceux qui n'aiment pas la censure :smiley:
+eroyuri:
+eron:
+cum_jpg:
+bj:
+nsfw_neko_gif:
+solo:
+kemonomimi:
+nsfw_avatar:
+poke:
+anal:
+slap:
+hentai:
+avatar:
+erofeet:
+holo:
+keta:
+blowjob:
+pussy:
+tits:
+holoero:
+lizard:
+pussy_jpg:
+pwankg:
+classic:
+kuni:
+pat:
+8ball:
+kiss:
+femdom:
+neko:
+cuddle:
+erok:
+fox_girl:
+boobs:
+random_hentai_gif:
+smallboobs:
+hug:
+ero:
+"""
+
 ##############
 # Paramètres #
 ##############
@@ -248,7 +309,7 @@ async def on_ready():
 @client.event
 async def on_error(event, *args, **kwargs):
 	message = args[0]
-	if message.channel.name == "spam-bot" or message.channel.name == "spamme-botte":
+	if message.channel.name == "spam-bot" or message.guild.id == "459096977507090432":
 		await message.channel.send(embed=discord.Embed(title="C'est con !", description="```python\n" + traceback.format_exc() + "\n```", color=0xff0000))
 	await thedevkiller.send("```python\n" + traceback.format_exc() + "\n```")
 #############
@@ -323,20 +384,62 @@ async def on_message(message):
 
 			# PC
 		if message.content.startswith(prefixe + "pc"):
-			la = ""
-			for index, elements in enumerate(os.getloadavg()):
-				if index != 2: la += "**" + str(elements) + "**" + " | " 
-				elif index == 2: la += "**" + str(elements) + "**" 
-			em.add_field(name="<:level_slider:474325122904489984> Load Average", value=la) # Load Average
-			em.add_field(name="<:cpu:452823427137667089> CPU", value="**" + str(psutil.cpu_percent()) + "%**") # CPU Percent
-			em.add_field(name="<:computerram:452824190475698187> RAM", value="**" + str(psutil.virtual_memory().percent) + "% **") # RAM Percent
-			uptimeplst = subprocess.check_output(["uptime", "-p"]).decode().split(" ")[1:]
-			uptimep = ""
-			for elements in uptimeplst:
-				uptimep += elements + " "
-			uptimeEmoteNbre = subprocess.check_output("uptime").split(" ")[3]
-			em.add_field(name=":clock10: Uptime", value="**" + uptimep.replace("week", "semaine").replace("day","jour").replace("hour","heure") + "**") # Uptime
-			em.add_field(name="<:ubuntu:465194164548665345> OS", value="**Ubuntu 18.04 LTS**") # OS
+			if message.content.strip() == "&pc":
+				await message.channel.send("Voulez-vous en savoir plus sur le `hardware` ou les `infos` ?")
+			elif message.content.split(" ")[1] == "infos":
+
+					# Load Average
+				la = ""
+				for index, elements in enumerate(os.getloadavg()):
+					if index != 2: la += "**" + str(elements) + "**" + " | " 
+					elif index == 2: la += "**" + str(elements) + "**"
+
+					# Uptime
+				uptimeplst = subprocess.check_output(["uptime", "-p"]).decode().split(" ")[1:]
+				uptimep = ""
+				for elements in uptimeplst:
+					uptimep += elements + " "
+
+				st = os.statvfs("/")
+				used = round((st.f_blocks - st.f_bfree) * st.f_frsize / 1000000000, 1)
+				total = round(st.f_blocks * st.f_frsize / 1000000000, 1)
+
+					# Color
+				if float(la.split(" ")[0].replace("**", "")) <= 3: color = 0x00ff00
+				elif float(la.split(" ")[0].replace("**", "")) > 3 and float(la.split(" ")[0].replace("**", "")) < 4: color = 0xFF6D00
+				elif float(la.split(" ")[0].replace("**", "")) >= 4: color = 0xff000
+				else: color = 0xffffff
+
+				em = discord.Embed(title="<:server:452826125584826378> Mon PC - Infos", color=color)
+				em.add_field(name="<:level_slider:474325122904489984> Load Average", value=la) # Load Average
+				em.add_field(name="<:cpu:452823427137667089> CPU", value="**" + str(psutil.cpu_percent()) + "%**") # CPU Percent
+				em.add_field(name="<:computerram:452824190475698187> RAM", value="**" + str(psutil.virtual_memory().percent) + "% **") # RAM Percent
+				#uptimeEmoteNbre = subprocess.check_output("uptime").split(" ")[3]
+				em.add_field(name=":clock10: Uptime", value="**" + uptimep.replace("week", "semaine").replace("day","jour").replace("hour","heure") + "**") # Uptime
+				em.add_field(name="<:ubuntu:465194164548665345> OS", value="**Ubuntu 18.04 LTS**") # OS
+				em.add_field(name="💾 Espace utilisé", value="**" + str(used) + "**" + "/" + "**" + str(total) + "** GB")
+				await message.channel.send(embed=em)
+
+				# Hardware
+			elif message.content.split(" ")[1] == "hardware":
+				em = discord.Embed(title="<:server:452826125584826378> Mon PC - Hardware", color=0x106b02)
+				em.add_field(name=":computer: Modèle", value="**MSI CX62 6QD 249XFR**")
+				em.add_field(name="<:nvidia:474722211391995904> Carte graphique", value="**NVIDIA 940MX**")
+				em.add_field(name="<:intel:474722665752428569> Processeur", value="**Intel core i3 4 coeurs**")
+				em.add_field(name="<:computerram:452824190475698187> RAM", value="**4GB DDR4**")
+
+				await message.channel.send(embed=em)
+			else:
+				await message.channel.send("Voulez-vous en savoir plus sur le `hardware` ou les `infos` ?")
+
+			# Serveurs
+		elif message.content.startswith(prefixe + "serveurs"):
+			serveurs = "** **\n"
+			servnbre = 0
+			for elements in client.guilds:
+				serveurs += "- **" + elements.name + "**\n\n" 
+				servnbre += 1
+			em = discord.Embed(title="<:server:452826125584826378> Serveurs", description=serveurs + "Je suis actuellement sur **" + str(servnbre) + "** serveurs", color=0x0294fc)
 			await message.channel.send(embed=em)
 
 			# Shell
@@ -716,7 +819,7 @@ async def on_message(message):
 			##############
 
 			# Dire un message
-		elif message.content.startswith(client.user.mention + " dis"):
+		elif message.content.startswith(client.user.mention + " dis") or message.content.startswith(prefixe + "dis"):
 			messageADireListe = message.content.split(" ")[2:]
 			messageADire = ""
 			for elements in messageADireListe:
@@ -846,8 +949,11 @@ async def on_message(message):
 		elif message.content.startswith(prefixe + "neko"):
 			if message.channel.is_nsfw():
 				arg = message.content.split(" ")[1]
-				await message.channel.send(nekos.img((arg)))
+				try:
+					await message.channel.send(nekos.img((arg)))
+				except nekos.errors.InvalidArgument:
+					await message.channel.send("Entre un argument valide :wink:\n Arguments: ['feet', 'yuri', 'trap', 'futanari', 'hololewd', 'lewdkemo', 'solog', 'feetg', 'cum', 'erokemo', 'les', 'lewdk', 'ngif', 'meow', 'tickle', 'lewd', 'feed', 'eroyuri', 'eron', 'cum_jpg', 'bj', 'nsfw_neko_gif', 'solo', 'kemonomimi', 'nsfw_avatar', 'poke', 'anal', 'slap', 'hentai', 'avatar', 'erofeet', 'holo', 'keta', 'blowjob', 'pussy', 'tits', 'holoero', 'lizard', 'pussy_jpg', 'pwankg', 'classic', 'kuni', 'pat', '8ball', 'kiss', 'femdom', 'neko', 'cuddle', 'erok', 'fox_girl', 'boobs', 'random_hentai_gif', 'smallboobs', 'hug', 'ero']")
 			else:
-				await message.channel.send("Tu va choquer des gens:scream: ! Vas dans un salon NSFW enfin !")
+				await message.channel.send("Tu va choquer des gens :scream: ! Vas dans un salon NSFW enfin !")
 
 client.run(secrets["discord"])
