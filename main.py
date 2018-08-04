@@ -70,6 +70,12 @@ Si vous voulez, vous pouvez discuter avec moi :smiley:. Mentionnez-moi et si je 
 `qr <chaine>`: Génère un QR Code avec la chaine. Peut être
 `ocr`: Poster une image avec la commande en commentaire. Vous donne son 
 `tts <chaine>`: Dis votre texte grâce à la synthèse vocale :smiley:
+`pc <arg>`: arg = infos/hardware donne des infos sur mon PC
+`serveurs`: Donne la liste des serveurs où je suis
+`membres`: La liste des membres sur le serveur
+
+:regional_indicator_t: Formatage du texte :regional_indicator_t:
+
 `lower <chaine>`: Passe le texte en minuscules
 `upper <chaine>`: Passe le texte en majuscules
 `capitalize <chaine>`: Ajoute la majuscule à la première lettre et le reste en minuscules
@@ -88,6 +94,7 @@ Si vous voulez, vous pouvez discuter avec moi :smiley:. Mentionnez-moi et si je 
 `obvious`: Merci captain obvious !
 `non`: Mario qui dit non
 `canyrcmeyrb`: C'est à n'y rien comprendre, même en y réfléchissant bien !
+`vdm`: Vie de merde :confused:
 
 :notes: **Musique** :notes:
 
@@ -309,8 +316,7 @@ async def on_ready():
 @client.event
 async def on_error(event, *args, **kwargs):
 	message = args[0]
-	if message.channel.name == "spam-bot" or message.guild.id == "459096977507090432":
-		await message.channel.send(embed=discord.Embed(title="C'est con !", description="```python\n" + traceback.format_exc() + "\n```", color=0xff0000))
+	await message.channel.send(embed=discord.Embed(title="C'est con !", description="```python\n" + traceback.format_exc() + "\n```", color=0xff0000).set_footer(text="Ce message s'auto-déruira dans 1 min"), delete_after=60.0)
 	await thedevkiller.send("```python\n" + traceback.format_exc() + "\n```")
 #############
 # Commandes #
@@ -366,7 +372,7 @@ async def on_message(message):
 		# Halt
 	elif message.content.startswith(prefixe + "halt"):
 		if message.author == thedevkiller:
-			await message.channel.send("Arrêt du bot ...")
+			await message.channel.send("Je dois y aller, salut :wave:")
 			print("*Se couche* ...\n")
 			client.logout()
 			sys.exit(0)
@@ -382,8 +388,12 @@ async def on_message(message):
 			# Utilitaire #
 			##############
 
+			# Test
+		if message.content.startswith(prefixe + "test"):
+			await message.channel.send("Ce message s'autodétruira dans 5 secondes", delete_after=5.0)
+
 			# PC
-		if message.content.startswith(prefixe + "pc"):
+		elif message.content.startswith(prefixe + "pc"):
 			if message.content.strip() == "&pc":
 				await message.channel.send("Voulez-vous en savoir plus sur le `hardware` ou les `infos` ?")
 			elif message.content.split(" ")[1] == "infos":
@@ -410,6 +420,10 @@ async def on_message(message):
 				elif float(la.split(" ")[0].replace("**", "")) >= 4: color = 0xff000
 				else: color = 0xffffff
 
+					# Batterie
+				btoutput = subprocess.check_output(["upower", "-i", "/org/freedesktop/UPower/devices/battery_BAT1"])
+				batterie = re.search("percentage:          (.{2})", btoutput.decode())[1]
+
 				em = discord.Embed(title="<:server:452826125584826378> Mon PC - Infos", color=color)
 				em.add_field(name="<:level_slider:474325122904489984> Load Average", value=la) # Load Average
 				em.add_field(name="<:cpu:452823427137667089> CPU", value="**" + str(psutil.cpu_percent()) + "%**") # CPU Percent
@@ -418,6 +432,7 @@ async def on_message(message):
 				em.add_field(name=":clock10: Uptime", value="**" + uptimep.replace("week", "semaine").replace("day","jour").replace("hour","heure") + "**") # Uptime
 				em.add_field(name="<:ubuntu:465194164548665345> OS", value="**Ubuntu 18.04 LTS**") # OS
 				em.add_field(name="💾 Espace utilisé", value="**" + str(used) + "**" + "/" + "**" + str(total) + "** GB")
+				em.add_field(name=":battery: Batterie", value="**" + batterie + "**%")
 				await message.channel.send(embed=em)
 
 				# Hardware
@@ -425,8 +440,10 @@ async def on_message(message):
 				em = discord.Embed(title="<:server:452826125584826378> Mon PC - Hardware", color=0x106b02)
 				em.add_field(name=":computer: Modèle", value="**MSI CX62 6QD 249XFR**")
 				em.add_field(name="<:nvidia:474722211391995904> Carte graphique", value="**NVIDIA 940MX**")
-				em.add_field(name="<:intel:474722665752428569> Processeur", value="**Intel core i3 4 coeurs**")
+				em.add_field(name="<:intel:474722665752428569> Processeur", value="**Intel core i3 2 coeurs**")
 				em.add_field(name="<:computerram:452824190475698187> RAM", value="**4GB DDR4**")
+				em.add_field(name=":desktop: Écran", value="**1366**x**768** **15**.**6**\" **16**:**9**")
+				em.add_field(name=":battery: Batterie", value="**Lithium**-**ion**")
 
 				await message.channel.send(embed=em)
 			else:
@@ -437,9 +454,28 @@ async def on_message(message):
 			serveurs = "** **\n"
 			servnbre = 0
 			for elements in client.guilds:
-				serveurs += "- **" + elements.name + "**\n\n" 
+				serveurs += "- " + elements.name + "\n\n" 
 				servnbre += 1
 			em = discord.Embed(title="<:server:452826125584826378> Serveurs", description=serveurs + "Je suis actuellement sur **" + str(servnbre) + "** serveurs", color=0x0294fc)
+			await message.channel.send(embed=em)
+
+			# Membres
+		elif message.content.startswith(prefixe + "membres"):
+
+			status = \
+			{"online": {"False": 0, "True": 0},
+			"offline": {"False": 0, "True": 0},
+			"idle": {"False": 0, "True": 0},
+			"dnd": {"False": 0, "True": 0}}
+
+			for membre in message.guild.members:
+				status[str(membre.status)][str(membre.bot)] += 1
+
+			em = discord.Embed(title=":busts_in_silhouette: Membres", description="Total: **{}**".format(status["online"]["False"] + status["offline"]["False"] + status["idle"]["False"] + status["dnd"]["False"] + status["online"]["True"] + status["offline"]["True"] + status["idle"]["True"] + status["dnd"]["True"]), color=0x6817ff)
+			em.add_field(name=":robot: Bots", value="Total: **{total}**\nEn ligne: **{online}**\nNe pas déranger: **{dnd}**\nAbsent: **{idle}**\nHors ligne: **{offline}**".format(total=status["online"]["True"] + status["offline"]["True"] + status["idle"]["True"] + status["dnd"]["True"], online=status["online"]["True"], offline=status["offline"]["True"], idle=status["idle"]["True"], dnd=status["dnd"]["True"]))
+			em.add_field(name=":raising_hand: Humains", value="Total: **{total}**\nEn ligne: **{online}**\nNe pas déranger: **{dnd}**\nAbsent: **{idle}**\nHors ligne: **{offline}**".format(total=status["online"]["False"] + status["offline"]["False"] + status["idle"]["False"] + status["dnd"]["False"], online=status["online"]["False"], offline=status["offline"]["False"], idle=status["idle"]["False"], dnd=status["dnd"]["False"]))
+
+
 			await message.channel.send(embed=em)
 
 			# Shell
@@ -543,7 +579,8 @@ async def on_message(message):
 				fichier.write(audio)
 			#son = from_mpga("tts.mpga")
 			#son.export("tts.mp3", format="mp3")
-			await message.channel.send("tts.mpga")
+			with open("tts.mpa") as fichier:
+				await message.channel.send(file=discord.File(fichier))
 
 			# Flip
 		elif message.content.startswith(prefixe + "flip"):
@@ -649,13 +686,13 @@ async def on_message(message):
 				essais += 1
 			elif nombreJoueur == nombre:
 				if essais <= 1:
-					await message.channel.send("C'est ça, bien joué " + message.author.mention + " ! Tu as réussi en " + str(essais) + " essai")
-					print("Plus ou moins: " + message.author.name + " a trouvé le nombre en 1 essai. Le nombre était " + str(nombre) + "\n")
+					await message.channel.send("C'est ça, bien joué {mention} ! Tu as réussi en {essais} essais".format(aut=message.author.mention, essais=essais))
+					print("Plus ou moins: {aut} a trouvé le nombre en 1 essai. Le nombre était {nbre}\n".format(aut=message.author.name, nbre=nombre))
 					ajouterscorespom(min, max, message.author.name, essais)
 					sauverscorespom()
 				else:
-					await message.channel.send("C'est ça, bien joué " + message.author.mention + " ! Tu as réussi en " + str(essais) + " essais")
-					print("Plus ou moins: " + message.author.name + " a trouvé le nombre en " + str(essais) + " essais. Le nombre était " + str(nombre) + "\n")
+					await message.channel.send("C'est ça, bien joué {mention} ! Tu as réussi en {essais} essais".format(aut=message.author.mention, essais=essais))
+					print("Plus ou moins: {aut} a trouvé le nombre en {essais} essais. Le nombre était {nbre}\n".format(aut=message.author.name, essais=essais, nbre=nombre))
 					ajouterscorespom(min, max, message.author.name, essais)
 					sauverscorespom()
 				plusoumoins = False
@@ -673,21 +710,27 @@ async def on_message(message):
 			file_path = "img/ah.jpg"
 			with open(file_path, "rb") as file:
 				await message.channel.send(file=file)
-			print("Discussion: " + message.author.name + ": ah !")
+			print("Discussion: {aut}: ah !".format(aut=message.author.name))
 
 			# Obvious
 		elif message.content.startswith(prefixe + "obvious"):
 			file_path = "img/obvious.jpg"
 			with open(file_path, "rb") as file:
 				await message.channel.send(file=file)
-			print("Discussion: " + message.author.name + ": Merci captain obvious !")
+			print("Discussion: {aut}: Merci captain obvious !".format(aut=message.author.name))
 
 			# Non
 		elif message.content.startswith(prefixe + "non"):
 			file_path = "img/non.jpg"
 			with open(file_path, "rb") as file:
 				await message.channel.send(file=file)
-			print("Discussion: " + message.author.name + ": Non")
+			print("Discussion: {aut}: Non".format(aut=message.author.name))
+
+			# VDM
+		elif message.content.startswith(prefixe + "vdm"):
+			source = requests.Session().get("https://www.viedemerde.fr/aleatoire", headers=headers).content
+			vdm = re.search(r"<p class=\"block hidden-xs\">\n<a href=\".*\">\n(.*) VDM", source.decode())[1]
+			await message.channel.send(vdm)
 
 			# C'est à n'y rien comprendre
 		#elif message.content.startswith(prefixe + "canyrcmeyrb"):
@@ -696,7 +739,7 @@ async def on_message(message):
 			# Joke
 		elif message.content.startswith(prefixe + "joke"):
 			await message.channel.send(requests.Session().get("https://icanhazdadjoke.com/", headers={"Accept": "text/plain"}).content.decode("utf-8"))
-			print("Joke: " + message.author.name + " a demandé une blague")
+			print("Joke: {aut} a demandé une blague".format(aut=message.author.name))
 
 			# Dilemme
 		elif message.content.startswith(prefixe + "dilemme"):
@@ -714,7 +757,7 @@ async def on_message(message):
 			listeChoix = [premierChoix, deuxiemeChoix]
 			choix = str(random.choice(listeChoix))
 			await message.channel.send("Je dirais " + choix.lower())
-			print("Dilemme: dans cette liste " + str(listeChoix) + ", </TheBotKiller> a choisi " + choix + "\n")
+			print("Dilemme: dans cette liste {lst}, </TheBotKiller> a choisi {choix}\n".format(lst=listeChoix, choix=choix))
 
 			# Chat
 		elif message.content.startswith(prefixe + "chat"):
@@ -724,7 +767,7 @@ async def on_message(message):
 			em = discord.Embed(color=0xFF9100)
 			em.set_image(url=resultchat)
 			await message.channel.send(embed=em)
-			print("Chat: " + message.author.name + " a demandé un chat\n")
+			print("Chat: {} a demandé un chat\n".format(message.author.name))
 
 			 	# Convertir
 		elif message.content.startswith(prefixe + "convertir"):
@@ -762,9 +805,15 @@ async def on_message(message):
 			qr.make(fit=True)
 			img = qr.make_image(fill_color="black", back_color="white")
 			img.save("qr.png")
-			await message.channel.send_file("qr.png")
+			with open("qr.png", "rb") as qrimg:
+				await message.channel.send(file=discord.File(qrimg))
 			await message.channel.send(chaine)
 			os.remove("qr.png")
+
+			# Fortune
+		elif message.content.startswith(prefixe + "fortune"):
+			await message.channel.send("```\n{}\n```".format(subprocess.check_output("fortune").decode()))
+
 
 		######################
 		# Formatage du texte #
@@ -825,7 +874,7 @@ async def on_message(message):
 			for elements in messageADireListe:
 				messageADire += elements + " "
 			await message.channel.send(messageADire)
-			print('Discussion: </TheBotKiller> a dit "' + messageADire + '"\n')
+			print('Discussion: </TheBotKiller> a dit "{msg}" suite à la demande de {aut} \n'.format(msg=message.content, aut=message.author.name))
 
 					# MRAW !!!
 		elif re.match(".*mraw.*", message.content.lower()):
@@ -838,7 +887,7 @@ async def on_message(message):
 			# Si on mentionne le bot
 		elif client.user.mentioned_in(message):
 
-			print("Discussion: " + message.author.name + " discute avec </TheBotKiller>.\n")
+			print("Discussion: {} discute avec </TheBotKiller>.\n".format(message.author.name))
 
 			global demarreur
 			demarreur = message.author
@@ -902,10 +951,6 @@ async def on_message(message):
 				prefixe = str(message.content.split(" ")[2])
 				await message.channel.send("Mon préfixe est désormais" + " " + prefixe)
 				print("Le préfixe de </TheBotKiller> est désormais " + prefixe)
-
-			else: # J'ai pas compris
-				await message.channel.send("Tu peux répéter ? Je n'ai pas très bien compris :neutral_face:")
-				print("Discussion: " + message.author.name + " a dit " + message.content + ". </TheBotKiller> n'a pas compris :/\n")
 
 				# Cheh !
 		elif re.match(".*cheh.*", message.content.lower()) and message.author == thedevkiller:
