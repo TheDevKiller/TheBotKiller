@@ -128,7 +128,7 @@ plusoumoins = False
 
 flags = ['ac', 'ad', 'ae', 'af', 'ag', 'ai', 'al', 'am', 'ao', 'aq', 'ar', 'as', 'at', 'au', 'aw', 'ax', 'az', 'ba', 'bb', 'bd', 'be', 'bf', 'bg', 'bh', 'bi', 'bj', 'bm', 'bn', 'bo', 'br', 'bs', 'bt', 'bw', 'by', 'bz', 'ca', 'cc', 'cd', 'cf', 'cg', 'ch', 'ci', 'ck', 'cl', 'cm', 'cn', 'co', 'cr', 'cu', 'cv', 'cw', 'cx', 'cy', 'cz', 'de', 'dj', 'dk', 'dm', 'do', 'dz', 'ec', 'ee', 'eg', 'er', 'es', 'et', 'eu', 'fi', 'fj', 'fm', 'fo', 'fr', 'ga', 'gb', 'gd', 'ge', 'gg', 'gh', 'gi', 'gl', 'gm', 'gn', 'gq', 'gr', 'gt', 'gu', 'gw', 'gy', 'hk', 'hn', 'hr', 'ht', 'hu', 'ic', 'id', 'ie', 'il', 'im', 'in', 'io', 'iq', 'ir', 'is', 'it', 'je', 'jm', 'jo', 'jp', 'ke', 'kg', 'kh', 'ki', 'km', 'kn', 'kp', 'kr', 'kw', 'ky', 'kz', 'la', 'lb', 'lc', 'li', 'lk', 'lr', 'ls', 'lt', 'lu', 'lv', 'ly', 'ma', 'mc', 'md', 'me', 'mg', 'mh', 'mk', 'ml', 'mm', 'mn', 'mo', 'mp', 'mr', 'ms', 'mt', 'mu', 'mv', 'mw', 'mx', 'my', 'mz', 'na', 'ne', 'nf', 'ng', 'ni', 'nl', 'no', 'np', 'nr', 'nu', 'nz', 'om', 'pa', 'pe', 'pf', 'pg', 'ph', 'pk', 'pl', 'pn', 'pr', 'ps', 'pt', 'pw', 'py', 'qa', 'ro', 'rs', 'ru', 'rw', 'sa', 'sb', 'sc', 'sd', 'se', 'sg', 'sh', 'si', 'sk', 'sl', 'sm', 'sn', 'so', 'sr', 'ss', 'st', 'sv']
 
-headers = {"User-Agent": "Je suis un gentil bot qui vient en paix ^^"}
+headers = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/60.0"}
 
 speedtestEnCours = False
 
@@ -439,11 +439,12 @@ async def on_message(message):
 			elif message.content.split(" ")[1] == "hardware":
 				em = discord.Embed(title="<:server:452826125584826378> Mon PC - Hardware", color=0x106b02)
 				em.add_field(name=":computer: Modèle", value="**MSI CX62 6QD 249XFR**")
-				em.add_field(name="<:nvidia:474722211391995904> Carte graphique", value="**NVIDIA 940MX**")
+				em.add_field(name="<:nvidia:474722211391995904> Carte graphique", value="**NVIDIA 940MX 2**GB")
 				em.add_field(name="<:intel:474722665752428569> Processeur", value="**Intel core i3 2 coeurs**")
 				em.add_field(name="<:computerram:452824190475698187> RAM", value="**4GB DDR4**")
-				em.add_field(name=":desktop: Écran", value="**1366**x**768** **15**.**6**\" **16**:**9**")
+				em.add_field(name=":desktop: Écran", value="**Mat 1366**x**768** **15**.**6**\" **16**:**9**")
 				em.add_field(name=":battery: Batterie", value="**Lithium**-**ion**")
+				em.add_field(name="💾 Disque Dur", value="**HDD 500**GB")
 
 				await message.channel.send(embed=em)
 			else:
@@ -709,21 +710,21 @@ async def on_message(message):
 		elif message.content.startswith(prefixe + "ah"):
 			file_path = "img/ah.jpg"
 			with open(file_path, "rb") as file:
-				await message.channel.send(file=file)
+				await message.channel.send(file=discord.File(file))
 			print("Discussion: {aut}: ah !".format(aut=message.author.name))
 
 			# Obvious
 		elif message.content.startswith(prefixe + "obvious"):
 			file_path = "img/obvious.jpg"
 			with open(file_path, "rb") as file:
-				await message.channel.send(file=file)
+				await message.channel.send(file=discord.File(file))
 			print("Discussion: {aut}: Merci captain obvious !".format(aut=message.author.name))
 
 			# Non
 		elif message.content.startswith(prefixe + "non"):
 			file_path = "img/non.jpg"
 			with open(file_path, "rb") as file:
-				await message.channel.send(file=file)
+				await message.channel.send(file=discord.File(file))
 			print("Discussion: {aut}: Non".format(aut=message.author.name))
 
 			# VDM
@@ -735,6 +736,11 @@ async def on_message(message):
 			# C'est à n'y rien comprendre
 		#elif message.content.startswith(prefixe + "canyrcmeyrb"):
 
+			# DansTonChat
+		elif message.content.startswith(prefixe + "dtc"):
+			source = requests.Session().get("https://danstonchat.com/random0.html", headers={'Cache-Control': 'no-cache'}).content.decode()
+			chat = re.search(r"<div class=\"addthis_inline_share_toolbox\" data-url=\"http:\/\/danstonchat\.com\/.{4}\" data-title=\"Dans Ton Chat n°.{4}\" data-description=\"(.+?)\" data-media=\"https://danstonchat\.com/icache/size/.{3}c.{3}/themes/danstonchat.{4}/images/logo-og\.png\">", source, flags=re.S)
+			await message.channel.send(chat)
 
 			# Joke
 		elif message.content.startswith(prefixe + "joke"):
@@ -769,7 +775,7 @@ async def on_message(message):
 			await message.channel.send(embed=em)
 			print("Chat: {} a demandé un chat\n".format(message.author.name))
 
-			 	# Convertir
+			# Convertir
 		elif message.content.startswith(prefixe + "convertir"):
 			unite1 = message.content.split(" ")[1]
 			unite2 = message.content.split(" ")[2]
@@ -795,7 +801,7 @@ async def on_message(message):
 			else:
 				await message.channel.send("Désolé mais je ne connais pas ces unités :confused:")
 
-				# QR Code
+			# QR Code
 		elif message.content.startswith(prefixe + "qr"):
 			chaineListe = message.content.split(" ")[1:]
 			chaine = ""
