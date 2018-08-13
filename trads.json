@@ -1,0 +1,22 @@
+{
+	"fr": {
+		"youcant": "Tu ne peux pas faire ça :stuck_out_tongue_winking_eye:",
+		"reboot": "Je reviens très vite :wave:",
+		"loaded": "Module {} chargé",
+		"idonthavemodule": "Désolé mais je n'ai pas ce module :sweat_smile:",
+		"reloaded": "Module {} rechargé",
+		"unloaded": "Module {} déchargé",
+		"noavailableset": "Désolé mais ce paramètre n'est pad disponible :sweat_smile:",
+		"shutdown": "Je dois y aller, ++"
+	},
+	"en": {
+		"youcant": "You can't do this :stuck_out_tongue_winking_eye:",
+		"reboot": "I'll be back very soon :wave:",
+		"loaded": "Module {} loaded",
+		"idonthavemodule": "Sorry but I don't have this module :sweat_smile:",
+		"reloaded": "Module {} reloaded",
+		"unloaded": "Module {} unloaded",
+		"noavailableset": "Sorry but this setting is not available :sweat_smile:",
+		"shutdown": "I must get away, ++"
+	}
+}

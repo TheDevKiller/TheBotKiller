@@ -3,4 +3,4 @@ __pycache__
 db
 reports.txt
 secrets.json
-.idea
+.ideaconfig.json
