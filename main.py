@@ -52,6 +52,8 @@ with open("trads.json", "r") as fichier:
 # Coroutines #
 ##############
 
+#bot.remove_command("help")
+
 @bot.event
 async def on_ready():
         global thedevkiller
@@ -143,6 +145,13 @@ async def conf(ctx, param, valeur):
             fichier.write(json.dumps(config, indent=4))
     else:
         await ctx.send(trad[config[str(ctx.message.guild.id)]["lang"]]["noavailableset"])
+
+#@bot.command()
+#async def help(ctx):
+#    for command in bot.commands:
+#        if command.cog_name == None: cog_name = getmsg(ctx, "nocathelp")
+#        if 
+#        print(command.name + " " + command.cog_name)
 
 @bot.event
 async def on_command(ctx):

@@ -8,6 +8,8 @@ import requests
 import re
 import nekos
 import random
+from bs4 import BeautifulSoup
+import random
 
 ########
 # Code #
@@ -25,7 +27,11 @@ class Fun:
         @commands.command(aliases=["viedemerde"], brief="Vie de merde", usage="(viedemerde|vdm)")
         async def vdm(self, ctx):
                 source = requests.Session().get("https://www.viedemerde.fr/aleatoire", headers={"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/60.0"}).content
-                vdm = re.search(r"<p class=\"block hidden-xs\">\n<a href=\".*\">\n(.*) VDM", source.decode())[1]
+                soup = BeautifulSoup(source)
+                #for child in random.choice(soup.find_all("p", class_="block hidden-xs")).children:
+                 #   vdm = child.string
+                 #   print("------------\n%s"%(vdm))
+                vdm =random.choice(soup.find_all("p", class_="block hidden-xs")).children[1].string 
                 await ctx.send(vdm)
 
         @commands.command(brief="Ah !", usage="ah")
@@ -43,7 +49,7 @@ class Fun:
                 with open("img/non.jpg", "rb") as img:
                         await ctx.send(file=discord.File(img))
 
-        @commands.command(aliases=["cat"], brief="Trop mignon <3", usage="(chat|cat)")
+        @commands.command(aliases=["cat"], brief="Des chats trop mignon <3", usage="(chat|cat)")
         async def chat(self, ctx):
                 chaturl = nekos.cat()
                 await ctx.send(chaturl)

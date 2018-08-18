@@ -7,7 +7,16 @@
 		"reloaded": "Module {} rechargé",
 		"unloaded": "Module {} déchargé",
 		"noavailableset": "Désolé mais ce paramètre n'est pad disponible :sweat_smile:",
-		"shutdown": "Je dois y aller, ++"
+		"shutdown": "Je dois y aller, ++",
+		"commandusage": "Utilisation de la commande: \n```\n{}\n```",
+		"titlepcinfosembed": "<:server:452826125584826378> Mon PC - Infos",
+		"usedspace": "💾 Espace utilisé",
+		"batterynamembed": ":battery: Batterie",
+		"titlepchardembed": "<:server:452826125584826378> Mon PC - Hardware",
+		"pcmodel": ":computer: Modèle",
+		"pcscreen": ":desktop: Écran",
+		"pchdd": "💾 Disque Dur",
+		"nocathelp": "Général"
 	},
 	"en": {
 		"youcant": "You can't do this :stuck_out_tongue_winking_eye:",
@@ -17,6 +26,15 @@
 		"reloaded": "Module {} reloaded",
 		"unloaded": "Module {} unloaded",
 		"noavailableset": "Sorry but this setting is not available :sweat_smile:",
-		"shutdown": "I must get away, ++"
+		"shutdown": "I must get away, ++",
+		"commandusage": "Usage of the command: \n```\n{}\n```",
+		"titlepcinfosembed": "<:server:452826125584826378> My PC - Infos",
+		"usedspace":"💾 Used Space",
+		"batterynamembed": ":battery: Battery",
+		"titlepchardembed": "<:server:452826125584826378> My PC - Hardware",
+		"pcmodel": ":computer: Model",
+		"pcscreen": ":desktop: Screen",
+		"pchdd": "💾 Hard Disk",
+		"nocathelp": "General"
 	}
 }
