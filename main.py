@@ -13,6 +13,7 @@ import sys
 import traceback
 import os
 import re
+import time
 
 #############
 # Fonctions #
@@ -155,6 +156,6 @@ async def conf(ctx, param, valeur):
 
 @bot.event
 async def on_command(ctx):
-        print("{author} a dit \"{msg}\" sur le serveur {serveur}".format(author=ctx.message.author.name, msg=ctx.message.content, serveur=ctx.message.guild.name))
+    print("[COMMAND][%s]: %s, %s, %s"%(time.asctime(), ctx.message.content, ctx.message.author.name, ctx.message.guild))
 
 bot.run(secrets["token"])

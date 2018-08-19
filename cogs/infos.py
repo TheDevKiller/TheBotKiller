@@ -99,7 +99,7 @@ class Infos:
                         em.add_field(name="<:intel:474722665752428569> CPU", value="**Intel core i3 2 coeurs**")
                         em.add_field(name="<:computerram:452824190475698187> RAM", value="**4GB DDR4**")
                         em.add_field(name=getmsg(ctx, "pcscreen"), value="**Mat 1366**x**768** **15**.**6**\" **16**:**9**")
-                        em.add_field(name=":battery: Batterie", value="**Lithium**-**ion**")
+                        em.add_field(name=getmsg(ctx, "batterynamembed"), value="**Lithium**-**ion**")
                         em.add_field(name=getmsg(ctx, "pchdd"), value="**HDD 500**GB")
 
                         await ctx.send(embed=em)

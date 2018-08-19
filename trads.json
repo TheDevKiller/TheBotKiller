@@ -16,7 +16,9 @@
 		"pcmodel": ":computer: Modèle",
 		"pcscreen": ":desktop: Écran",
 		"pchdd": "💾 Disque Dur",
-		"nocathelp": "Général"
+		"nocathelp": "Général",
+		"autodestructerrorfooter": "Ce message s'auto-détruira dans 1 min",
+		"titlerrorembed": "C'est con !"
 	},
 	"en": {
 		"youcant": "You can't do this :stuck_out_tongue_winking_eye:",
@@ -35,6 +37,8 @@
 		"pcmodel": ":computer: Model",
 		"pcscreen": ":desktop: Screen",
 		"pchdd": "💾 Hard Disk",
-		"nocathelp": "General"
+		"nocathelp": "General",
+		"autodestructerrorfooter": "This message will self-destruct in 1 min",
+		"titlerrorembed": "Oh god !"
 	}
 }

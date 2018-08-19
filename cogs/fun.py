@@ -27,12 +27,16 @@ class Fun:
         @commands.command(aliases=["viedemerde"], brief="Vie de merde", usage="(viedemerde|vdm)")
         async def vdm(self, ctx):
                 source = requests.Session().get("https://www.viedemerde.fr/aleatoire", headers={"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/60.0"}).content
-                soup = BeautifulSoup(source)
-                #for child in random.choice(soup.find_all("p", class_="block hidden-xs")).children:
-                 #   vdm = child.string
-                 #   print("------------\n%s"%(vdm))
-                vdm =random.choice(soup.find_all("p", class_="block hidden-xs")).children[1].string 
-                await ctx.send(vdm)
+                soup = BeautifulSoup(source, "html.parser")
+                vdm = list(random.choice(soup.find_all("p", class_="block hidden-xs")).children)[1].string 
+                await ctx.send(vdm.replace(" VDM", ""))
+
+        @commands.command(aliases=["danstonchat"], brief="Un chat aléatoire volé sur DansTonChat", usage="(dtc|danstonchat")
+        async def dtc(self, ctx):
+            source = requests.get("https://www.danstonchat.com/random0.html").content
+            soup = BeautifulSoup(source, "html.parser")
+            lst = soup.find_all("div", class_="addthis_inline_share_toolbox")
+            await ctx.send(random.choice(lst)["data-description"])
 
         @commands.command(brief="Ah !", usage="ah")
         async def ah(self, ctx):
