@@ -19,6 +19,7 @@ import time
 # Fonctions #
 #############
 
+# Préfixe
 def prefixe(bot, message):
     with open("config.json", "r") as fichier:
         config = json.loads(fichier.read())
@@ -27,6 +28,7 @@ def prefixe(bot, message):
         except:
             return "&"
 
+# Traductions
 def getmsg(ctx, txt):
     with open("config.json", "r") as fichier:
         config = json.loads(fichier.read())
@@ -39,13 +41,16 @@ def getmsg(ctx, txt):
 
 bot = commands.Bot(command_prefix=prefixe)
 
+# Secrets
 with open("secrets.json", "r") as fichier:
         secrets = json.loads(fichier.read())
 
+# Config
 defaultConfig = \
 {"prefixe": "&",
 "lang": "en"}
 
+# Traductions
 with open("trads.json", "r") as fichier:
     trad = json.loads(fichier.read())
 
@@ -53,21 +58,35 @@ with open("trads.json", "r") as fichier:
 # Coroutines #
 ##############
 
-#bot.remove_command("help")
+bot.remove_command("help")
 
+# On ready
 @bot.event
 async def on_ready():
+
+        # Moi
         global thedevkiller
-        print("Je suis connecté !")
+
         thedevkiller = await bot.get_user_info(436105272310759426)
+
+        print("Je suis connecté !")
+
+        # Présence
+        #await bot.change_presence(activity=discord.Streaming("&help"))
+        
+        # Charger les cogs
         for fichier in os.listdir("cogs"):
             if re.match(r".*\.py.swp", fichier):
                 pass
             elif re.match(r".*\.py", fichier):
                 print("Chargement de " + fichier)
                 bot.load_extension("cogs." + fichier.replace(".py", ""))
+
+        # Chargement de la config
         with open("config.json", "r") as fichier:
             config = json.loads(fichier.read())
+
+        # Config par défaut
         for server in bot.guilds:
             if str(server.id) in config:
                 for param in defaultConfig:
@@ -77,8 +96,10 @@ async def on_ready():
                 config[str(server.id)] = defaultConfig
         with open("config.json", "w") as fichier:
             fichier.write(json.dumps(config, indent=4))
+
         print("------------")
 
+# Halt
 @bot.command(name="halt", aliases=["shutdown"], brief="Éteint le bot")
 async def halt(ctx):
         if ctx.message.author == thedevkiller:
@@ -89,16 +110,18 @@ async def halt(ctx):
         else:
                 await ctx.send(trad[config[str(ctx.message.guild.id)]["lang"]]["youcant"])
 
-@bot.command(name="reboot", brief="Redémarre le bot")
+# Reboot
+@bot.command(name="reboot", brief="Redémarre le bot", usage="reboot")
 async def reboot(ctx):
         if ctx.message.author == thedevkiller:
                 print("Je redémarre")
                 await ctx.send(getmsg(ctx, "reboot"))
-                subprocess.call("./reboot.sh")
+                subprocess.call(["bash", "/home/thedevkiller/TheBotKiller/reboot.sh"])
                 sys.exit(0)
         else:
                 await ctx.send(getmsg(ctx, "youcant"))
         
+# Load        
 @bot.command(name="load", aliases=["charge"], brief="Charge un module")
 async def load(ctx, arg):
         if ctx.message.author == thedevkiller:
@@ -110,6 +133,7 @@ async def load(ctx, arg):
         else:
                 await ctx.send(getmsg(ctx, "youcant"))
 
+# Reload
 @bot.command(name="reload", aliases=["recharge"], brief="Recharge un module")
 async def reload(ctx, arg):
         if ctx.message.author == thedevkiller:
@@ -122,6 +146,7 @@ async def reload(ctx, arg):
         else:
                 await ctx.send(getmsg(ctx, "youcant"))
 
+# Unload
 @bot.command(name="unload", aliases=["décharge"], brief="Décharge un module")
 async def unload(ctx, arg):
         if ctx.message.author == thedevkiller:
@@ -133,10 +158,21 @@ async def unload(ctx, arg):
         else:
                 await ctx.send(getmsg(ctx, "youcant"))
 
+# Erreurs
+@bot.event
+async def on_error(event, *args, **kwargs):
+    
+    message = args[0]
+    em = discord.Embed(title="C'est con !", description="```python\n{}\n```".format(traceback.format_exc()), color=0xff0000)
+    
+    await thedevkiller.send(embed=em)
+
+## Cogs chargées
 #@commands.command(name="cogs", aliases=["modules"], brief="Liste des modules")
 #async def cogs(ctx):
 
-@bot.command(aliases=["config"])
+# Config
+@bot.command(aliases=["config"], usage="(conf|config) setting value")
 async def conf(ctx, param, valeur):
     if param in defaultConfig:
         with open("config.json", "r") as fichier:
@@ -147,13 +183,15 @@ async def conf(ctx, param, valeur):
     else:
         await ctx.send(trad[config[str(ctx.message.guild.id)]["lang"]]["noavailableset"])
 
-#@bot.command()
-#async def help(ctx):
-#    for command in bot.commands:
-#        if command.cog_name == None: cog_name = getmsg(ctx, "nocathelp")
-#        if 
-#        print(command.name + " " + command.cog_name)
+# Replace help
+@bot.command(aliases=["aide"], usage="(help|aide)")
+async def help(ctx):
 
+    em = discord.Embed(title=getmsg(ctx, "helptitlembed"))
+
+    await ctx.send(embed=em)
+
+# Logs
 @bot.event
 async def on_command(ctx):
     print("[COMMAND][%s]: %s, %s, %s"%(time.asctime(), ctx.message.content, ctx.message.author.name, ctx.message.guild))

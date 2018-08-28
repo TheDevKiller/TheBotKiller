@@ -9,12 +9,30 @@ import requests
 import json
 import random
 
+# Config
+with open("config.json", "r") as fichier:
+    config = json.loads(fichier.read())
+
+#############
+# Fonctions #
+#############
+
+# Obtenir une traduction
+def getmsg(ctx, txt):
+
+    # Ouvrir le fichier de traductions
+    with open("trads.json", "r") as fichier:
+        trad = json.loads(fichier.read())
+
+    return trad[config[str(ctx.message.guild.id)]["lang"]][txt]
+
 class NSFW:
 
         def __init__(self, bot):
                 self.bot = bot
 
-        @commands.command(aliases=["hentai"], brief="Du bon hentai", usage="(neko|hentai)")
+        # Neko
+        @commands.command(aliases=["hentai"], usage="(neko|hentai)")
         async def neko(self, ctx, arg):
                 if ctx.message.channel.is_nsfw():
                         try:
@@ -25,36 +43,52 @@ class NSFW:
                 else:
                         await ctx.send("Tu vas choquer des gens :scream: Va dans un salon NSFW !")
 
-        @commands.command(aliases=["ass"], brief="Du bon cul", usage="(cul|ass)")
+        # Cul
+        @commands.command(aliases=["ass"], usage="(cul|ass)")
         async def cul(self, ctx):
+
+                # Vérification du channel
                 if ctx.message.channel.is_nsfw():
+                        # URL
                         lien = "http://media.obutts.ru/{}".format(requests.Session().get("http://api.obutts.ru/butts/0/1/random/").json()[0]["preview"])
                         await ctx.send(lien)
                 else:
                         await ctx.send("Tu vas choquer des gens :scream: Va dans un salon NSFW !")
-        
-        @commands.command(aliases=["boobs"], brief="Des boobs", usage="(seins|boobs)")
+        # Seins
+        @commands.command(aliases=["boobs"], usage="(seins|boobs)")
         async def seins(self, ctx):
+
+                # URL
                 lien = "http://media.oboobs.ru/{}".format(requests.Session().get("http://api.oboobs.ru/boobs/0/1/random").json()[0]["preview"])
+                
+                # Vérification du channel
                 if ctx.message.channel.is_nsfw():
                     await ctx.send(lien)
                 else:
                     await ctx.message.author.send(lien)
                     await ctx.send("Je t'ai envoyé ça en MP {mention}, si tu veux ça dans le salon, va dans un salon NSFW ^^".format(mention=ctx.message.author.mention))
 
-
-        @commands.command(brief="Du hentai :smiley:", usage="yandere (search|random) [recherche] entre guillemets si il y a des espaces")
+        # Yandere
+        @commands.command(brief="Du hentai :smiley:", usage="yandere")
         async def yandere(self, ctx, arg1, arg2):
             try:
                 if arg1 == "search":
+
+                    # Espaces
                     recherche = arg2.replace(" ", "+")
+
+                    # URL
                     resultat = requests.get("https://yande.re/post.json?limit=42&tags={}".format(recherche), headers={"User-Agent": "Je suis un gentil bot Discord qui vient en paix :)"}).json()
-                    if ctx.message.channel.is_nsfw():
+                    
+                    # Vérification du channel
+                    if isinstance(ctx.message.channel, discord.DMChannel) or ctx.message.channel.is_nsfw():
                         await ctx.send(resultat[random.randint(0, 42)]["jpeg_url"])
                     else:
                         await ctx.message.author.send(resultat[random.randint(0, 42)]["jpeg_url"])
                         await ctx.send("Je t'ai envoyé ça en MP {mention}, si tu veux ça dans le salon, va dans un salon NSFW ^^".format(mention=ctx.message.author.mention))
-            except:
+            
+            except KeyError:
                         await ctx.send("Aucun résultat pour \"{}\"".format(arg2)) 
+
 def setup(bot):
         bot.add_cog(NSFW(bot))

@@ -18,7 +18,15 @@
 		"pchdd": "💾 Disque Dur",
 		"nocathelp": "Général",
 		"autodestructerrorfooter": "Ce message s'auto-détruira dans 1 min",
-		"titlerrorembed": "C'est con !"
+		"titlerrorembed": "C'est con !",
+		"erroravatar": "Entre une mention valide s'il te plaît :wink:",
+		"servs": "{servers} Je suis actuellement sur **{servnbre}** serveurs",
+		"searchspeedserv": "Recherche du meilleur serveur ...",
+		"measuringdownload": "Mesure du débit descendant ...",
+		"measuringupload": "Mesure du débit montant ...",
+		"commanderror": "Usage de la commande: ```\n{}\n\n``` *Si vous pensez que cette erreur est anormale, veuillez contacter </TheDevKiller>#8230*",
+		"nottscredits": "Désolé mais je n'ai plus de crédit pour l'API :sweat_smile:",
+		"helptitlembed": "Liste des commandes disponibles"
 	},
 	"en": {
 		"youcant": "You can't do this :stuck_out_tongue_winking_eye:",
@@ -29,7 +37,6 @@
 		"unloaded": "Module {} unloaded",
 		"noavailableset": "Sorry but this setting is not available :sweat_smile:",
 		"shutdown": "I must get away, ++",
-		"commandusage": "Usage of the command: \n```\n{}\n```",
 		"titlepcinfosembed": "<:server:452826125584826378> My PC - Infos",
 		"usedspace":"💾 Used Space",
 		"batterynamembed": ":battery: Battery",
@@ -39,6 +46,14 @@
 		"pchdd": "💾 Hard Disk",
 		"nocathelp": "General",
 		"autodestructerrorfooter": "This message will self-destruct in 1 min",
-		"titlerrorembed": "Oh god !"
+		"titlerrorembed": "Oh god !",
+		"erroravatar": "Please use a valid mention :wink:",
+		"servs": "{servers} I'm now on **{servnbre}** servers",
+		"searchspeedserv": "Searching the best server ...",
+		"measuringdownload": "Measuring the download speed ...",
+		"measuringupload": "Measuring the upload speed ...",
+		"commanderror": "Command usage: ```\n{}\n\n``` *If you think this error is abnormal, contact </TheDevKiller>#8230*",
+		"nottscredits": "Sorry but I don't have credits for the API :sweat_smile:",
+		"helptitlembed": "List of available commands"
 	}
 }

@@ -11,13 +11,21 @@ import psutil
 import speedtest
 import json
 
+# Config
+with open("config.json", "r") as fichier:
+    config = json.loads(fichier.read())
+
 #############
 # Fonctions #
 #############
 
+# Obtenir une traduction
 def getmsg(ctx, txt):
+
+    # Ouvrir le fichier de traductions
     with open("trads.json", "r") as fichier:
         trad = json.loads(fichier.read())
+
     return trad[config[str(ctx.message.guild.id)]["lang"]][txt]
 
 #############
@@ -33,21 +41,25 @@ class Infos:
         
         def __init__(self, bot):
                 self.bot = bot
+                self.speedtestEnCours = False
         
-        global speedtestEnCours
-        speedtestEnCours = False
-        
-        @commands.command(alias=["source", "github"], brief="My source code", usage="(code|source|github)")
+        # Code source
+        @commands.command(alias=["source", "github"], usage="(code|source|github)")
         async def code(self, ctx):
             with open("config.json", "r") as fichier:
                 config = json.loads(fichier.read())
             await ctx.send("https://github.com/TheDevKiller/TheBotKiller")
 
-        @commands.command(brief="Infos on my PC", usage="pc (infos|hardware)")
+        # PC 
+        @commands.command(usage="pc (infos|hardware)")
         async def pc(self, ctx, arg):
+            
+            # Config
             with open("config.json", "r") as fichier:
                 global config
                 config = json.loads(fichier.read())
+            
+            # Infos
             if arg == "infos":
 
                                 # Load Average
@@ -90,7 +102,7 @@ class Infos:
                         em.add_field(name=getmsg(ctx, "batterynamembed"), value="**" + batterie + "**%")
                         await ctx.send(embed=em)
                                 
-                        # Hardware
+            # Hardware
             elif arg == "hardware":
                                 
                         em = discord.Embed(title=getmsg(ctx, "titlepchardembed"), color=0x106b02)
@@ -105,9 +117,10 @@ class Infos:
                         await ctx.send(embed=em)
 
             else:
-                        await ctx.send("Usge de la commande:\n```\n{}\n```".format(ctx.command.usage))
+                        await ctx.send(getmsg(ctx, "commandusage").format(ctx.command.usage))
 
-        @commands.command(aliases=["servers"], brief="Les serveurs où je suis", usage="(serveurs|servers)")
+        # Serveurs
+        @commands.command(aliases=["servers"], usage="(serveurs|servers)")
         async def serveurs(self, ctx):
             with open("config.json", "r") as fichier:
                 config = json.loads(fichier.read())
@@ -116,49 +129,86 @@ class Infos:
             for elements in self.bot.guilds:
                     serveurs += "- " + elements.name + "\n\n"
                     servnbre += 1
-            em = discord.Embed(title="<:server:452826125584826378> Serveurs", description="{serveurs} Je suis actuellement sur **{servnbre}** serveurs".format(serveurs=serveurs, servnbre=servnbre), color=0x0294fc)
+            em = discord.Embed(title="<:server:452826125584826378> Serveurs", description=getmsg(ctx, "servs").format(servers=serveurs, servnbre=servnbre), color=0x0294fc)
             await ctx.send(embed=em)
 
-        @commands.command(aliases=["members"], brief="Les membres du serveurs", usage="(membres|members)")
+        # Membres
+        @commands.command(aliases=["members"], usage="(membres|members)")
         async def membres(self, ctx):
+            
+            # Config
             with open("config.json", "r") as fichier:
                 config = json.loads(fichier.read())
+            
             status = \
             {"online": {"False": 0, "True": 0},
             "offline": {"False": 0, "True": 0},
             "idle": {"False": 0, "True": 0},
             "dnd": {"False": 0, "True": 0}}
                         
+            # Check du status des membres et du nombre
             for membre in ctx.message.guild.members:
                     print(membre)
                     status[str(membre.status)][str(membre.bot)] += 1
-                    
+            
+            # Embed
             em = discord.Embed(title=":busts_in_silhouette: Membres", description="Total: **{}**".format(status["online"]["False"] + status["offline"]["False"] + status["idle"]["False"] + status["dnd"]["False"] + status["online"]["True"] + status["offline"]["True"] + status["idle"]["True"] + status["dnd"]["True"]), color=0x6817ff)
             em.add_field(name=":robot: Bots", value="Total: **{total}**\nEn ligne: **{online}**\nNe pas déranger: **{dnd}**\nAbsent: **{idle}**\nHors ligne: **{offline}**".format(total=status["online"]["True"] + status["offline"]["True"] + status["idle"]["True"] + status["dnd"]["True"], online=status["online"]["True"], offline=status["offline"]["True"], idle=status["idle"]["True"], dnd=status["dnd"]["True"]))
             em.add_field(name=":raising_hand: Humains", value="Total: **{total}**\nEn ligne: **{online}**\nNe pas déranger: **{dnd}**\nAbsent: **{idle}**\nHors ligne: **{offline}**".format(total=status["online"]["False"] + status["offline"]["False"] + status["idle"]["False"] + status["dnd"]["False"], online=status["online"]["False"], offline=status["offline"]["False"], idle=status["idle"]["False"], dnd=status["dnd"]["False"]))
         
             await ctx.send(embed=em)
 
+        # Speedtest
         @commands.command(brief="Test de connexion", usage="speedtest")
         async def speedtest(self, ctx):
+
+            # Config
             with open("config.json", "r") as fichier:
                 config = json.loads(fichier.read())
-            global speedtestEnCours
-            if speedtestEnCours == False:
+
+            # Speedtest
+            if self.speedtestEnCours == False:
                     speedtestEnCours = True
-                    messageChargement = await ctx.send("Recherche du meilleur serveur ...")
+
+                    messageChargement = await ctx.send(getmsg(ctx, "searchspeedserv"))
+
+                    # Speedtest
                     test = speedtest.Speedtest()
+                    
+                    # Obtenir le meilleur serveur
                     test.get_best_server()
-                    await messageChargement.edit(content = "Mesure du débit descendant")
+
+                    await messageChargement.edit(content = getmsg(ctx, "measuringdownload"))
+
+                    # Test du Download
                     test.download()
-                    await messageChargement.edit(content = "Mesure du débit montant")
+
+                    await messageChargement.edit(content = getmsg(ctx, "measuringupload"))
+                    
+                    # Test de l'upload
                     test.upload()
+                    
+                    # URL de l'image
                     url = test.results.share()
+
                     await messageChargement.delete()
-                    em = discord.Embed(title="** **Voilà ma bonne connexion de campagnard", color=0x012ea0)
+                    
+                    # Embed
+                    em = discord.Embed(color=0x012ea0)
                     em.set_image(url=test.results.share())
+                    
                     await ctx.send(embed=em)
+                    
                     speedtestEnCours = False
+
+        # Avatar
+        @commands.command(aliases=["pp"], brief="Get user's avatar", usage="(avatar|pp) mention")
+        async def avatar(self, ctx, arg):
+            try:
+                user = self.bot.get_user(int(arg.replace("<", "").replace(">", "").replace("@", "").replace("!", "")))
+                await ctx.send("https://cdn.discordapp.com/avatars/%s/%s.png?size=2048"%(user.id, user.avatar))
+            except:
+                await ctx.send(getmsg(ctx, "erroravatar"))
 
 def setup(bot):
         bot.add_cog(Infos(bot))

@@ -19,6 +19,23 @@ import random
 with open("secrets.json", "rb") as secretsFile:
         secrets = json.load(secretsFile)
 
+# Config
+with open("config.json", "r") as fichier:
+    config = json.loads(fichier.read())
+
+#############
+# Fonctions #
+#############
+
+# Obtenir une traduction
+def getmsg(ctx, txt):
+
+    # Ouvrir le fichier de traductions
+    with open("trads.json", "r") as fichier:
+        trad = json.loads(fichier.read())
+
+    return trad[config[str(ctx.message.guild.id)]["lang"]][txt]
+
 ########
 # Code #
 ########
@@ -35,13 +52,16 @@ class Outils:
                 border=2
                 )
 
-        @commands.command(aliases=["bug"], brief="Signaler un bug", usage="(report|bug) \"problème\", le problème doit être entre guillemets si il y a des espaces")
-        async def report(self, ctx, arg):
+        # Report
+        @commands.command(aliases=["bug"], brief="Signaler un bug", usage="(report|bug) message")
+        async def report(self, ctx, *, arg):
                 thedevkiller = await self.bot.get_user_info(436105272310759426)
                 await thedevkiller.send("{report}\n{auth}".format(report=arg, auth=ctx.message.author.name))
 
-        @commands.command(aliases=["convert"], brief="Convertir deux unités", usage="(convertisseur|convert) unite1 unite2 \"chaine\", la chaine doit être entre guillemets si il y a des espaces")
-        async def convertir(self, ctx, unite1, unite2, chaine):
+        # Convertir
+        @commands.command(aliases=["convert"], brief="Convertir deux unités", usage="(convertisseur|convert) unite1 unite2 text")
+        async def convertir(self, ctx, unite1, unite2, *, chaine):
+
                 if unite1 == "ascii" and unite2 == "base64":
                         encode = base64.b64encode(str.encode(chaine))
                         await ctx.send(encode.decode())
@@ -58,58 +78,67 @@ class Outils:
                         for elements in chaine:
                                 for element in elements[::2]:      
                                         msg += chr(element)
+
                 else:
                         await ctx.send("Désolé mais je ne connais pas ces unités :confused:")
 
+        # Traduire
         @commands.command(aliases=["translate"], brief="Traduire une chaine", usage="(traduire|translate) langueSource langueCible \"chaine\", la chaine doit être entre guillemets si il y a des espaces et les langues sont en deux lettres. Langue \"auto\" en source aussi acceptée")
-        async def traduire(self, ctx, ls, lc, cs):
+        async def traduire(self, ctx, ls, lc, *, cs):
+
+                # URL
                 url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=" + ls + "&tl=" + lc + "&dt=t&q=" + cs
+                
+                # Requête
                 cc = requests.get(url, headers={"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/60.0"}).json()[0][0][0]
+                
                 await ctx.send(embed=discord.Embed(title="Traduction", description="{ls}: {cs}\n{lc}: {cc}".format(ls=ls.capitalize(), cs=cs.capitalize(), lc=lc.capitalize(), cc=cc.capitalize()), color=0x225bff))
 
+        # QR
         @commands.command(aliases=["qr"], brief="Générateur de QR code", usage="(qr|qrcode) \"chaine\", la chaine doit être entre guillemets si il y a des espaces")
         async def qrcode(self, ctx, chaine):
+
+                # QR
                 self.qr.add_data(chaine)
                 self.qr.make(fit=True)
                 img = self.qr.make_image(fill_color="black", back_color="white")
                 img.save("qr.png")
-                with open("qr.png", "rb") as qrimg:
-                        await ctx.send(file=discord.File(qrimg))
+
+                await ctx.send(file=discord.File("qr.png"))
                 await ctx.send(chaine)
                 os.remove("qr.png")
 
+        # OCR
         @commands.command(brief="Prend le texte d'une image", usage="ocr en commentaire à l'envoi d'une image")
         async def ocr(self, ctx):
-                print(ctx.message.attachments[0].url)
+
+                # Image
                 url = ctx.message.attachments[0].url
                 image = requests.Session().get(url).content
                 fichier = ctx.message.attachments[0].filename
                 with open(fichier, "wb") as ocrimage:
                         ocrimage.write(image)
+
+                # OCR
                 texte = pytesseract.image_to_string(Image.open(fichier))
+
                 await ctx.send(texte)
                 os.remove(fichier)
 
+        # TTS
         @commands.command(brief="Synthèse vocale", usage="tts \"chaine\", la chaine doit être entre guillemets si il y a des espaces")
         async def tts(self, ctx, chaine):
-            mp3 = requests.get("https://tts.readspeaker.com/a/speak?key={token}&lang=fr_ca&voice=leo&text={chaine}".format(token=secrets["tts"], chaine=chaine)).content
+
+            # Fichier
+            reponse = requests.get("https://tts.readspeaker.com/a/speak?key={token}&lang=fr_ca&voice=leo&text={chaine}".format(token=secrets["tts"], chaine=chaine)).content
+            if reponse.decode().strip() == "ERROR: Needed credits exceeds available amount.":
+                await ctx.send(getmsg(ctx, "nottscredits"))
             with open("tts.mp3", "wb") as fichier:
                 fichier.write(mp3)
-            with open("tts.mp3", "rb") as fichier:
-                await ctx.send(file=discord.File(fichier))
+            await ctx.send(file=discord.File("tts.mp3"))
 
-        @commands.command(brief="Retourne le texte d'une image", usage="ocr, en commentaire de l'image à scanner")
-        async def ocr(self, ctx):
-            url = ctx.message.attachments[0].url
-            image = requests.Session().get(url).content
-            fichier = ctx.message.attachments[0].filename
-            with open(fichier, "wb") as ocrimage:
-                ocrimage.write(image)
-                texte = pytesseract.image_to_string(Image.open(fichier))
-                await ctx.message.channel.send(texte)
-            os.remove(fichier)
-
-        @commands.command(aliases=["dilem"], brief="Dilemme", usage="dilemme choix1 choix2 choix3 ..., les choix doivent être entre guillemets si il y a des espaces")
+        # Dilemme
+        @commands.command(aliases=["dilem"], brief="Dilemme", usage="(dilem|dilemme) \"choice1\"")
         async def dilemme(self, ctx, *args):
             liste = [*args]
             await ctx.send(liste)
