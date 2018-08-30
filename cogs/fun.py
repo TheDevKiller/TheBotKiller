@@ -16,6 +16,20 @@ from pprint import pformat
 import pickle
 import numpy as np
 
+#############
+# Fonctions #
+#############
+
+# Obtenir une traduction
+def getmsg(ctx, txt):
+
+    # Ouvrir le fichier de traductions
+    with open("trads.json", "r") as fichier:
+        trad = json.loads(fichier.read())
+
+    return trad[config[str(ctx.message.guild.id)]["lang"]][txt]
+
+
 ########
 # Code #
 ########
@@ -44,9 +58,24 @@ class Fun:
                 self.joueurShifumi = 1
         
         # MRAW
-        @commands.command()
+        @commands.command(usage="mraw")
         async def mraw(self, ctx):
             await ctx.send(":regional_indicator_m: :regional_indicator_r: :regional_indicator_a: :regional_indicator_w: ")
+
+        # Kop1
+        @commands.command(name="kop1", usage="kop1")
+        async def kop(self, ctx):
+            await ctx.send(":regional_indicator_k: :regional_indicator_o: :regional_indicator_p: :one:")
+
+        # <3
+        @commands.command(name="heart", usage=":heart:")
+        async def heart(self, ctx):
+            await ctx.send(":heart:")
+
+        # Cookie
+        @commands.command(usage="cookie mention")
+        async def cookie(self, ctx, arg):
+            await ctx.send(getmsg(ctx, "cookiemsg"))
 
         # VDM
         @commands.command(aliases=["viedemerde"], usage="(viedemerde|vdm)")
@@ -57,7 +86,7 @@ class Fun:
                 await ctx.send(vdm.replace(" VDM", ""))
 
         # DTC
-        @commands.command(aliases=["danstonchat"], usage="(dtc|danstonchat")
+        @commands.command(aliases=["danstonchat"], usage="(dtc|danstonchat)")
         async def dtc(self, ctx):
             source = requests.get("https://www.danstonchat.com/random0.html").content
             soup = BeautifulSoup(source, "html.parser")
@@ -76,14 +105,14 @@ class Fun:
                 with open("img/obvious.jpg", "rb") as img:
                         await ctx.send(file=discord.File(img))
         # Non
-        @commands.command(usage="non")
-        async def non(self, ctx):
+        @commands.command(aliases=["non"], usage="non")
+        async def no(self, ctx):
                 with open("img/non.jpg", "rb") as img:
                         await ctx.send(file=discord.File(img))
 
         # Chat
-        @commands.command(aliases=["cat"], usage="(chat|cat)")
-        async def chat(self, ctx):
+        @commands.command(aliases=["chat"], usage="(chat|cat)")
+        async def cat(self, ctx):
                 chaturl = nekos.cat()
                 await ctx.send(chaturl)
 
@@ -154,12 +183,12 @@ class Fun:
                 elementBot = elementBot.split(" ")[0]
 
         # Dis
-        @commands.command(aliases=["say"], brief="Dis quelque chose", usage="\"message\", le message doit être entre guillemets si il y a des espaces")
-        async def dis(self, ctx, *, arg):
+        @commands.command(aliases=["dis"], usage="(dis|say) message")
+        async def say(self, ctx, *, arg):
                 await ctx.send(arg)
 
         # POM
-        @commands.command(aliases=["plusoumoins", "+-", "+ou+"], brief="Plus ou moins", usage="(+-|+ou-|plusoumoins|pom) <min> <max>")
+        @commands.command(aliases=["plusoumoins", "+-", "+ou+"], usage="(+-|+ou-|plusoumoins|pom) <min> <max>")
         async def pom(self, ctx, pmin, pmax):
 
                 # Globales
@@ -188,6 +217,7 @@ class Fun:
                 pom = True
                 essais = 1
 
+        # P4
         @commands.command(aliases=["c4", "connect4", "puissance4"], name="p4", usage="p4 mention")
         async def _p4(self, ctx, arg):
 
@@ -242,6 +272,42 @@ class Fun:
             # Sauvegarde & Envoi de l'image
             self.im.save("p4.png")
             await ctx.send(file=discord.File("p4.png"))
+
+        # Martine
+        @commands.command(usage="martine imageName text")
+        async def martine(self, ctx, image, *, texte):
+
+            image = image.lower()
+
+            imageList = ['ecole', 'surprise', 'lanterne', 'train', 'camping', 'menage', 'ferme', 'zoo', 'fantome', 'contes', 'ours', 'rentree', 'princesse', 'maman', 'voyage', 'accident', 'noel', 'demenage', 'avion', 'theatre', 'mongolfiere']
+
+            if image not in imageList:
+                await ctx.send("Liste des images disponibles:\n\n- %s"%"\n- ".join(imageList))
+
+            else:
+                for i, e in enumerate(imageList):
+                    if e == image:
+                        imageNbre = i
+
+                source = requests.get("http://www.retourdemartine.free.fr/create2.php?t=%s&m=%s"%(texte, imageNbre+1), headers={"User-Agent": "Un gentil bot discord"}).content
+
+                soup = BeautifulSoup(source, "html.parser")
+
+                imgUrl = "http://www.retourdemartine.free.fr/" + soup.find("img", class_="blackborder")["src"]
+
+                await ctx.send(imgUrl)
+
+        # Pi
+        @commands.command(usage="pi number")
+        async def pi(self, ctx, nbre):
+
+            pi = "141592653589"
+
+            if nbre in pi:
+                await ctx.send("Votre nombre est dans les 12 premières décimales de pi")
+
+            else:
+                await ctx.send("Votre nombre n'est pas dans les 12 premières décimales de pi")
 
         # Réactions
         async def on_reaction_add(self, reaction, user):

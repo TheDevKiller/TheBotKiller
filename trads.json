@@ -1,14 +1,18 @@
 {
 	"fr": {
+
 		"youcant": "Tu ne peux pas faire ça :stuck_out_tongue_winking_eye:",
-		"reboot": "Je reviens très vite :wave:",
+
+		"rebootmsg": "Je reviens très vite :wave:",
 		"loaded": "Module {} chargé",
 		"idonthavemodule": "Désolé mais je n'ai pas ce module :sweat_smile:",
 		"reloaded": "Module {} rechargé",
 		"unloaded": "Module {} déchargé",
+
 		"noavailableset": "Désolé mais ce paramètre n'est pad disponible :sweat_smile:",
+
 		"shutdown": "Je dois y aller, ++",
-		"commandusage": "Utilisation de la commande: \n```\n{}\n```",
+
 		"titlepcinfosembed": "<:server:452826125584826378> Mon PC - Infos",
 		"usedspace": "💾 Espace utilisé",
 		"batterynamembed": ":battery: Batterie",
@@ -17,26 +21,91 @@
 		"pcscreen": ":desktop: Écran",
 		"pchdd": "💾 Disque Dur",
 		"nocathelp": "Général",
-		"autodestructerrorfooter": "Ce message s'auto-détruira dans 1 min",
-		"titlerrorembed": "C'est con !",
-		"erroravatar": "Entre une mention valide s'il te plaît :wink:",
 		"servs": "{servers} Je suis actuellement sur **{servnbre}** serveurs",
 		"searchspeedserv": "Recherche du meilleur serveur ...",
 		"measuringdownload": "Mesure du débit descendant ...",
 		"measuringupload": "Mesure du débit montant ...",
+
+		"autodestructerrorfooter": "Ce message s'auto-détruira dans 1 min",
+		"titlerrorembed": "C'est con !",
+		"erroravatar": "Entre une mention valide s'il te plaît :wink:",
 		"commanderror": "Usage de la commande: ```\n{}\n\n``` *Si vous pensez que cette erreur est anormale, veuillez contacter </TheDevKiller>#8230*",
 		"nottscredits": "Désolé mais je n'ai plus de crédit pour l'API :sweat_smile:",
-		"helptitlembed": "Liste des commandes disponibles"
+		"commandoesntexisthelp": "Désolé mais j'ai l'impression que cette commande n'existe pas, voir `help` pour une liste des commandes disponibles",
+
+		"play": "Joue :wink:",
+		"cookiemsg": "{}, {} vous a donné un :cookie:",
+		
+		"helptitlembed": "Liste des commandes disponibles",
+		"helpembedfooter": "La plupart des commandes sont disponibles en français avec un alias, pour avoir plus d'infos sur un commande, faites `help command`",
+
+		"load": "Charge un module",
+		"halt": "Éteint le bot",
+		"reload": "Rechagre un module",
+		"reboot": "Redémarre le bot",
+		"unload": "Décharge un module",
+		"conf": "Configure the bot",
+		"help": "Affiche cet embed magnifique",
+
+
+		"boobs": "Seins sur oboobs.ru",
+		"ass": "Culs sur obutts.ru",
+		"yandere": "Recherche sur yande.re",
+		"neko": "Nekos avec nekos.py",
+
+		"lower": "Votre texte en minuscules",
+		"upper": "Votre texte en majuscules",
+		"capitalize": "Votre texte avec une mjuscules au début",
+		"title": "Votre texte avec une majuscule à chaque mot",
+		"glitch": "Votre texte glitché",
+
+		"code": "Mon code source",
+		"avatar": "L'avatr de l'utilisateur mentionné",
+		"members": "Membres sur ce serveur",
+		"servers": "Les serveur où je suis",
+		"pc": "Les infos sur mon PC",
+		"speedtest": "La vitesse de ma connexion internet",
+
+		"report": "Reporter un bug",
+		"convert": "Convertir l'unit1 en l'unit2",
+		"translate": "Traduire un texte",
+		"qrcode": "Générer un QR code avec votre texte",
+		"ocr": "Scanner le texte d'une image",
+		"tts": "Lire votre texte avec ma magnifique voix",
+		"dilem": "Choisir parmis vos choix",
+
+		"heart": "<3",
+		"vdm": "Une VDM de viedemerde.fr",
+		"dtc": "Un chat de danstonchat.com",
+		"mraw": "MRAW",
+		"obvious": "Merci Captain Obvious !",
+		"no": "Non !",
+		"cat": "Trop mignon <3",
+		"say": "Je dis un message pour vous",
+		"cookie": "Donner un cookie à un autre membre",
+		"ah": "Denis Brogniart dit \"Ah !\"",
+		"kop1": "KOP1 <3",
+		"pom": "Plus ou moins",
+		"p4": "Puissance 4",
+		"martine": "Génère une image avec martine",
+		"todo": "Une To-Do list"
+
 	},
+
 	"en": {
+
 		"youcant": "You can't do this :stuck_out_tongue_winking_eye:",
-		"reboot": "I'll be back very soon :wave:",
+
+		"rebootmsg": "I'll be back very soon :wave:",
 		"loaded": "Module {} loaded",
 		"idonthavemodule": "Sorry but I don't have this module :sweat_smile:",
 		"reloaded": "Module {} reloaded",
 		"unloaded": "Module {} unloaded",
+
 		"noavailableset": "Sorry but this setting is not available :sweat_smile:",
+
 		"shutdown": "I must get away, ++",
+
 		"titlepcinfosembed": "<:server:452826125584826378> My PC - Infos",
 		"usedspace":"💾 Used Space",
 		"batterynamembed": ":battery: Battery",
@@ -52,8 +121,69 @@
 		"searchspeedserv": "Searching the best server ...",
 		"measuringdownload": "Measuring the download speed ...",
 		"measuringupload": "Measuring the upload speed ...",
+
 		"commanderror": "Command usage: ```\n{}\n\n``` *If you think this error is abnormal, contact </TheDevKiller>#8230*",
 		"nottscredits": "Sorry but I don't have credits for the API :sweat_smile:",
-		"helptitlembed": "List of available commands"
+		
+
+		"play": "Play :wink:",
+		"cookiemsg": "{}, {} gave you a :cookie:",
+
+		"helptitlembed": "List of available commands",
+		"helpembedfooter": "Most of the commands are also available in french with aliases, to get more info on a command, do `help command`",
+		"commandoesntexisthelp": "Sorry but I think this command doesn't exists, see `help` for a list of available commands",
+
+		"load": "Loads a module",
+		"halt": "Shutdown the bot",
+		"reload": "Reloads a module",
+		"reboot": "Reboot the bots",
+		"unload": "Unloads a module",
+		"conf": "Configure the bot",
+		"help": "Display this beautiful embed",
+
+
+		"boobs": "Boobs on oboobs.ru",
+		"ass": "Ass on obutts.ru",
+		"yandere": "Search on yande.re",
+		"neko": "Nekos with nekos.py",
+
+		"lower": "Your text with lowercases characters",
+		"upper": "Your text with uppercases characters",
+		"capitalize": "Your text an uppercase character at the beginning of the text",
+		"title": "Your text with uppercase characters for each word",
+		"glitch": "Glitch your text",
+
+		"code": "My source code",
+		"avatar": "The avatar of the mentionned user",
+		"members": "Members on this server",
+		"servers": "The servers I'm on",
+		"pc": "The infos of my PC",
+		"speedtest": "My connection speed",
+
+		"report": "Report a bug",
+		"convert": "Convert unit1 to unit2",
+		"translate": "Translate sourceLang to targetLang",
+		"qrcode": "Generate a QR code with your text",
+		"ocr": "Scan a text from image attachment",
+		"tts": "Read your text with my beautiful voice",
+		"dilem": "Choice with your choices",
+
+		"heart": "<3",
+		"vdm": "A vdm from the french website VieDeMerde",
+		"dtc": "A chat from the french website DansTonChat",
+		"mraw": "MRAW",
+		"obvious": "Thank you Captain Obvious !",
+		"no": "No !",
+		"cat": "So cute <3",
+		"say": "I say a message for you",
+		"cookie": "Give a cookie to another member",
+		"ah": "Denis Brogniart says \"Ah !\"",
+		"kop1": "KOP1 <3",
+		"pom": "More or less",
+		"p4": "Connect 4",
+		"martine": "Generate an image with martine",
+		"todo": "A To-Do list"
+
 	}
+
 }

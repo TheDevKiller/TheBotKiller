@@ -14,6 +14,8 @@ import traceback
 import os
 import re
 import time
+import threading
+import asyncio
 
 #############
 # Fonctions #
@@ -30,10 +32,14 @@ def prefixe(bot, message):
 
 # Traductions
 def getmsg(ctx, txt):
+
     with open("config.json", "r") as fichier:
         config = json.loads(fichier.read())
 
-    return trad[config[str(ctx.message.guild.id)]["lang"]][txt]
+    try:
+        return trad[config[str(ctx.message.guild.id)]["lang"]][txt]
+    except:
+        return ""
 
 #############
 # Variables #
@@ -72,7 +78,7 @@ async def on_ready():
         print("Je suis connecté !")
 
         # Présence
-        #await bot.change_presence(activity=discord.Streaming("&help"))
+        await bot.change_presence(status=discord.Status.dnd, activity=discord.Activity(name="&help", type=discord.ActivityType.listening), afk=False)
         
         # Charger les cogs
         for fichier in os.listdir("cogs"):
@@ -97,10 +103,11 @@ async def on_ready():
         with open("config.json", "w") as fichier:
             fichier.write(json.dumps(config, indent=4))
 
+        # Séparateur
         print("------------")
 
 # Halt
-@bot.command(name="halt", aliases=["shutdown"], brief="Éteint le bot")
+@bot.command(name="halt", aliases=["shutdown"])
 async def halt(ctx):
         if ctx.message.author == thedevkiller:
             with open("config.json", "r") as fichier:
@@ -111,18 +118,18 @@ async def halt(ctx):
                 await ctx.send(trad[config[str(ctx.message.guild.id)]["lang"]]["youcant"])
 
 # Reboot
-@bot.command(name="reboot", brief="Redémarre le bot", usage="reboot")
+@bot.command(name="reboot", usage="reboot")
 async def reboot(ctx):
         if ctx.message.author == thedevkiller:
                 print("Je redémarre")
-                await ctx.send(getmsg(ctx, "reboot"))
+                await ctx.send(getmsg(ctx, "rebootmsg"))
                 subprocess.call(["bash", "/home/thedevkiller/TheBotKiller/reboot.sh"])
                 sys.exit(0)
         else:
                 await ctx.send(getmsg(ctx, "youcant"))
         
 # Load        
-@bot.command(name="load", aliases=["charge"], brief="Charge un module")
+@bot.command(name="load", aliases=["charge"])
 async def load(ctx, arg):
         if ctx.message.author == thedevkiller:
                 try:
@@ -134,7 +141,7 @@ async def load(ctx, arg):
                 await ctx.send(getmsg(ctx, "youcant"))
 
 # Reload
-@bot.command(name="reload", aliases=["recharge"], brief="Recharge un module")
+@bot.command(name="reload", aliases=["recharge"])
 async def reload(ctx, arg):
         if ctx.message.author == thedevkiller:
                 try:
@@ -147,7 +154,7 @@ async def reload(ctx, arg):
                 await ctx.send(getmsg(ctx, "youcant"))
 
 # Unload
-@bot.command(name="unload", aliases=["décharge"], brief="Décharge un module")
+@bot.command(name="unload", aliases=["décharge"])
 async def unload(ctx, arg):
         if ctx.message.author == thedevkiller:
                 try:
@@ -174,6 +181,7 @@ async def on_error(event, *args, **kwargs):
 # Config
 @bot.command(aliases=["config"], usage="(conf|config) setting value")
 async def conf(ctx, param, valeur):
+
     if param in defaultConfig:
         with open("config.json", "r") as fichier:
             config = json.loads(fichier.read())
@@ -183,13 +191,89 @@ async def conf(ctx, param, valeur):
     else:
         await ctx.send(trad[config[str(ctx.message.guild.id)]["lang"]]["noavailableset"])
 
-# Replace help
+# Help
 @bot.command(aliases=["aide"], usage="(help|aide)")
-async def help(ctx):
+async def help(ctx, arg="defaultarg"):
 
-    em = discord.Embed(title=getmsg(ctx, "helptitlembed"))
+    if arg == "defaultarg":
 
-    await ctx.send(embed=em)
+        dico = {}
+
+        em = discord.Embed(title=getmsg(ctx, "helptitlembed"), color=0xff0000)
+
+        for commande in bot.commands:
+
+            if commande.hidden == False:
+
+                if not commande.cog_name in dico:
+
+                    dico[commande.cog_name] = []
+
+                dico[commande.cog_name].append("`%s`: %s"%(commande.name, getmsg(ctx, commande.name)))
+
+        for index, categorie in enumerate(dico):
+
+            if categorie == None:
+
+                em.add_field(name="Main", value="\n".join(dico[categorie]))
+
+            else:
+
+                em.add_field(name=categorie, value="\n".join(dico[categorie]))
+
+            em.set_footer(text=getmsg(ctx, "helpembedfooter"))
+
+        await ctx.send(embed=em)
+
+    else:
+
+        for commande in bot.commands:
+
+            if commande.name == arg:
+
+                em = discord.Embed(title=commande.name.capitalize(), description=getmsg(ctx, commande.name), color=0xff0000)
+
+                if commande.aliases != []:
+
+                    em.add_field(name="Aliases", value=", ".join(commande.aliases))
+
+                if isinstance(commande.usage, str):
+
+                    em.add_field(name="Usage", value="`\n%s\n`"%commande.usage)
+
+                if isinstance(commande.cog_name, str):
+
+                    em.add_field(name="Category", value=commande.cog_name)
+
+                await ctx.send(embed=em)
+
+# Input
+async def handle_console_input():
+    while not bot.is_closed():
+        console_input = await bot.loop.run_in_executor(None, input, "~>")
+        bot.dispatch("console_input", console_input)
+
+bot.loop.create_task(handle_console_input())
+
+@bot.event
+async def on_console_input(input):
+    if input.split(" ")[0] == "dis":
+
+                serveurid = int(input.split(" ")[1])
+                serveur = bot.get_guild(serveurid)
+
+                channelid = int(input.split(" ")[2])
+                channel = serveur.get_channel(channelid)
+
+                string = " ".join(input.split(" ")[3:])
+                await channel.send(string)
+    elif input.split(" ")[0] == "exit":
+        sys.exit(0)
+
+# it = InputThread()
+# it.start()
+# # while True:
+# #     print("Vous avez dit: %s"%it.last_user_input)
 
 # Logs
 @bot.event

@@ -120,8 +120,8 @@ class Infos:
                         await ctx.send(getmsg(ctx, "commandusage").format(ctx.command.usage))
 
         # Serveurs
-        @commands.command(aliases=["servers"], usage="(serveurs|servers)")
-        async def serveurs(self, ctx):
+        @commands.command(aliases=["serveurs"], usage="(serveurs|servers)")
+        async def servers(self, ctx):
             with open("config.json", "r") as fichier:
                 config = json.loads(fichier.read())
             serveurs = "** **\n"
@@ -133,8 +133,8 @@ class Infos:
             await ctx.send(embed=em)
 
         # Membres
-        @commands.command(aliases=["members"], usage="(membres|members)")
-        async def membres(self, ctx):
+        @commands.command(aliases=["membres"], usage="(membres|members)")
+        async def members(self, ctx):
             
             # Config
             with open("config.json", "r") as fichier:
@@ -159,7 +159,7 @@ class Infos:
             await ctx.send(embed=em)
 
         # Speedtest
-        @commands.command(brief="Test de connexion", usage="speedtest")
+        @commands.command(usage="speedtest")
         async def speedtest(self, ctx):
 
             # Config
@@ -202,10 +202,9 @@ class Infos:
                     speedtestEnCours = False
 
         # Avatar
-        @commands.command(aliases=["pp"], brief="Get user's avatar", usage="(avatar|pp) mention")
-        async def avatar(self, ctx, arg):
+        @commands.command(aliases=["pp"], usage="(avatar|pp) mention")
+        async def avatar(self, ctx, user:discord.Member):
             try:
-                user = self.bot.get_user(int(arg.replace("<", "").replace(">", "").replace("@", "").replace("!", "")))
                 await ctx.send("https://cdn.discordapp.com/avatars/%s/%s.png?size=2048"%(user.id, user.avatar))
             except:
                 await ctx.send(getmsg(ctx, "erroravatar"))

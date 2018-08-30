@@ -33,7 +33,7 @@ class NSFW:
 
         # Neko
         @commands.command(aliases=["hentai"], usage="(neko|hentai)")
-        async def neko(self, ctx, arg):
+        async def neko(self, ctx, *, arg):
                 if ctx.message.channel.is_nsfw():
                         try:
                                 await ctx.send(nekos.img(arg))
@@ -44,8 +44,8 @@ class NSFW:
                         await ctx.send("Tu vas choquer des gens :scream: Va dans un salon NSFW !")
 
         # Cul
-        @commands.command(aliases=["ass"], usage="(cul|ass)")
-        async def cul(self, ctx):
+        @commands.command(aliases=["cul"], usage="(cul|ass)")
+        async def ass(self, ctx):
 
                 # Vérification du channel
                 if ctx.message.channel.is_nsfw():
@@ -55,8 +55,8 @@ class NSFW:
                 else:
                         await ctx.send("Tu vas choquer des gens :scream: Va dans un salon NSFW !")
         # Seins
-        @commands.command(aliases=["boobs"], usage="(seins|boobs)")
-        async def seins(self, ctx):
+        @commands.command(aliases=["seins"], usage="(seins|boobs)")
+        async def boobs(self, ctx):
 
                 # URL
                 lien = "http://media.oboobs.ru/{}".format(requests.Session().get("http://api.oboobs.ru/boobs/0/1/random").json()[0]["preview"])
@@ -69,10 +69,12 @@ class NSFW:
                     await ctx.send("Je t'ai envoyé ça en MP {mention}, si tu veux ça dans le salon, va dans un salon NSFW ^^".format(mention=ctx.message.author.mention))
 
         # Yandere
-        @commands.command(brief="Du hentai :smiley:", usage="yandere")
-        async def yandere(self, ctx, arg1, arg2):
-            try:
-                if arg1 == "search":
+        @commands.command(usage="yandere (search), search")
+        async def yandere(self, ctx, arg1, *, arg2):
+
+            if arg1 == "search":
+
+                try:
 
                     # Espaces
                     recherche = arg2.replace(" ", "+")
@@ -87,7 +89,7 @@ class NSFW:
                         await ctx.message.author.send(resultat[random.randint(0, 42)]["jpeg_url"])
                         await ctx.send("Je t'ai envoyé ça en MP {mention}, si tu veux ça dans le salon, va dans un salon NSFW ^^".format(mention=ctx.message.author.mention))
             
-            except KeyError:
+                except KeyError:
                         await ctx.send("Aucun résultat pour \"{}\"".format(arg2)) 
 
 def setup(bot):
