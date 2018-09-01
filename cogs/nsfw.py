@@ -9,16 +9,16 @@ import requests
 import json
 import random
 
-# Config
-with open("config.json", "r") as fichier:
-    config = json.loads(fichier.read())
-
 #############
 # Fonctions #
 #############
 
 # Obtenir une traduction
 def getmsg(ctx, txt):
+
+    # Config
+    with open("config.json", "r") as fichier:
+        config = json.loads(fichier.read())
 
     # Ouvrir le fichier de traductions
     with open("trads.json", "r") as fichier:

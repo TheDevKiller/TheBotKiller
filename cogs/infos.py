@@ -11,16 +11,16 @@ import psutil
 import speedtest
 import json
 
-# Config
-with open("config.json", "r") as fichier:
-    config = json.loads(fichier.read())
-
 #############
 # Fonctions #
 #############
 
 # Obtenir une traduction
 def getmsg(ctx, txt):
+
+    # Config
+    with open("config.json", "r") as fichier:
+        config = json.loads(fichier.read())
 
     # Ouvrir le fichier de traductions
     with open("trads.json", "r") as fichier:
@@ -153,8 +153,8 @@ class Infos:
             
             # Embed
             em = discord.Embed(title=":busts_in_silhouette: Membres", description="Total: **{}**".format(status["online"]["False"] + status["offline"]["False"] + status["idle"]["False"] + status["dnd"]["False"] + status["online"]["True"] + status["offline"]["True"] + status["idle"]["True"] + status["dnd"]["True"]), color=0x6817ff)
-            em.add_field(name=":robot: Bots", value="Total: **{total}**\nEn ligne: **{online}**\nNe pas déranger: **{dnd}**\nAbsent: **{idle}**\nHors ligne: **{offline}**".format(total=status["online"]["True"] + status["offline"]["True"] + status["idle"]["True"] + status["dnd"]["True"], online=status["online"]["True"], offline=status["offline"]["True"], idle=status["idle"]["True"], dnd=status["dnd"]["True"]))
-            em.add_field(name=":raising_hand: Humains", value="Total: **{total}**\nEn ligne: **{online}**\nNe pas déranger: **{dnd}**\nAbsent: **{idle}**\nHors ligne: **{offline}**".format(total=status["online"]["False"] + status["offline"]["False"] + status["idle"]["False"] + status["dnd"]["False"], online=status["online"]["False"], offline=status["offline"]["False"], idle=status["idle"]["False"], dnd=status["dnd"]["False"]))
+            em.add_field(name=":robot: Bots", value="Total: **{total}**\nEn ligne: **{online}**\nNe pas déranger: **{dnd}**\nInactif: **{idle}**\nHors ligne: **{offline}**".format(total=status["online"]["True"] + status["offline"]["True"] + status["idle"]["True"] + status["dnd"]["True"], online=status["online"]["True"], offline=status["offline"]["True"], idle=status["idle"]["True"], dnd=status["dnd"]["True"]))
+            em.add_field(name=":raising_hand: Humains", value="Total: **{total}**\nEn ligne: **{online}**\nNe pas déranger: **{dnd}**\nInactif: **{idle}**\nHors ligne: **{offline}**".format(total=status["online"]["False"] + status["offline"]["False"] + status["idle"]["False"] + status["dnd"]["False"], online=status["online"]["False"], offline=status["offline"]["False"], idle=status["idle"]["False"], dnd=status["dnd"]["False"]))
         
             await ctx.send(embed=em)
 

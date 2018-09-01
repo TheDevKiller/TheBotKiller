@@ -33,8 +33,14 @@
 		"nottscredits": "Désolé mais je n'ai plus de crédit pour l'API :sweat_smile:",
 		"commandoesntexisthelp": "Désolé mais j'ai l'impression que cette commande n'existe pas, voir `help` pour une liste des commandes disponibles",
 
+		"todotitlembed": "Votre To-Do list",
+		"notodolist": "Vous n'avez pas de To-Do list, veuillez utiliser `todo add` pour en ajouter une",
+
 		"play": "Joue :wink:",
 		"cookiemsg": "{}, {} vous a donné un :cookie:",
+		"new_moon": "Pierre",
+		"page_facing_up": "Feuille",
+		"scissors": "Ciseaux",
 		
 		"helptitlembed": "Liste des commandes disponibles",
 		"helpembedfooter": "La plupart des commandes sont disponibles en français avec un alias, pour avoir plus d'infos sur un commande, faites `help command`",
@@ -46,7 +52,6 @@
 		"unload": "Décharge un module",
 		"conf": "Configure the bot",
 		"help": "Affiche cet embed magnifique",
-
 
 		"boobs": "Seins sur oboobs.ru",
 		"ass": "Culs sur obutts.ru",
@@ -124,10 +129,15 @@
 
 		"commanderror": "Command usage: ```\n{}\n\n``` *If you think this error is abnormal, contact </TheDevKiller>#8230*",
 		"nottscredits": "Sorry but I don't have credits for the API :sweat_smile:",
-		
+
+		"todotitlembed": "Your To-Do list",
+		"notodolist": "You have no To-Do list, please use `todo add` to add a thing to do",
 
 		"play": "Play :wink:",
 		"cookiemsg": "{}, {} gave you a :cookie:",
+		"🌑": "Rock",
+		"📄": "Paper",
+		"✂": "Scissors",
 
 		"helptitlembed": "List of available commands",
 		"helpembedfooter": "Most of the commands are also available in french with aliases, to get more info on a command, do `help command`",
@@ -183,7 +193,6 @@
 		"p4": "Connect 4",
 		"martine": "Generate an image with martine",
 		"todo": "A To-Do list"
-
 	}
 
 }

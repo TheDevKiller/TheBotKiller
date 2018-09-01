@@ -23,6 +23,10 @@ import numpy as np
 # Obtenir une traduction
 def getmsg(ctx, txt):
 
+    # Config
+    with open("config.json", "r") as fichier:
+        config = json.loads(fichier.read())
+
     # Ouvrir le fichier de traductions
     with open("trads.json", "r") as fichier:
         trad = json.loads(fichier.read())
@@ -117,70 +121,22 @@ class Fun:
                 await ctx.send(chaturl)
 
         # Shifumi
-        @commands.command(usage="shifumi")
-        async def shifumi(self, ctx):
+        @commands.command(name="shifumi", usage="shifumi")
+        async def _shifumi(self, ctx):
 
-                # Partie de Shifumi en cours
-                self.shifumi = True
+            # Partie de Shifumi en cours
+            self.shifumi = True
 
-                # Joueur
-                self.joueurShifumi = ctx.message.author.id
+            # Joueur
+            self.joueurShifumi = ctx.message.author
 
-                # Message joue, à modifier
-                messageJoue = await ctx.send(embed=discord.Embed(title="Shifumi", description="Joue :wink:", color=0xff7400))
+            # Message joue, à modifier
+            self.messageJoue = await ctx.send(embed=discord.Embed(title="Shifumi", description="Joue :wink:", color=0xff7400))
 
-                # Réactions
-                await messageJoue.add_reaction("🌑")
-                await messageJoue.add_reaction("📄")
-                await messageJoue.add_reaction("✂")
-
-                # Vérif' des réaction
-                reactionsValides = ["🌑", "📄", "✂"]
-                
-                # Réactions Invalides
-                while reaction[0].emoji not in reactionsValides:
-                        await ctx.send("Réagis avec pierre, feuille ou ciseaux :wink:")
-                        reaction = await bot.wait_for("reaction_add", check=lambda r, u: u.id == ctx.message.author.id)
-
-                # Définition du jeu du joueur
-                if reaction[0].emoji == "🌑":
-                        jeuJoueur = "pierre :new_moon:"
-                elif reaction[0].emoji == "📄":
-                        jeuJoueur = "feuille :page_facing_up:"
-                elif reaction[0].emoji == "✂":
-                        jeuJoueur = "ciseaux :scissors:"
-
-                # Jeu du bot
-                elements = ["pierre :new_moon:", "feuille :page_facing_up:", "ciseaux :scissors:"]
-                elementBot = random.choice(elements)
-
-                # Possibilités pour voir les gagnants
-                jeux = \
-                {"pierre :new_moon:": ["ciseaux :scissors:"],
-                "ciseaux :scissors:": ["feuille :page_facing_up:"],
-                "feuille :page_facing_up:": ["pierre :new_moon:"]}
-
-                # Check de qui a gagné
-                if jeuJoueur == elementBot:
-                        resultat = "Égalité :neutral_face:"
-                elif elementBot in jeux[jeuJoueur]:
-                        resultat = "T'as gagné :frowning:"
-                else:
-                        resultat = "T'as perdu :smiley:"
-
-                # Édition du message
-                await messageJoue.edit(embed=discord.Embed(title="Résultat du Shifumi entre " + ctx.message.author.name + " et </TheBotKiller>", description="** **\n**Tu as joué: **\n\n" + jeuJoueur.capitalize() + "\n\n**J'ai joué: **\n\n" + elementBot.capitalize() + "\n\n**Résultat: **\n\n" + resultat, color=0xff7400))
-
-                # Deuxième check de qui a gagné pour la variable gagant
-                if resultat == "Égalité :neutral_face:":
-                        gagnant = "Aucun"
-                elif resultat == "T'as gagné :frowning:":
-                        gagnant = ctx.message.author.name
-                else:
-                        gagnant = "</TheBotKiller>"
-
-                jeuJoueur = jeuJoueur.split(" ")[0]
-                elementBot = elementBot.split(" ")[0]
+            # Réactions
+            await self.messageJoue.add_reaction("🌑")
+            await self.messageJoue.add_reaction("📄")
+            await self.messageJoue.add_reaction("✂")
 
         # Dis
         @commands.command(aliases=["dis"], usage="(dis|say) message")
@@ -304,22 +260,56 @@ class Fun:
             pi = "141592653589"
 
             if nbre in pi:
-                await ctx.send("Votre nombre est dans les 12 premières décimales de pi")
+                for i, e in enumerate(pi):
+                    if e == nbre[0]:
+                        if pi[i:i+len(nbre)] == nbre:
+                            await ctx.send("Le nombre se trouve à la %sème décimale de pi"%(i+1))
+                            if i-5 < 0:
+                                await ctx.send(pi[0:i+len(nbre)+5])
+                            elif i+len(nbre)+5 > len(pi):
+                                await ctx.send(pi[i-5:])
+                            else:
+                                await ctx.send(pi[i-5:i+len(nbre)+5])
+                            break
 
             else:
-                await ctx.send("Votre nombre n'est pas dans les 12 premières décimales de pi")
+                await ctx.send("Votre nombre n'est pas dans les %s premières décimales de pi"%len(pi))
 
         # Réactions
         async def on_reaction_add(self, reaction, user):
             
-            reactionValides = [":page_facing_up:" ":new_moon:" ":scissors:"]
+            reactionValides = ["🌑", "📄", "✂"]
 
             if self.shifumi == True:
-                #if reaction.message.author.id == self.shifumijoueur:
-                    #if reaction.name in reactionValides:
-                self.jeuJoueurShifumi = reaction.name
-                print("JEUJOUEUR: %s"%self.jeuJoueurShifumi)
+                if self.joueurShifumi == user:
+                    if reaction.emoji in reactionValides:
 
+                        jeuJoueur = reaction.emoji
+
+                        # Jeu du bot
+                        elements = ["🌑", "📄", "✂"]
+                        elementBot = random.choice(elements)
+
+                        # Possibilités pour voir les gagnants
+                        jeux = \
+                        {"🌑": ["✂"],
+                        "✂": ["📄"],
+                        "📄": ["🌑"]}
+
+                        # Check de qui a gagné
+                        if jeuJoueur == elementBot:
+                                resultat = "Égalité :neutral_face:"
+                        elif elementBot in jeux[jeuJoueur]:
+                                resultat = "T'as gagné :frowning:"
+                        else:
+                                resultat = "T'as perdu :smiley:"
+
+                        # Édition du message
+                        em = discord.Embed(title="Résultat du sifumi entre %s et </TheBotKiller>"%(self.joueurShifumi.name), color=0xff7400)
+                        em.add_field(name="Tu as joué", value="%s %s"%(getmsg(reaction, jeuJoueur), jeuJoueur))
+                        em.add_field(name="J'ai joué", value="%s %s"%(getmsg(reaction, elementBot), elementBot))
+                        em.add_field(name="Résultat", value=resultat)
+                        await self.messageJoue.edit(embed=em)
 
         # Messages
         async def on_message(self, message):
