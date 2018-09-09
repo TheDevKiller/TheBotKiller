@@ -29,7 +29,8 @@
 		"autodestructerrorfooter": "Ce message s'auto-détruira dans 1 min",
 		"titlerrorembed": "C'est con !",
 		"erroravatar": "Entre une mention valide s'il te plaît :wink:",
-		"commanderror": "Usage de la commande: ```\n{}\n\n``` *Si vous pensez que cette erreur est anormale, veuillez contacter </TheDevKiller>#8230*",
+		"commanderrortitle": "Usage de la commande",
+		"commanderrorfooter": "Si vous pensez que cette erreur est anormale, veuillez contacter </TheDevKiller>#8230",
 		"nottscredits": "Désolé mais je n'ai plus de crédit pour l'API :sweat_smile:",
 		"commandoesntexisthelp": "Désolé mais j'ai l'impression que cette commande n'existe pas, voir `help` pour une liste des commandes disponibles",
 
@@ -127,7 +128,8 @@
 		"measuringdownload": "Measuring the download speed ...",
 		"measuringupload": "Measuring the upload speed ...",
 
-		"commanderror": "Command usage: ```\n{}\n\n``` *If you think this error is abnormal, contact </TheDevKiller>#8230*",
+		"commanderrortitle": "Usage of the command",
+		"commanderrorfooter": "I you think this error is abnormal, please contact </TheDevKiller>#8230",
 		"nottscredits": "Sorry but I don't have credits for the API :sweat_smile:",
 
 		"todotitlembed": "Your To-Do list",

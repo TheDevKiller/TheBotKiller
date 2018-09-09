@@ -168,9 +168,21 @@ async def unload(ctx, arg):
 # Erreurs
 @bot.event
 async def on_error(event, *args, **kwargs):
-    
-    message = args[0]
-    em = discord.Embed(title="C'est con !", description="```python\n{}\n```".format(traceback.format_exc()), color=0xff0000)
+
+    try:
+        message = args[0]
+        await message.channel.send("An error happened, </TheDevKiller>#8230 has been notified")
+
+    except:
+        pass
+
+    try:
+        commande = message.content.split(" ")[0]
+    except: 
+        commande = " "
+
+    err = traceback.format_exc()
+    em = discord.Embed(title=f"Error with {commande}", description=f"```python\n{err}\n```", color=0xff0000)
     
     await thedevkiller.send(embed=em)
 
@@ -185,11 +197,14 @@ async def conf(ctx, param, valeur):
     if param in defaultConfig:
         with open("config.json", "r") as fichier:
             config = json.loads(fichier.read())
+
         config[str(ctx.message.guild.id)][param] = valeur
+
         with open("config.json", "w") as fichier:
             fichier.write(json.dumps(config, indent=4))
+
     else:
-        await ctx.send(trad[config[str(ctx.message.guild.id)]["lang"]]["noavailableset"])
+        await ctx.send(getmsg(ctx, "noavailableset"))
 
 # Help
 @bot.command(aliases=["aide"], usage="(help|aide)")
@@ -209,7 +224,7 @@ async def help(ctx, arg="defaultarg"):
 
                     dico[commande.cog_name] = []
 
-                dico[commande.cog_name].append("`%s`: %s"%(commande.name, getmsg(ctx, commande.name)))
+                dico[commande.cog_name].append(f"`{commande.name}`: {getmsg(ctx, commande.name)}")
 
         for index, categorie in enumerate(dico):
 
@@ -239,7 +254,7 @@ async def help(ctx, arg="defaultarg"):
 
                 if isinstance(commande.usage, str):
 
-                    em.add_field(name="Usage", value="`\n%s\n`"%commande.usage)
+                    em.add_field(name="Usage", value="`\n{command.usage}\n`")
 
                 if isinstance(commande.cog_name, str):
 
@@ -250,7 +265,7 @@ async def help(ctx, arg="defaultarg"):
 # Input
 async def handle_console_input():
     while not bot.is_closed():
-        console_input = await bot.loop.run_in_executor(None, input, "~>")
+        console_input = await bot.loop.run_in_executor(None, input, "")
         bot.dispatch("console_input", console_input)
 
 bot.loop.create_task(handle_console_input())
@@ -270,14 +285,9 @@ async def on_console_input(input):
     elif input.split(" ")[0] == "exit":
         sys.exit(0)
 
-# it = InputThread()
-# it.start()
-# # while True:
-# #     print("Vous avez dit: %s"%it.last_user_input)
-
 # Logs
 @bot.event
 async def on_command(ctx):
-    print("[COMMAND][%s]: %s, %s, %s"%(time.asctime(), ctx.message.content, ctx.message.author.name, ctx.message.guild))
+    print(f"[COMMAND][{time.asctime()}]: {ctx.message.content}, {ctx.message.author.name}, {ctx.message.guild}")
 
 bot.run(secrets["token"])

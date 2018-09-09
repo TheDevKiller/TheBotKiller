@@ -21,7 +21,11 @@ def getmsg(ctx, txt):
     with open("trads.json", "r") as fichier:
         trad = json.loads(fichier.read())
 
-    return trad[config[str(ctx.message.guild.id)]["lang"]][txt]
+    try:
+        return trad[config[str(ctx.message.guild.id)]["lang"]][txt]
+
+    except:
+        return trad["en"][txt]
 
 ########
 # Code #
@@ -41,7 +45,9 @@ class Errors:
                 #if isinstance(ex, commands.MissingRequiredArgument) or isinstance(ex, commands.BadArgument):
                 
                 else:
-                    await ctx.send(getmsg(ctx, "commanderror").format(ctx.command.usage))
+                    em = discord.Embed(title=getmsg(ctx, "commanderrortitle"), description=f"`{ctx.command.usage}`", color=0xEA2027)
+                    em.set_footer(text=getmsg(ctx, "commanderrorfooter"))
+                    await ctx.send(embed=em)
                     print(ex)
 
                 # else:

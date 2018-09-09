@@ -24,8 +24,12 @@ def getmsg(ctx, txt):
     with open("trads.json", "r") as fichier:
         trad = json.loads(fichier.read())
 
-    return trad[config[str(ctx.message.guild.id)]["lang"]][txt]
+    try:
+        return trad[config[str(ctx.message.guild.id)]["lang"]][txt]
 
+    except:
+        return trad["fr"][txt]
+        
 class NSFW:
 
         def __init__(self, bot):
@@ -50,7 +54,7 @@ class NSFW:
                 # Vérification du channel
                 if ctx.message.channel.is_nsfw():
                         # URL
-                        lien = "http://media.obutts.ru/{}".format(requests.Session().get("http://api.obutts.ru/butts/0/1/random/").json()[0]["preview"])
+                        lien = f"http://media.obutts.ru/{requests.Session().get('http://api.obutts.ru/butts/0/1/random/').json()[0]['preview']}"
                         await ctx.send(lien)
                 else:
                         await ctx.send("Tu vas choquer des gens :scream: Va dans un salon NSFW !")
@@ -59,14 +63,14 @@ class NSFW:
         async def boobs(self, ctx):
 
                 # URL
-                lien = "http://media.oboobs.ru/{}".format(requests.Session().get("http://api.oboobs.ru/boobs/0/1/random").json()[0]["preview"])
+                lien = f"http://media.oboobs.ru/{requests.Session().get('http://api.oboobs.ru/boobs/0/1/random').json()[0]['preview']}"
                 
                 # Vérification du channel
                 if ctx.message.channel.is_nsfw():
                     await ctx.send(lien)
                 else:
                     await ctx.message.author.send(lien)
-                    await ctx.send("Je t'ai envoyé ça en MP {mention}, si tu veux ça dans le salon, va dans un salon NSFW ^^".format(mention=ctx.message.author.mention))
+                    await ctx.send(f"Je t'ai envoyé ça en MP {ctx.message.author.mention}, si tu veux ça dans le salon, va dans un salon NSFW ^^")
 
         # Yandere
         @commands.command(usage="yandere (search), search")
@@ -80,17 +84,17 @@ class NSFW:
                     recherche = arg2.replace(" ", "+")
 
                     # URL
-                    resultat = requests.get("https://yande.re/post.json?limit=42&tags={}".format(recherche), headers={"User-Agent": "Je suis un gentil bot Discord qui vient en paix :)"}).json()
+                    resultat = requests.get(f"https://yande.re/post.json?limit=42&tags={recherche}", headers={"User-Agent": "Je suis un gentil bot Discord qui vient en paix :)"}).json()
                     
                     # Vérification du channel
                     if isinstance(ctx.message.channel, discord.DMChannel) or ctx.message.channel.is_nsfw():
                         await ctx.send(resultat[random.randint(0, 42)]["jpeg_url"])
                     else:
                         await ctx.message.author.send(resultat[random.randint(0, 42)]["jpeg_url"])
-                        await ctx.send("Je t'ai envoyé ça en MP {mention}, si tu veux ça dans le salon, va dans un salon NSFW ^^".format(mention=ctx.message.author.mention))
+                        await ctx.send(f"Je t'ai envoyé ça en MP {ctx.message.author.mention}, si tu veux ça dans le salon, va dans un salon NSFW ^^")
             
                 except KeyError:
-                        await ctx.send("Aucun résultat pour \"{}\"".format(arg2)) 
+                        await ctx.send(f"Aucun résultat pour \"{arg2}\"") 
 
 def setup(bot):
         bot.add_cog(NSFW(bot))

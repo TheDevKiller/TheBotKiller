@@ -26,7 +26,11 @@ def getmsg(ctx, txt):
     with open("trads.json", "r") as fichier:
         trad = json.loads(fichier.read())
 
-    return trad[config[str(ctx.message.guild.id)]["lang"]][txt]
+    try:
+        return trad[config[str(ctx.message.guild.id)]["lang"]][txt]
+
+    except:
+        return trad["fr"][txt]
 
 #############
 # Variables #
@@ -148,7 +152,6 @@ class Infos:
                         
             # Check du status des membres et du nombre
             for membre in ctx.message.guild.members:
-                    print(membre)
                     status[str(membre.status)][str(membre.bot)] += 1
             
             # Embed
@@ -205,7 +208,7 @@ class Infos:
         @commands.command(aliases=["pp"], usage="(avatar|pp) mention")
         async def avatar(self, ctx, user:discord.Member):
             try:
-                await ctx.send("https://cdn.discordapp.com/avatars/%s/%s.png?size=2048"%(user.id, user.avatar))
+                await ctx.send(f"https://cdn.discordapp.com/avatars/{user.id}/{user.avatar}.png?size=2048")
             except:
                 await ctx.send(getmsg(ctx, "erroravatar"))
 

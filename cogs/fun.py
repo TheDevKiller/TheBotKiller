@@ -15,6 +15,7 @@ import json
 from pprint import pformat
 import pickle
 import numpy as np
+import subprocess
 
 #############
 # Fonctions #
@@ -31,7 +32,11 @@ def getmsg(ctx, txt):
     with open("trads.json", "r") as fichier:
         trad = json.loads(fichier.read())
 
-    return trad[config[str(ctx.message.guild.id)]["lang"]][txt]
+    try:
+        return trad[config[str(ctx.message.guild.id)]["lang"]][txt]
+
+    except:
+        return trad["fr"][txt]
 
 
 ########
@@ -44,409 +49,194 @@ pom = False
 
 class Fun:
         
-        def __init__(self, bot):
-                self.bot = bot
-                self.jeuJoueurShifumi = None
-                self.essais = 0
-                self.p4 = False
-                self.jTour = None
-                self.jJaune = None
-                self.jRouge = None
-                self.grillep4 = None
-                self.gris = (0, 0, 0)
-                self.jaune = (0, 0, 0)
-                self.rouge = (0, 0, 0)
-                self.im = None
-                self.draw = None
-                self.shifumi = False
-                self.joueurShifumi = 1
-        
-        # MRAW
-        @commands.command(usage="mraw")
-        async def mraw(self, ctx):
-            await ctx.send(":regional_indicator_m: :regional_indicator_r: :regional_indicator_a: :regional_indicator_w: ")
+    def __init__(self, bot):
+            self.bot = bot
+            self.jeuJoueurShifumi = None
+            self.essais = 0
+            self.shifumi = False
+            self.joueurShifumi = 1
 
-        # Kop1
-        @commands.command(name="kop1", usage="kop1")
-        async def kop(self, ctx):
-            await ctx.send(":regional_indicator_k: :regional_indicator_o: :regional_indicator_p: :one:")
+    # img2txt
+    @commands.command(usage="img2txt with attachment")
+    async def img2txt(self, ctx):
 
-        # <3
-        @commands.command(name="heart", usage=":heart:")
-        async def heart(self, ctx):
-            await ctx.send(":heart:")
+        try:
+            url = ctx.message.attachments[0].url
+        except:
+            await ctx.send("I need an image !")
 
-        # Cookie
-        @commands.command(usage="cookie mention")
-        async def cookie(self, ctx, arg):
-            await ctx.send(getmsg(ctx, "cookiemsg"))
+        image = requests.Session().get(url).content
 
-        # VDM
-        @commands.command(aliases=["viedemerde"], usage="(viedemerde|vdm)")
-        async def vdm(self, ctx):
-                source = requests.Session().get("https://www.viedemerde.fr/aleatoire", headers={"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/60.0"}).content
-                soup = BeautifulSoup(source, "html.parser")
-                vdm = list(random.choice(soup.find_all("p", class_="block hidden-xs")).children)[1].string 
-                await ctx.send(vdm.replace(" VDM", ""))
+        fichier = ctx.message.attachments[0].filename
 
-        # DTC
-        @commands.command(aliases=["danstonchat"], usage="(dtc|danstonchat)")
-        async def dtc(self, ctx):
-            source = requests.get("https://www.danstonchat.com/random0.html").content
+        with open(fichier, "wb") as file:
+                file.write(image)
+
+        im = Image.open(fichier)
+
+        im = im.convert(mode="L")
+
+        im.save()
+
+        im.close(filename)
+
+    # Cookie
+    @commands.command(usage="cookie mention")
+    async def cookie(self, ctx, arg):
+        await ctx.send(getmsg(ctx, "cookiemsg"))
+
+    # VDM
+    @commands.command(aliases=["viedemerde"], usage="(viedemerde|vdm)")
+    async def vdm(self, ctx):
+            source = requests.Session().get("https://www.viedemerde.fr/aleatoire", headers={"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/60.0"}).content
             soup = BeautifulSoup(source, "html.parser")
-            lst = soup.find_all("div", class_="addthis_inline_share_toolbox")
-            await ctx.send(random.choice(lst)["data-description"])
+            vdm = list(random.choice(soup.find_all("p", class_="block hidden-xs")).children)[1].string 
+            await ctx.send(vdm.replace(" VDM", ""))
 
-        # Ah
-        @commands.command(usage="ah")
-        async def ah(self, ctx):
-                with open("img/ah.jpg", "rb") as img:
-                        await ctx.send(file=discord.File(img))
+    # DTC
+    @commands.command(aliases=["danstonchat"], usage="(dtc|danstonchat)")
+    async def dtc(self, ctx):
+        source = requests.get("https://www.danstonchat.com/random0.html").content
+        soup = BeautifulSoup(source, "html.parser")
+        lst = soup.find_all("div", class_="addthis_inline_share_toolbox")
+        await ctx.send(random.choice(lst)["data-description"])
 
-        # Obvious
-        @commands.command(usage="obvious")
-        async def obvious(self, ctx):
-                with open("img/obvious.jpg", "rb") as img:
-                        await ctx.send(file=discord.File(img))
-        # Non
-        @commands.command(aliases=["non"], usage="non")
-        async def no(self, ctx):
-                with open("img/non.jpg", "rb") as img:
-                        await ctx.send(file=discord.File(img))
+    # Ah
+    @commands.command(usage="ah")
+    async def ah(self, ctx):
+            with open("img/ah.jpg", "rb") as img:
+                    await ctx.send(file=discord.File(img))
 
-        # Chat
-        @commands.command(aliases=["chat"], usage="(chat|cat)")
-        async def cat(self, ctx):
-                chaturl = nekos.cat()
-                await ctx.send(chaturl)
+    # Obvious
+    @commands.command(usage="obvious")
+    async def obvious(self, ctx):
+            with open("img/obvious.jpg", "rb") as img:
+                    await ctx.send(file=discord.File(img))
+    # Non
+    @commands.command(aliases=["non"], usage="non")
+    async def no(self, ctx):
+            with open("img/non.jpg", "rb") as img:
+                    await ctx.send(file=discord.File(img))
 
-        # Shifumi
-        @commands.command(name="shifumi", usage="shifumi")
-        async def _shifumi(self, ctx):
+    # Chat
+    @commands.command(aliases=["chat"], usage="(chat|cat)")
+    async def cat(self, ctx):
+            chaturl = nekos.cat()
+            await ctx.send(chaturl)
 
-            # Partie de Shifumi en cours
-            self.shifumi = True
+    # Shifumi
+    @commands.command(name="shifumi", usage="shifumi")
+    async def _shifumi(self, ctx):
 
-            # Joueur
-            self.joueurShifumi = ctx.message.author
+        # Partie de Shifumi en cours
+        self.shifumi = True
 
-            # Message joue, à modifier
-            self.messageJoue = await ctx.send(embed=discord.Embed(title="Shifumi", description="Joue :wink:", color=0xff7400))
+        # Joueur
+        self.joueurShifumi = ctx.message.author
 
-            # Réactions
-            await self.messageJoue.add_reaction("🌑")
-            await self.messageJoue.add_reaction("📄")
-            await self.messageJoue.add_reaction("✂")
-
-        # Dis
-        @commands.command(aliases=["dis"], usage="(dis|say) message")
-        async def say(self, ctx, *, arg):
-                await ctx.send(arg)
-
-        # POM
-        @commands.command(aliases=["plusoumoins", "+-", "+ou+"], usage="(+-|+ou-|plusoumoins|pom) <min> <max>")
-        async def pom(self, ctx, pmin, pmax):
-
-                # Globales
-                global joueurPom
-                global minpom
-                global maxpom
-                global nbre
-                global pomchan
-                global essais
-                global pom
-
-                # Variables
-                minpom = pmin
-                maxpom = pmax
-                joueurPom = ctx.message.author
-
-                # Check si le max et min doivent être inversés
-                if(minpom > maxpom):
-                        minpom, maxpom = maxpom, minpom
-
-                await ctx.send("Devine à quel nombre je pense entre {} et {}".format(minpom, maxpom))
-
-                # Nombre du bot & autres variables
-                nbre = random.randint(int(minpom), int(maxpom))
-                pomchan = ctx.message.channel
-                pom = True
-                essais = 1
-
-        # P4
-        @commands.command(aliases=["c4", "connect4", "puissance4"], name="p4", usage="p4 mention")
-        async def _p4(self, ctx, arg):
-
-            # Partie en cours
-            self.p4 = True
-
-            # Dessin
-            self.im = Image.open("p4.png")
-            self.draw = ImageDraw.Draw(self.im, "RGBA")
-            self.draw.rectangle([(0, 0), (355, 348)], (58, 53, 155))
-            self.draw.rectangle([(0, 306), (355, 348)], (0, 0, 0, 30))
-            
-            # Police (Ubuntu)
-            font = ImageFont.truetype("/usr/share/fonts/truetype/ubuntu/Ubuntu-M.ttf", 34)
-
-            # Joueurs
-            self.jJaune = ctx.message.author
-            self.jRouge = await self.bot.get_user_info(int(arg.replace("<", "").replace(">", "").replace("@", "").replace("!", "")))
-
-            # Joueur qui doit commencer
-            self.jTour = random.choice([self.jJaune, self.jRouge])
-    
-            await ctx.send("C'est à %s de commencer"%self.jTour.mention)
-
-            # Couleurs
-            self.jaune = (241, 196, 15)
-            self.rouge = (231, 76, 60)
-            self.gris = (58, 53, 155, 0)
-
-            # Grille
-            self.grillep4 = \
-                    [[self.gris, self.gris, self.gris, self.gris, self.gris, self.gris],
-                    [self.gris, self.gris, self.gris, self.gris, self.gris, self.gris],
-                    [self.gris, self.gris, self.gris, self.gris, self.gris, self.gris],
-                    [self.gris, self.gris, self.gris, self.gris, self.gris, self.gris],
-                    [self.gris, self.gris, self.gris, self.gris, self.gris, self.gris],
-                    [self.gris, self.gris, self.gris, self.gris, self.gris, self.gris],
-                    [self.gris, self.gris, self.gris, self.gris, self.gris, self.gris]]
-
-            # Dessin de la grille
-            for coindex, colonne in enumerate(self.grillep4):
-                coindex *= 50
-                for caindex, case in enumerate(colonne):
-                    caindex *= 50
-                    self.draw.ellipse([(coindex+5, caindex+5), (coindex+50, caindex+50)], case)
-
-            # Dessin des nombres en bas de la grille
-            for index, n in enumerate(range(1, 8)):
-                index *= 50
-                self.draw.text((index + 20, 305), str(n), "white", font)
-
-            # Sauvegarde & Envoi de l'image
-            self.im.save("p4.png")
-            await ctx.send(file=discord.File("p4.png"))
-
-        # Martine
-        @commands.command(usage="martine imageName text")
-        async def martine(self, ctx, image, *, texte):
-
-            image = image.lower()
-
-            imageList = ['ecole', 'surprise', 'lanterne', 'train', 'camping', 'menage', 'ferme', 'zoo', 'fantome', 'contes', 'ours', 'rentree', 'princesse', 'maman', 'voyage', 'accident', 'noel', 'demenage', 'avion', 'theatre', 'mongolfiere']
-
-            if image not in imageList:
-                await ctx.send("Liste des images disponibles:\n\n- %s"%"\n- ".join(imageList))
-
-            else:
-                for i, e in enumerate(imageList):
-                    if e == image:
-                        imageNbre = i
-
-                source = requests.get("http://www.retourdemartine.free.fr/create2.php?t=%s&m=%s"%(texte, imageNbre+1), headers={"User-Agent": "Un gentil bot discord"}).content
-
-                soup = BeautifulSoup(source, "html.parser")
-
-                imgUrl = "http://www.retourdemartine.free.fr/" + soup.find("img", class_="blackborder")["src"]
-
-                await ctx.send(imgUrl)
-
-        # Pi
-        @commands.command(usage="pi number")
-        async def pi(self, ctx, nbre):
-
-            pi = "141592653589"
-
-            if nbre in pi:
-                for i, e in enumerate(pi):
-                    if e == nbre[0]:
-                        if pi[i:i+len(nbre)] == nbre:
-                            await ctx.send("Le nombre se trouve à la %sème décimale de pi"%(i+1))
-                            if i-5 < 0:
-                                await ctx.send(pi[0:i+len(nbre)+5])
-                            elif i+len(nbre)+5 > len(pi):
-                                await ctx.send(pi[i-5:])
-                            else:
-                                await ctx.send(pi[i-5:i+len(nbre)+5])
-                            break
-
-            else:
-                await ctx.send("Votre nombre n'est pas dans les %s premières décimales de pi"%len(pi))
+        # Message joue, à modifier
+        self.messageJoue = await ctx.send(embed=discord.Embed(title="Shifumi", description="Joue :wink:", color=0xff7400))
 
         # Réactions
-        async def on_reaction_add(self, reaction, user):
-            
-            reactionValides = ["🌑", "📄", "✂"]
+        await self.messageJoue.add_reaction("🌑")
+        await self.messageJoue.add_reaction("📄")
+        await self.messageJoue.add_reaction("✂")
 
-            if self.shifumi == True:
-                if self.joueurShifumi == user:
-                    if reaction.emoji in reactionValides:
+    # Dis
+    @commands.command(aliases=["dis"], usage="(dis|say) message")
+    async def say(self, ctx, *, arg):
+            await ctx.send(arg)
 
-                        jeuJoueur = reaction.emoji
+    # Website screen
+    @commands.command(usage="websitescreen url", aliases=["sitescreen", "wsb", "wb"])
+    async def websitescreen(self, ctx, *, url):
 
-                        # Jeu du bot
-                        elements = ["🌑", "📄", "✂"]
-                        elementBot = random.choice(elements)
+        subprocess.call(["wkhtmltoimage", url, "tmp/websitescreen.png"])
+        await ctx.send(file=discord.File("tmp/websitescreen.png"))
 
-                        # Possibilités pour voir les gagnants
-                        jeux = \
-                        {"🌑": ["✂"],
-                        "✂": ["📄"],
-                        "📄": ["🌑"]}
+    # Martine
+    @commands.command(usage="martine imageName text")
+    async def martine(self, ctx, image, *, texte):
 
-                        # Check de qui a gagné
-                        if jeuJoueur == elementBot:
-                                resultat = "Égalité :neutral_face:"
-                        elif elementBot in jeux[jeuJoueur]:
-                                resultat = "T'as gagné :frowning:"
+        image = image.lower()
+
+        imageList = ['ecole', 'surprise', 'lanterne', 'train', 'camping', 'menage', 'ferme', 'zoo', 'fantome', 'contes', 'ours', 'rentree', 'princesse', 'maman', 'voyage', 'accident', 'noel', 'demenage', 'avion', 'theatre', 'mongolfiere']
+
+        if image not in imageList:
+
+            n = "\n"
+            await ctx.send(f"Liste des images disponibles:{n}{n}- {f'{n}- '.join(imageList)}")
+
+        else:
+            for i, e in enumerate(imageList):
+                if e == image:
+                    imageNbre = i
+
+            source = requests.get(f"http://www.retourdemartine.free.fr/create2.php?t={texte}&m={imageNbre+1}", headers={"User-Agent": "Un gentil bot discord"}).content
+
+            soup = BeautifulSoup(source, "html.parser")
+
+            imgUrl = "http://www.retourdemartine.free.fr/" + soup.find("img", class_="blackborder")["src"]
+
+            await ctx.send(imgUrl)
+
+    # Pi
+    @commands.command(usage="pi number")
+    async def pi(self, ctx, nbre):
+
+        pi = "141592653589"
+
+        if nbre in pi:
+            for i, e in enumerate(pi):
+                if e == nbre[0]:
+                    if pi[i:i+len(nbre)] == nbre:
+                        await ctx.send(f"Le nombre se trouve à la {i+1}ème décimale de pi")
+                        if i-5 < 0:
+                            await ctx.send(pi[0:i+len(nbre)+5])
+                        elif i+len(nbre)+5 > len(pi):
+                            await ctx.send(pi[i-5:])
                         else:
-                                resultat = "T'as perdu :smiley:"
+                            await ctx.send(pi[i-5:i+len(nbre)+5])
+                        break
 
-                        # Édition du message
-                        em = discord.Embed(title="Résultat du sifumi entre %s et </TheBotKiller>"%(self.joueurShifumi.name), color=0xff7400)
-                        em.add_field(name="Tu as joué", value="%s %s"%(getmsg(reaction, jeuJoueur), jeuJoueur))
-                        em.add_field(name="J'ai joué", value="%s %s"%(getmsg(reaction, elementBot), elementBot))
-                        em.add_field(name="Résultat", value=resultat)
-                        await self.messageJoue.edit(embed=em)
+        else:
+            await ctx.send(f"Votre nombre n'est pas dans les {len(pi)} premières décimales de pi")
 
-        # Messages
-        async def on_message(self, message):
-       
-            # Essais du POM
-            global essais
-            
-            # POM    
-            if pom == True and message.author == joueurPom and message.channel == pomchan:
-                
-                # Nombre du joueur
-                nbreJoueur = int(message.content)
-                
-                # Vérifications
-                if nbreJoueur < nbre:
-                    await message.channel.send("C'est plus !")
-                    essais += 1
-                elif nbreJoueur > nbre:
-                    await message.channel.send("C'est moins !")
-                    essais += 1
-                elif nbreJoueur == nbre:
-                    if essais <= 1:
-                        await message.channel.send("C'est ça, bien joué {mention} ! Tu as réussi en {essais} essais".format(mention=message.author.mention, essais=essais))
-                    else:
-                        await message.channel.send("C'est ça, bien joué {mention} ! Tu as réussi en {essais} essais".format(mention=message.author.mention, essais=essais))
-                    
-                    # Fin de la partie
-                    plusoumoins = False
+    # Réactions
+    async def on_reaction_add(self, reaction, user):
         
-            # P4
-            elif self.p4 == True and message.author.id == self.jTour.id:
+        reactionValides = ["🌑", "📄", "✂"]
 
-                # Vérification si le message est un nombre entre 1 & 8 (largeur de la grille)
-                for e in range(1, 8):
-                    if message.content.strip() == str(e):
-                        
-                        # Vérification des cases de bas en haut une par une pour jouer
-                        for index, case in enumerate(self.grillep4[int(message.content) - 1]):
-                            
-                            # Vérification de quel joueur joue
-                            if case == self.gris:
-                                if self.jTour == self.jJaune:
-                                    self.grillep4[int(message.content) - 1][index] = self.jaune
-                                    break
-                                elif self.jTour == self.jRouge:
-                                    self.grillep4[int(message.content) - 1][index] = self.rouge
-                                    break
+        if self.shifumi == True:
+            if self.joueurShifumi == user:
+                if reaction.emoji in reactionValides:
 
-                        # Inverse la grille
-                        for element in self.grillep4:
-                            element.reverse()
+                    jeuJoueur = reaction.emoji
 
-                        # Dessin de la grille colonne par colonne
-                        for coindex, colonne in enumerate(self.grillep4):
-                            coindex *= 50
-                            for caindex, case in enumerate(colonne):
-                                caindex *= 50
-                                self.draw.ellipse([(coindex+5, caindex+5), (coindex+50, caindex+50)], case)
+                    # Jeu du bot
+                    elements = ["🌑", "📄", "✂"]
+                    elementBot = random.choice(elements)
 
-                        # Sauvegarde de l'image
-                        self.im.save("p4.png")
+                    # Possibilités pour voir les gagnants
+                    jeux = \
+                    {"🌑": ["✂"],
+                    "✂": ["📄"],
+                    "📄": ["🌑"]}
 
-                        # Changement de tour
-                        if self.jTour == self.jRouge:
-                            self.jTour = self.jJaune
-                        elif self.jTour == self.jJaune:
-                            self.jTour = self.jRouge
+                    # Check de qui a gagné
+                    if jeuJoueur == elementBot:
+                            resultat = "Égalité :neutral_face:"
+                    elif elementBot in jeux[jeuJoueur]:
+                            resultat = "T'as gagné :frowning:"
+                    else:
+                            resultat = "T'as perdu :smiley:"
 
-                        # Vérifications des colonnes
-                        for coindex, colonne in enumerate(self.grillep4):
-                            for caindex, case in enumerate(colonne):
-                                try:
-                                    if self.grillep4[coindex][caindex:caindex+4].count(self.jaune) == 4 or self.grillep4[coindex][caindex:caindex+4].count(self.rouge) == 4:
-                                        if self.grillep4[coindex][caindex] == self.jaune:
-                                            if self.p4 == True:
-                                                await message.channel.send("%s, tu as gagné, bien joué !"%self.jJaune.mention, file=discord.File("p4.png"))
-                                            self.p4 = False
-                                        elif self.grillep4[coindex][caindex] == self.rouge:
-                                            if self.p4 == True:
-                                                await message.channel.send("%s, tu as gagné, bien joué !"%self.jRouge.mention, file=discord.File("p4.png"))
-                                            self.p4 = False
-                                except:
-                                    pass
-
-                        # Vérification des lignes
-                        ligne = []
-                        for coindex, colonne in enumerate(self.grillep4):
-                            for caindex, case in enumerate(colonne):
-                                for coindex, colonne in enumerate(self.grillep4):
-                                    ligne.append(self.grillep4[coindex][caindex])
-                                for index, case in enumerate(ligne):
-                                    if ligne[index:index+4].count(self.jaune) == 4 or ligne[index:index+4].count(self.rouge) == 4:
-                                        if ligne[index] == self.rouge:
-                                            if self.p4 == True: 
-                                                await message.channel.send("%s, tu as gagné, bien joué !"%self.jRouge.mention)
-                                            self.p4 = False
-                                            break
-                                        elif ligne[index] == self.jaune:
-                                            if self.p4 == True: 
-                                                await message.channel.send("%s, tu as gagné, bien joué !"%self.jRouge.mention)
-                                            self.p4 = False
-                                            break                                
-
-                        # Vérification des diagonales
-                        diagonales = []
-                        a = np.array(self.grillep4)
-                        diags = [a[::-1,:].diagonal(i) for i in range(-a.shape[0]+1,a.shape[1])]
-                        diags.extend(a.diagonal(i) for i in range(a.shape[1]-1,-a.shape[0],-1))
-                        for n in diags:
-                            diagonales.append(n.tolist())
-                        for dindex, d in enumerate(diagonales):
-                            for cindex, c in enumerate(d):
-                                try:
-                                    if diagonales[dindex][cindex:cindex+4].count(self.jaune) == 4 or diagonales[dindex][cindex:cindex+4].count(self.rouge) == 4:
-                                        print("le premier if passe")
-                                        if diagonales[dindex][cindex] == self.rouge:
-                                            if self.p4 == True: 
-                                                await message.channel.send("%s, tu as gagné, bien joué !"%self.jRouge.mention, file=discord.File("p4.png"))
-                                            self.p4 = False
-                                            break
-                                        elif diagonales[dindex][cindex] == self.jaune:
-                                            print("le deuxième if passe")
-                                            if self.p4 == True: 
-                                                await message.channel.send("%s, tu as gagné, bien joué !"%self.jRouge.mention, file=discord.File("p4.png"))
-                                            self.p4 = False
-                                            break
-                                except IndexError:
-                                    pass
-
-                        if self.p4 == True:
-                            await message.channel.send("À toi, %s"%self.jTour.mention, file=discord.File("p4.png"))
-
-                        # Inversement de la grille
-                        for element in self.grillep4:
-                            element.reverse()
-
-
+                    # Édition du message
+                    em = discord.Embed(title=f"Résultat du sifumi entre {self.joueurShifumi.name} et </TheBotKiller>", color=0xff7400)
+                    em.add_field(name="Tu as joué", value=f"{getmsg(reaction, jeuJoueur)} {jeuJoueur}")
+                    em.add_field(name="J'ai joué", value=f"{getmsg(reaction, elementBot)} {elementBot}")
+                    em.add_field(name="Résultat", value=resultat)
+                    await self.messageJoue.edit(embed=em)
 
 def setup(bot):
         bot.add_cog(Fun(bot)) 

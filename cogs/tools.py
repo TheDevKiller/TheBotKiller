@@ -34,7 +34,11 @@ def getmsg(ctx, txt):
     with open("trads.json", "r") as fichier:
         trad = json.loads(fichier.read())
 
-    return trad[config[str(ctx.message.guild.id)]["lang"]][txt]
+    try:
+        return trad[config[str(ctx.message.guild.id)]["lang"]][txt]
+
+    except:
+        return trad["fr"][txt]
 
 ########
 # Code #
@@ -87,7 +91,7 @@ class Tools:
                 try:
                     description = ""
                     for i, e in enumerate(dico[str(ctx.message.author.id)]):
-                        description += "%s. %s\n"%(i+1, e)
+                        description += f"{i+1}. {e}\n"
 
                     em = discord.Embed(title=getmsg(ctx, "todotitlembed"), description=description, color=0xff6600)
                     await ctx.send(embed=em)
@@ -130,7 +134,7 @@ class Tools:
         @commands.command(aliases=["bug"], brief="Signaler un bug", usage="(report|bug) message")
         async def report(self, ctx, *, arg):
                 thedevkiller = await self.bot.get_user_info(436105272310759426)
-                await thedevkiller.send("{report}\n{auth}".format(report=arg, auth=ctx.message.author.name))
+                await thedevkiller.send(f"{arg}\n{ctx.message.author.name}")
 
         # Convertir
         @commands.command(aliases=["convertir"], brief="Convertir deux unités", usage="(convertisseur|convert) unite1 unite2 text")
@@ -166,7 +170,7 @@ class Tools:
                 # Requête
                 cc = requests.get(url, headers={"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/60.0"}).json()[0][0][0]
                 
-                await ctx.send(embed=discord.Embed(title="Traduction", description="{ls}: {cs}\n{lc}: {cc}".format(ls=ls.capitalize(), cs=cs.capitalize(), lc=lc.capitalize(), cc=cc.capitalize()), color=0x225bff))
+                await ctx.send(embed=discord.Embed(title="Traduction", description=f"{ls.capitalize()}: {cs.capitalize()}\n{lc.capitalize()}: {cc.capitalize()}", color=0x225bff))
 
         # QR
         @commands.command(aliases=["qr"], brief="Générateur de QR code", usage="(qr|qrcode) \"chaine\", la chaine doit être entre guillemets si il y a des espaces")
@@ -204,12 +208,13 @@ class Tools:
         async def tts(self, ctx, chaine):
 
             # Fichier
-            reponse = requests.get("https://tts.readspeaker.com/a/speak?key={token}&lang=fr_ca&voice=leo&text={chaine}".format(token=secrets["tts"], chaine=chaine)).content
+            reponse = requests.get(f"https://tts.readspeaker.com/a/speak?key={secrets['tts']}&lang=fr_ca&voice=leo&text={chaine}").content
             if reponse.decode().strip() == "ERROR: Needed credits exceeds available amount.":
                 await ctx.send(getmsg(ctx, "nottscredits"))
-            with open("tts.mp3", "wb") as fichier:
-                fichier.write(mp3)
-            await ctx.send(file=discord.File("tts.mp3"))
+            else:
+                with open("tts.mp3", "wb") as fichier:
+                    fichier.write(mp3)
+                await ctx.send(file=discord.File("tts.mp3"))
 
         # Dilemme
         @commands.command(aliases=["dilemme"], usage="(dilem|dilemme) \"choice1\"")
