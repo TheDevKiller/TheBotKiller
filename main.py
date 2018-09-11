@@ -16,6 +16,7 @@ import re
 import time
 import threading
 import asyncio
+from termcolor import colored
 
 #############
 # Fonctions #
@@ -75,7 +76,7 @@ async def on_ready():
 
         thedevkiller = await bot.get_user_info(436105272310759426)
 
-        print("Je suis connecté !")
+        print(colored("Je suis connecté !", "white"))
 
         # Présence
         await bot.change_presence(status=discord.Status.dnd, activity=discord.Activity(name="&help", type=discord.ActivityType.listening), afk=False)
@@ -85,7 +86,7 @@ async def on_ready():
             if re.match(r".*\.py.swp", fichier):
                 pass
             elif re.match(r".*\.py", fichier):
-                print("Chargement de " + fichier)
+                print(colored(f"Chargement de {fichier}", "white"))
                 bot.load_extension("cogs." + fichier.replace(".py", ""))
 
         # Chargement de la config
@@ -182,9 +183,8 @@ async def on_error(event, *args, **kwargs):
         commande = " "
 
     err = traceback.format_exc()
-    em = discord.Embed(title=f"Error with {commande}", description=f"```python\n{err}\n```", color=0xff0000)
     
-    await thedevkiller.send(embed=em)
+    print(colored(err, "red"))
 
 ## Cogs chargées
 #@commands.command(name="cogs", aliases=["modules"], brief="Liste des modules")
@@ -254,7 +254,9 @@ async def help(ctx, arg="defaultarg"):
 
                 if isinstance(commande.usage, str):
 
-                    em.add_field(name="Usage", value="`\n{command.usage}\n`")
+                    n = "\n"
+
+                    em.add_field(name="Usage", value=f"`\n{command.usage}\n`")
 
                 if isinstance(commande.cog_name, str):
 
@@ -288,6 +290,6 @@ async def on_console_input(input):
 # Logs
 @bot.event
 async def on_command(ctx):
-    print(f"[COMMAND][{time.asctime()}]: {ctx.message.content}, {ctx.message.author.name}, {ctx.message.guild}")
+    print(colored(f"[COMMAND][{time.asctime()}]: {ctx.message.content}, {ctx.message.author.name}, {ctx.message.guild}", "white"))
 
 bot.run(secrets["token"])

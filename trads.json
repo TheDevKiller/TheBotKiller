@@ -48,7 +48,7 @@
 
 		"load": "Charge un module",
 		"halt": "Éteint le bot",
-		"reload": "Rechagre un module",
+		"reload": "Recharge un module",
 		"reboot": "Redémarre le bot",
 		"unload": "Décharge un module",
 		"conf": "Configure the bot",

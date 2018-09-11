@@ -5,6 +5,7 @@
 import discord
 from discord.ext import commands
 import json
+from termcolor import colored
 
 #############
 # Fonctions #
@@ -48,7 +49,7 @@ class Errors:
                     em = discord.Embed(title=getmsg(ctx, "commanderrortitle"), description=f"`{ctx.command.usage}`", color=0xEA2027)
                     em.set_footer(text=getmsg(ctx, "commanderrorfooter"))
                     await ctx.send(embed=em)
-                    print(ex)
+                    print(colored(ex, "yellow"))
 
                 # else:
                 #     await ctx.send(ex)

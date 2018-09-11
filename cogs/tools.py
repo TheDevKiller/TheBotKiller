@@ -56,6 +56,18 @@ class Tools:
                 border=2
                 )
 
+        # Clearme
+        @commands.command(usage="clearme")
+        async def clearme(self, ctx):
+            async for message in ctx.history(limit=100, before=ctx.message):
+                if message.author == ctx.guild.me:
+                    await message.delete()
+
+        @commands.command(usage="clear <limit>")
+        async def clear(self, ctx, limit):
+            async for message in ctx.history(limit=int(limit)+1):
+                await message.delete()
+
         # Todo
         @commands.command(usage="todo (add|remove|modify|view) [number] text")
         async def todo(self, ctx, action="view", *, text=""):

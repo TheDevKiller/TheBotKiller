@@ -16,6 +16,7 @@ from pprint import pformat
 import pickle
 import numpy as np
 import subprocess
+from pyppeteer import launch
 
 #############
 # Fonctions #
@@ -151,8 +152,15 @@ class Fun:
     @commands.command(usage="websitescreen url", aliases=["sitescreen", "wsb", "wb"])
     async def websitescreen(self, ctx, *, url):
 
-        subprocess.call(["wkhtmltoimage", url, "tmp/websitescreen.png"])
-        await ctx.send(file=discord.File("tmp/websitescreen.png"))
+        browser = await laucnh()
+        page = await browser.newPage()
+
+        if "file:///" not in url:
+            await page.goto(url)
+        else:
+            await ctx.send("Méchant !")
+
+        await page.screenshot({"tmp": "screen.png!"})
 
     # Martine
     @commands.command(usage="martine imageName text")
