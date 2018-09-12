@@ -23,7 +23,7 @@ from termcolor import colored
 #############
 
 # Préfixe
-def prefixe(bot, message):
+def prefixe(bot, message): 
     with open("config.json", "r") as fichier:
         config = json.loads(fichier.read())
         try:
@@ -33,14 +33,12 @@ def prefixe(bot, message):
 
 # Traductions
 def getmsg(ctx, txt):
-
     with open("config.json", "r") as fichier:
         config = json.loads(fichier.read())
-
     try:
         return trad[config[str(ctx.message.guild.id)]["lang"]][txt]
     except:
-        return ""
+        return " "
 
 #############
 # Variables #
