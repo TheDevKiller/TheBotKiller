@@ -1,6 +1,3 @@
-#!/usr/binython3
-#-*- coding: utf-8 -*-
-
 ###########
 # Imports #
 ###########
