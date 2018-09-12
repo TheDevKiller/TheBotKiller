@@ -149,7 +149,7 @@ class Fun:
             await ctx.send(arg)
 
     # Website screen
-    @commands.command(usage="websitescreen url", aliases=["sitescreen", "wsb", "wb"])
+    @commands.command(usage="websitescreen url", aliases=["sitescreen", "ws"])
     async def websitescreen(self, ctx, *, url):
 
         browser = await laucnh()
@@ -160,7 +160,7 @@ class Fun:
         else:
             await ctx.send("Méchant !")
 
-        await page.screenshot({"tmp": "screen.png!"})
+        await page.screenshot({"tmp": "screen.png"})
 
     # Martine
     @commands.command(usage="martine imageName text")
