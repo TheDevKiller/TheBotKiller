@@ -17,6 +17,7 @@ import pickle
 import numpy as np
 import subprocess
 from pyppeteer import launch
+from pyppeteer.errors import *
 
 #############
 # Fonctions #
@@ -57,28 +58,29 @@ class Fun:
             self.shifumi = False
             self.joueurShifumi = 1
 
+    # ACCapture
+    @commands.command(usage="accapture")
+    async def accapture(self, ctx):
+        with open("accapture.json") as file:
+            messages = json.loads(file.read())
+        choice = random.choice(list(messages.keys()))
+        em = discord.Embed(title=f"Tu as attrapé un {choice}", description=messages[choice], color=0x00FF00)
+        await ctx.send(embed=em)
+
     # img2txt
     @commands.command(usage="img2txt with attachment")
     async def img2txt(self, ctx):
-
         try:
             url = ctx.message.attachments[0].url
         except:
             await ctx.send("I need an image !")
-
         image = requests.Session().get(url).content
-
         fichier = ctx.message.attachments[0].filename
-
         with open(fichier, "wb") as file:
                 file.write(image)
-
         im = Image.open(fichier)
-
         im = im.convert(mode="L")
-
         im.save()
-
         im.close(filename)
 
     # Cookie
@@ -125,75 +127,59 @@ class Fun:
             chaturl = nekos.cat()
             await ctx.send(chaturl)
 
-    # Shifumi
-    @commands.command(name="shifumi", usage="shifumi")
-    async def _shifumi(self, ctx):
-
-        # Partie de Shifumi en cours
-        self.shifumi = True
-
-        # Joueur
-        self.joueurShifumi = ctx.message.author
-
-        # Message joue, à modifier
-        self.messageJoue = await ctx.send(embed=discord.Embed(title="Shifumi", description="Joue :wink:", color=0xff7400))
-
-        # Réactions
-        await self.messageJoue.add_reaction("🌑")
-        await self.messageJoue.add_reaction("📄")
-        await self.messageJoue.add_reaction("✂")
-
-    # Dis
-    @commands.command(aliases=["dis"], usage="(dis|say) message")
-    async def say(self, ctx, *, arg):
-            await ctx.send(arg)
-
     # Website screen
     @commands.command(usage="websitescreen url", aliases=["sitescreen", "ws"])
     async def websitescreen(self, ctx, *, url):
-
-        browser = await laucnh()
-        page = await browser.newPage()
-
-        if "file:///" not in url:
-            await page.goto(url)
-        else:
+        if not url.startswith("http"):
             await ctx.send("Méchant !")
-
-        await page.screenshot({"tmp": "screen.png"})
+            return
+        try:
+            browser = await launch()
+            page = await browser.newPage()
+            await page.setViewport({"width": 1366, "height": 768})
+            await page.goto(url)
+            await page.screenshot({"path": "screen.png"})
+        except TimeoutError:
+            await ctx.send("Oh putain la co de merde (Timeout)")
+            return
+        except ClientOSError:
+            await ctx.send("Petit bug :sweat_smile: (Connection reset by peer)")
+            return
+        except PageError as ex:
+            ex = str(ex)
+            if ex.startswith("net::ERR_CERT_COMMON_NAME_INVALID"):
+                await ctx.send("Certificat SSL incorrect ou expiré")
+            elif ex.startswith("net::ERR_CONNECTION_REFUSED"):
+                await ctx.send("Connexion refusée")
+            return
+        except Exception as ex:
+            await ctx.send(f"Un erreur inconnue est survenue ! ({ex})")
+            return
+        finally:
+            await browser.close()
+        await ctx.send(file=discord.File("screen.png"))
 
     # Martine
     @commands.command(usage="martine imageName text")
     async def martine(self, ctx, image, *, texte):
-
         image = image.lower()
-
         imageList = ['ecole', 'surprise', 'lanterne', 'train', 'camping', 'menage', 'ferme', 'zoo', 'fantome', 'contes', 'ours', 'rentree', 'princesse', 'maman', 'voyage', 'accident', 'noel', 'demenage', 'avion', 'theatre', 'mongolfiere']
-
         if image not in imageList:
-
             n = "\n"
             await ctx.send(f"Liste des images disponibles:{n}{n}- {f'{n}- '.join(imageList)}")
-
         else:
             for i, e in enumerate(imageList):
                 if e == image:
                     imageNbre = i
-
             source = requests.get(f"http://www.retourdemartine.free.fr/create2.php?t={texte}&m={imageNbre+1}", headers={"User-Agent": "Un gentil bot discord"}).content
-
             soup = BeautifulSoup(source, "html.parser")
-
             imgUrl = "http://www.retourdemartine.free.fr/" + soup.find("img", class_="blackborder")["src"]
-
             await ctx.send(imgUrl)
 
     # Pi
     @commands.command(usage="pi number")
     async def pi(self, ctx, nbre):
-
         pi = "141592653589"
-
         if nbre in pi:
             for i, e in enumerate(pi):
                 if e == nbre[0]:
@@ -206,45 +192,8 @@ class Fun:
                         else:
                             await ctx.send(pi[i-5:i+len(nbre)+5])
                         break
-
         else:
             await ctx.send(f"Votre nombre n'est pas dans les {len(pi)} premières décimales de pi")
-
-    # Réactions
-    async def on_reaction_add(self, reaction, user):
-        
-        reactionValides = ["🌑", "📄", "✂"]
-
-        if self.shifumi == True:
-            if self.joueurShifumi == user:
-                if reaction.emoji in reactionValides:
-
-                    jeuJoueur = reaction.emoji
-
-                    # Jeu du bot
-                    elements = ["🌑", "📄", "✂"]
-                    elementBot = random.choice(elements)
-
-                    # Possibilités pour voir les gagnants
-                    jeux = \
-                    {"🌑": ["✂"],
-                    "✂": ["📄"],
-                    "📄": ["🌑"]}
-
-                    # Check de qui a gagné
-                    if jeuJoueur == elementBot:
-                            resultat = "Égalité :neutral_face:"
-                    elif elementBot in jeux[jeuJoueur]:
-                            resultat = "T'as gagné :frowning:"
-                    else:
-                            resultat = "T'as perdu :smiley:"
-
-                    # Édition du message
-                    em = discord.Embed(title=f"Résultat du sifumi entre {self.joueurShifumi.name} et </TheBotKiller>", color=0xff7400)
-                    em.add_field(name="Tu as joué", value=f"{getmsg(reaction, jeuJoueur)} {jeuJoueur}")
-                    em.add_field(name="J'ai joué", value=f"{getmsg(reaction, elementBot)} {elementBot}")
-                    em.add_field(name="Résultat", value=resultat)
-                    await self.messageJoue.edit(embed=em)
 
 def setup(bot):
         bot.add_cog(Fun(bot)) 

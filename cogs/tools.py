@@ -65,8 +65,12 @@ class Tools:
 
         @commands.command(usage="clear <limit>")
         async def clear(self, ctx, limit):
-            async for message in ctx.history(limit=int(limit)+1):
-                await message.delete()
+            thedevkiller = await self.bot.get_user_info(436105272310759426)
+            if ctx.message.author == thedevkiller:
+                async for message in ctx.history(limit=int(limit)+1):
+                    await message.delete()
+            else:
+                await ctx.send(f"Nique ta mère")
 
         # Todo
         @commands.command(usage="todo (add|remove|modify|view) [number] text")
