@@ -158,30 +158,6 @@ class Tools:
                 thedevkiller = await self.bot.get_user_info(436105272310759426)
                 await thedevkiller.send(f"{arg}\n{ctx.message.author.name}")
 
-        # Convert
-        @commands.command(aliases=["convertir"], brief="Convertir deux unités", usage="(convertisseur|convert) unite1 unite2 text")
-        async def convert(self, ctx, unite1, unite2, *, chaine):
-
-                if unite1 == "ascii" and unite2 == "base64":
-                        encode = base64.b64encode(str.encode(chaine))
-                        await ctx.send(encode.decode())
-                elif unite1 == "base64" and unite2 == "ascii":
-                        decode = base64.b64decode(str.encode(chaine))
-                        await ctx.send(decode.decode().capitalize())
-                elif unite1 == "ascii" and unite2 == "bin":
-                        encode = ' '.join(format(ord(x), 'b') for x in chaine)
-                        await ctx.send(encode)
-                elif unite1 == "bin" and unite2 == "ascii":
-                        chaine = int(chaine, 2)
-                        chaine.to_bytes((chaine.bit_length() + 7) // 8, "big").decode("utf-8", "surogatepass") or "\0"
-                        msg = ""
-                        for elements in chaine:
-                                for element in elements[::2]:      
-                                        msg += chr(element)
-
-                else:
-                        await ctx.send("Désolé mais je ne connais pas ces unités :confused:")
-
         # Traduire
         @commands.command(aliases=["traduire"], usage="(traduire|translate) (sourceLang|auto) targetLang string")
         async def translate(self, ctx, ls, lc, *, cs):
