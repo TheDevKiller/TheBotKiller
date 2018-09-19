@@ -75,76 +75,82 @@ class Tools:
         # Todo
         @commands.command(usage="todo (add|remove|modify|view) [number] text")
         async def todo(self, ctx, action="view", *, text=""):
+            # Add a task
             if action == "add":
-
+                # Capitalize the task
                 text = text.capitalize()
-
+                # Open the todo's file
                 with open("todo.json", "r") as file:
                     dico = json.loads(file.read())
-
+                # If the user has a To-Do list, add the task to it
                 if str(ctx.message.author.id) in dico:
-
-
+                    # Verify if the list is valid
                     if isinstance(dico[str(ctx.message.author.id)], list):
+                        # Add the task to the list
                         dico[str(ctx.message.author.id)].append(text)
-
+                    # If the task isn't valid
                     else:
+                        # Create the list
                         dico[str(ctx.message.author.id)] = []
+                        # Add the task to the list
                         dico[str(ctx.message.author.id)].append(text)
-
+                    await ctx.send(getmsg(ctx, "Task successfully added"))
+                # If the user hasn't a To-Do list
                 else:
+                    # Create the user's To-Do list
                     dico[str(ctx.message.author.id)] = []
+                    # Add the task to the list
                     dico[str(ctx.message.author.id)].append(text)
-
+                # Write the To-Do list's JSON
                 with open("todo.json", "w") as file:
                     file.write(json.dumps(dico, indent=4))
-
+            # View the user's To-Do list
             elif action == "view":
-
+                # Open the To-Do list's file
                 with open("todo.json", "r") as file:
                     dico = json.loads(file.read())
-
-                try:
+                # If the user has a To-Do list and it's not empty
+                if str(ctx.message.author.id) in dico and dico[str(ctx.message.author.id)] != []:
+                    # Create the formatted list and the embed
                     description = ""
                     for i, e in enumerate(dico[str(ctx.message.author.id)]):
                         description += f"{i+1}. {e}\n"
-
-                    em = discord.Embed(title=getmsg(ctx, "todotitlembed"), description=description, color=0xff6600)
+                    em = discord.Embed(title=getmsg(ctx, "Your To-Do list"), description=description, color=0xff6600)
+                    # Send the embed
                     await ctx.send(embed=em)
-
-                except KeyError:
-                    await ctx.send(getmsg(ctx, "todotitlembed"))
-
+                # If the user hasn't got a To
+                else:
+                    await ctx.send(getmsg(ctx, "You have no To-Do list"))
+            # Remove a task from the To-Do list
             elif action == "remove":
-
+                # Get task's index in list
                 nbre = int(text.split(" ")[0])
-
+                # Open the To-Do list's file
                 with open("todo.json", "r") as file:
                     dico = json.loads(file.read())
-
+                # Delete the task from the list
                 del dico[str(ctx.message.author.id)][nbre - 1]
-
+                # Write the changes
                 with open("todo.json", "w") as file:
                     file.write(json.dumps(dico, indent=4))
-
+                await ctx.send(getmsg(ctx, "Task successfully removed"))
+            # Modify a task
             elif action == "modify":
-
+                # Open the To-Do list's file
                 with open("todo.json", "r") as file:
                     dico = json.loads(file.read())
-
+                # Get task's index in list
                 nbre = int(text.split(" ")[0])
-
+                # Get the new text
                 texte = ""
-
                 for e in text.split(" ")[1:]:
                     texte += e + " "
-
+                # Replace the element by the text
                 dico[str(ctx.message.author.id)][nbre - 1] = texte
-
+                # Write all changes in the file
                 with open("todo.json", "w") as file:
                     file.write(json.dumps(dico, indent=4))
-
-                await ctx.send("")
+                await ctx.send(getmsg(ctx, "Task successfully modified"))
 
         # Report
         @commands.command(aliases=["bug"], brief="Signaler un bug", usage="(report|bug) message")
@@ -152,7 +158,7 @@ class Tools:
                 thedevkiller = await self.bot.get_user_info(436105272310759426)
                 await thedevkiller.send(f"{arg}\n{ctx.message.author.name}")
 
-        # Convertir
+        # Convert
         @commands.command(aliases=["convertir"], brief="Convertir deux unités", usage="(convertisseur|convert) unite1 unite2 text")
         async def convert(self, ctx, unite1, unite2, *, chaine):
 

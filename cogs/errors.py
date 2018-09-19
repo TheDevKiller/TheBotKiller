@@ -46,8 +46,8 @@ class Errors:
                 #if isinstance(ex, commands.MissingRequiredArgument) or isinstance(ex, commands.BadArgument):
                 
                 else:
-                    em = discord.Embed(title=getmsg(ctx, "commanderrortitle"), description=f"`{ctx.command.usage}`", color=0xEA2027)
-                    em.set_footer(text=getmsg(ctx, "commanderrorfooter"))
+                    em = discord.Embed(title=getmsg(ctx, "Usage of the command"), description=f"`{ctx.command.usage}`", color=0xEA2027)
+                    em.set_footer(text=getmsg(ctx, "If you think this error is abnormal"))
                     await ctx.send(embed=em)
                     print(colored(ex, "yellow"))
 

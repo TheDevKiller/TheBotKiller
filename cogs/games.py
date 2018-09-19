@@ -6,6 +6,8 @@ import discord
 from discord.ext import commands
 from PIL import Image, ImageDraw, ImageFont
 import random
+import json
+from time import sleep
 
 #############
 # Fonctions #
@@ -44,18 +46,18 @@ class Games:
         # Message joue, à modifier
         messageJoue = await ctx.send(embed=discord.Embed(title="Shifumi", description="Joue :wink:", color=0xff7400))
         # Réactions
-        await self.messageJoue.add_reaction("🌑")
-        await self.messageJoue.add_reaction("📄")
-        await self.messageJoue.add_reaction("✂")
+        await messageJoue.add_reaction("🌑")
+        await messageJoue.add_reaction("📄")
+        await messageJoue.add_reaction("✂")
         # Check
-        def check(r):
-            return r.author == joueurShifumi
+        def check(r, u):
+            return u == joueurShifumi
         # Réaction
-        react = await wait_for("reaction", check=check)
+        react = await self.bot.wait_for("reaction_add", check=check)
         # Réactions valides
         reactionValides = ["🌑", "📄", "✂"]
         # Jeu
-        jeuJoueur = reaction.emoji
+        jeuJoueur = react[0].emoji
         # Jeu du bot
         elements = ["🌑", "📄", "✂"]
         elementBot = random.choice(elements)
@@ -72,11 +74,11 @@ class Games:
         else:
             resultat = "T'as perdu :smiley:"
         # Édition du message
-        em = discord.Embed(title=f"Résultat du sifumi entre {self.joueurShifumi.name} et </TheBotKiller>", color=0xff7400)
-        em.add_field(name="Tu as joué", value=f"{getmsg(reaction, jeuJoueur)} {jeuJoueur}")
-        em.add_field(name="J'ai joué", value=f"{getmsg(reaction, elementBot)} {elementBot}")
+        em = discord.Embed(title=f"Résultat du sifumi entre {joueurShifumi.name} et </TheBotKiller>", color=0xff7400)
+        em.add_field(name="Tu as joué", value=f"{getmsg(react, jeuJoueur)} {jeuJoueur}")
+        em.add_field(name="J'ai joué", value=f"{getmsg(react, elementBot)} {elementBot}")
         em.add_field(name="Résultat", value=resultat)
-        await self.messageJoue.edit(embed=em)
+        await messageJoue.edit(embed=em)
 
     # Batons
     @commands.command(usage="sticks <mention>", aliases=["batons"])
@@ -121,8 +123,10 @@ class Games:
         await ctx.send(f"{gagnant.name} a gagné")
 
     # Simon Pocket
-    @commands.command(usage="sp")
+    @commands.command(usage="si")
     async def si(self, ctx):
+        # Joueur
+        joueur = ctx.message.author
         # Partie
         partie = True
         # Couleurs
@@ -137,25 +141,37 @@ class Games:
         for reaction in choix:
             await msg.add_reaction(reaction)
         def reacTourCheck(r, u):
-            return r.message == msg and u == ctx.message.author
+            return r.message.id == msg.id and u == joueur
         # Index
         tour = 1
         # Tours
         while partie == True:
             combinaisonAFaire = []
-            cominaisonFaite = []
+            combinaisonFaite = []
             # Tours de la combinaison
             for combiTour in range(1, tour+1):
                 choice = random.choice(choix)
+                try:
+                    while choix == combinaisonAFaire[combiTour-1]:
+                        choice = random.choice(choix)
+                except:
+                    pass
                 await msg.edit(content=f"<:{choice}>")
                 combinaisonAFaire.append(f"<:{choice}>")
+                sleep(0.5)
             # Tours des réactions
             for reacTour in range(1, len(combinaisonAFaire)+1):
-                reac = await self.bot.wait_for("reaction", check=reacTourCheck)
-                combinaisonFaite.append(reac)
-                await self.bot.remove_reaction(reactions.emoji, reaction.user)
+                reac = await self.bot.wait_for("reaction_add", check=reacTourCheck)
+                combinaisonFaite.append(f"<:{reac[0].emoji.name}:{reac[0].emoji.id}>")
+                try:
+                    await msg.remove_reaction(reac[0].emoji, reac[1])
+                except discord.Forbidden:
+                    pass
             tour += 1
-            
+            if combinaisonAFaire != combinaisonFaite:
+                await msg.edit(content=f"Mauvaise combinaison, partie terminée. Tu feras mieux la prochaine fois :wink:\nTu as tenu {tour-2} tours")
+                partie = False
+
     # POM
     @commands.command(aliases=["plusoumoins", "+-", "+ou+"], usage="(+-|+ou-|plusoumoins|pom) <min> <max>")
     async def pom(self, ctx, pmin, pmax):
