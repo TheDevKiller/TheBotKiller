@@ -90,6 +90,7 @@ class Games:
         j1 = ctx.message.author
         j2 = j2
         tour = j1  
+        msgdelete = await ctx.send("Préparation ...")
         while batons > 0:
             n = 0
             i = 85
@@ -101,7 +102,8 @@ class Games:
                     im.paste(alumette, (i-alumette.size[0], 0))
                 i += alumette.size[0]
             im.save("tmp/batons.png")
-            await ctx.send(f"{tour.name}, prend un, deux ou trois bâtons", file=discord.File("tmp/batons.png"))
+            await msgdelete.delete()
+            msgdelete = await ctx.send(f"{tour.name}, prend un, deux ou trois bâtons", file=discord.File("tmp/batons.png"))
             def check(m):
                 return m.author == tour
             msg = await self.bot.wait_for("message", check=check)
@@ -120,6 +122,7 @@ class Games:
                     tour = j1
                 else:
                     await ctx.send("Oups, un problème est survenu lors du changement des tours")
+            await msg.delete()
         await ctx.send(f"{gagnant.name} a gagné")
 
     # Simon Pocket

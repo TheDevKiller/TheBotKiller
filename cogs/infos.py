@@ -208,7 +208,7 @@ class Infos:
         @commands.command(aliases=["pp"], usage="(avatar|pp) mention")
         async def avatar(self, ctx, user:discord.Member):
             try:
-                await ctx.send(f"https://cdn.discordapp.com/avatars/{user.id}/{user.avatar}.png?size=2048")
+                await ctx.send(user.avatar_url_as(format="png", size=1024))
             except:
                 await ctx.send(getmsg(ctx, "erroravatar"))
 

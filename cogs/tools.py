@@ -25,18 +25,14 @@ with open("secrets.json", "rb") as secretsFile:
 
 # Obtenir une traduction
 def getmsg(ctx, txt):
-
     # Config
     with open("config.json", "r") as fichier:
         config = json.loads(fichier.read())
-
     # Ouvrir le fichier de traductions
     with open("trads.json", "r") as fichier:
         trad = json.loads(fichier.read())
-
     try:
         return trad[config[str(ctx.message.guild.id)]["lang"]][txt]
-
     except:
         return trad["fr"][txt]
 
@@ -161,25 +157,20 @@ class Tools:
         # Traduire
         @commands.command(aliases=["traduire"], usage="(traduire|translate) (sourceLang|auto) targetLang string")
         async def translate(self, ctx, ls, lc, *, cs):
-
                 # URL
                 url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=" + ls + "&tl=" + lc + "&dt=t&q=" + cs
-                
                 # Requête
                 cc = requests.get(url, headers={"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/60.0"}).json()[0][0][0]
-                
                 await ctx.send(embed=discord.Embed(title="Traduction", description=f"{ls.capitalize()}: {cs.capitalize()}\n{lc.capitalize()}: {cc.capitalize()}", color=0x225bff))
 
         # QR
         @commands.command(aliases=["qr"], brief="Générateur de QR code", usage="(qr|qrcode) \"chaine\", la chaine doit être entre guillemets si il y a des espaces")
         async def qrcode(self, ctx, chaine):
-
                 # QR
                 self.qr.add_data(chaine)
                 self.qr.make(fit=True)
                 img = self.qr.make_image(fill_color="black", back_color="white")
                 img.save("qr.png")
-
                 await ctx.send(file=discord.File("qr.png"))
                 await ctx.send(chaine)
                 os.remove("qr.png")
@@ -187,24 +178,20 @@ class Tools:
         # OCR
         @commands.command(brief="Prend le texte d'une image", usage="ocr en commentaire à l'envoi d'une image")
         async def ocr(self, ctx):
-
                 # Image
                 url = ctx.message.attachments[0].url
                 image = requests.Session().get(url).content
                 fichier = ctx.message.attachments[0].filename
                 with open(fichier, "wb") as ocrimage:
                         ocrimage.write(image)
-
                 # OCR
                 texte = pytesseract.image_to_string(Image.open(fichier))
-
                 await ctx.send(texte)
                 os.remove(fichier)
 
         # TTS
         @commands.command(brief="Synthèse vocale", usage="tts \"chaine\", la chaine doit être entre guillemets si il y a des espaces")
         async def tts(self, ctx, chaine):
-
             # Fichier
             reponse = requests.get(f"https://tts.readspeaker.com/a/speak?key={secrets['tts']}&lang=fr_ca&voice=leo&text={chaine}").content
             if reponse.decode().strip() == "ERROR: Needed credits exceeds available amount.":

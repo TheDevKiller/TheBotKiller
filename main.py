@@ -17,6 +17,7 @@ import time
 import threading
 import asyncio
 from termcolor import colored
+from sanic import Sanic, response
 
 #############
 # Fonctions #
@@ -94,7 +95,6 @@ async def on_ready():
                 config[str(server.id)] = defaultConfig
         with open("config.json", "w") as fichier:
             fichier.write(json.dumps(config, indent=4))
-
         # Séparateur
         print("------------")
 
@@ -219,29 +219,58 @@ async def help(ctx, arg="defaultarg"):
                     em.add_field(name="Category", value=commande.cog_name)
                 await ctx.send(embed=em)
 
-# Input
-async def handle_console_input():
-    while not bot.is_closed():
-        console_input = await bot.loop.run_in_executor(None, input, "")
-        bot.dispatch("console_input", console_input)
-
-bot.loop.create_task(handle_console_input())
-
-@bot.event
-async def on_console_input(input):
-    if input.split(" ")[0] == "dis":
-                serveurid = int(input.split(" ")[1])
-                serveur = bot.get_guild(serveurid)
-                channelid = int(input.split(" ")[2])
-                channel = serveur.get_channel(channelid)
-                string = " ".join(input.split(" ")[3:])
-                await channel.send(string)
-    elif input.split(" ")[0] == "exit":
-        sys.exit(0)
-
 # Logs
 @bot.event
 async def on_command(ctx):
-    print(colored(f"[COMMAND][{time.asctime()}]: {ctx.message.content}, {ctx.message.author.name}, {ctx.message.guild}", "white"))
+    #print(colored(f"[COMMAND][{time.asctime()}]: {ctx.message.content}, {ctx.message.author.name}, {ctx.message.guild}", "white"))
+    if len(ctx.message.guild.name) > 15:
+        guild = ""
+        for word in ctx.message.guild.name.split(" "):
+            guild += word[0].upper()
+    else:
+        guild = ctx.message.guild.name
+    print(f"[{colored('COMMAND', 'green')}][{colored(time.asctime(), 'yellow')}]: {colored(guild, 'blue')}, {colored(ctx.message.author.name, 'red')}, {ctx.message.content}")
 
-bot.run(secrets["token"])
+# Web server
+app = Sanic()
+
+# Generate the HTML page
+def html(text):
+    return """
+    <head>
+        <meta charset="utf-8" />
+        <style>
+            img {
+                width: 200px
+            }
+            p {
+                font: "DejaVu";
+                align: center;
+            }
+        </style>
+    </head>
+    <body>
+        <img src="https://cdn.discordapp.com/avatars/462604575514558465/e9b219da4ba57d934323f28922af2670.png?size=2048" />
+        <p>""" + text + """</p>
+    </body>
+    """
+
+# Say command
+@app.route("/say/<servId>/<chanId>/<msg>")
+async def index(req, servId, chanId, msg):
+    serv = bot.get_guild(int(servId))
+    chan = serv.get_channel(int(chanId))
+    await chan.send(msg)
+    return response.html(html("Message successfully sended"))
+
+# Bot
+botApp = bot.start(secrets["token"])
+botTask = asyncio.ensure_future(botApp)
+
+# Webserver
+webserver = app.create_server(host="localhost", port=8080)
+webserverTask = asyncio.ensure_future(webserver)
+
+# Start the both
+loop = asyncio.get_event_loop()
+loop.run_forever()
