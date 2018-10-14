@@ -10,6 +10,7 @@ import re
 import psutil
 import speedtest
 import json
+import distro
 
 #############
 # Fonctions #
@@ -89,10 +90,28 @@ class Infos:
                         elif float(la.split(" ")[0].replace("**", "")) >= 4: color = 0xff000
                         else: color = 0xffffff
 
+                                # OS
+                        emojis = {
+                        "manjaro": "<:manjaro:493839293131915337>",
+                        "ubuntu": "<:ubuntu:465194164548665345>",
+                        "rhel": "<:redhat:483725100810764298>",
+                        "centos": "<:centos:493839062952574977>",
+                        "fedora": "<:fedora:483724704470007820>",
+                        "gentoo": "<:gentoo:483724726993158155>",
+                        "arch": "<:arch:483724722182422528>",
+                        "linuxmint": "<:mint:483724725013446667>"
+                        }
+                        if distro.id() in emojis.keys():
+                            OSEmoji = emojis[distro.id()]
+                        else:
+                            OSEmoji = "<:linux:402153029815500820>"
+                        OS = f"{distro.name()} {distro.version()} {distro.codename()}".replace("Linux", "")
+
                                 # Batterie
                         btoutput = subprocess.check_output(["upower", "-i", "/org/freedesktop/UPower/devices/battery_BAT1"]).decode()
                         batterie = re.search("percentage:          (.{1,3})%", btoutput)[1]
-                        em = discord.Embed(title=getmsg(ctx, "titlepcinfosembed"), color=color)
+                        em = discord.Embed(title=getmsg(ctx, "My PC - Infos"), color=color)
+                        em.add_field(name=f"{OSEmoji} OS", value=OS)
                         em.add_field(name="<:level_slider:474325122904489984> Load Average", value=la) # Load Average
                         em.add_field(name="<:cpu:452823427137667089> CPU", value="**" + str(psutil.cpu_percent()) + "%**") # CPU Percent
                         em.add_field(name="<:computerram:452824190475698187> RAM", value="**" + str(psutil.virtual_memory().percent) + "% **") # RAM Percent
@@ -102,8 +121,8 @@ class Infos:
                         elif config[str(ctx.message.guild.id)]["lang"] == "en":
                             em.add_field(name=":clock10: Uptime", value="**" + uptimep+ "**")
                         em.add_field(name="<:ubuntu:465194164548665345> OS", value="**Ubuntu 18.04 LTS**") # OS
-                        em.add_field(name=getmsg(ctx, "usedspace"), value="**" + str(used) + "**" + "/" + "**" + str(total) + "** GB")
-                        em.add_field(name=getmsg(ctx, "batterynamembed"), value="**" + batterie + "**%")
+                        em.add_field(name=getmsg(ctx, "Used Space"), value="**" + str(used) + "**" + "/" + "**" + str(total) + "** GB")
+                        em.add_field(name=getmsg(ctx, "Battery"), value="**" + batterie + "**%")
                         await ctx.send(embed=em)
                                 
             # Hardware
