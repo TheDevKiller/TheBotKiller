@@ -263,6 +263,21 @@ async def index(req, servId, chanId, msg):
     await chan.send(msg)
     return response.html(html("Message successfully sended"))
 
+# Getchans
+@app.route("/getchans")
+async def index(req):
+    dic = []
+    for i, server in enumerate(bot.guilds):
+        dic.append({"name": server.name, "id": f"{server.id}", "channels": []})
+        for channel in server.channels:
+            dic[i]["channels"].append({"name": channel.name, "id": f"{channel.id}"})
+    return response.json(dic, headers={"Access-Control-Allow-Origin": "*"})
+
+# Test
+@bot.command()
+async def test(ctx):
+    print(ctx.guild.id)
+
 # Bot
 botApp = bot.start(secrets["token"])
 botTask = asyncio.ensure_future(botApp)
@@ -271,6 +286,6 @@ botTask = asyncio.ensure_future(botApp)
 webserver = app.create_server(host="localhost", port=8080)
 webserverTask = asyncio.ensure_future(webserver)
 
-# Start the both
+# Start both
 loop = asyncio.get_event_loop()
 loop.run_forever()
