@@ -128,36 +128,36 @@ class Fun:
             await ctx.send(chaturl)
 
     # Website screen
-    @commands.command(usage="websitescreen url", aliases=["sitescreen", "ws"])
-    async def websitescreen(self, ctx, *, url):
-        if not url.startswith("http"):
-            await ctx.send("Méchant !")
-            return
-        try:
-            browser = await launch()
-            page = await browser.newPage()
-            await page.setViewport({"width": 1366, "height": 768})
-            await page.goto(url)
-            await page.screenshot({"path": "screen.png"})
-        except TimeoutError:
-            await ctx.send("Oh putain la co de merde (Timeout)")
-            return
-        except ClientOSError:
-            await ctx.send("Petit bug :sweat_smile: (Connection reset by peer)")
-            return
-        except PageError as ex:
-            ex = str(ex)
-            if ex.startswith("net::ERR_CERT_COMMON_NAME_INVALID"):
-                await ctx.send("Certificat SSL incorrect ou expiré")
-            elif ex.startswith("net::ERR_CONNECTION_REFUSED"):
-                await ctx.send("Connexion refusée")
-            return
-        except Exception as ex:
-            await ctx.send(f"Un erreur inconnue est survenue ! ({ex})")
-            return
-        finally:
-            await browser.close()
-        await ctx.send(file=discord.File("screen.png"))
+    # @commands.command(usage="websitescreen url", aliases=["sitescreen", "ws"])
+    # async def websitescreen(self, ctx, *, url):
+    #     if not url.startswith("http"):
+    #         await ctx.send("Méchant !")
+    #         return
+    #     try:
+    #         browser = await launch()
+    #         page = await browser.newPage()
+    #         await page.setViewport({"width": 1366, "height": 768})
+    #         await page.goto(url)
+    #         await page.screenshot({"path": "screen.png"})
+    #     except TimeoutError:
+    #         await ctx.send("Alala la co' en carton (Timeout)")
+    #         return
+    #     # except ClientOSError:
+    #     #     await ctx.send("Petit bug :sweat_smile: (Connection reset by peer)")
+    #     #     return
+    #     except PageError as ex:
+    #         ex = str(ex)
+    #         if ex.startswith("net::ERR_CERT_COMMON_NAME_INVALID"):
+    #             await ctx.send("Certificat SSL incorrect ou expiré")
+    #         elif ex.startswith("net::ERR_CONNECTION_REFUSED"):
+    #             await ctx.send("Connexion refusée")
+    #         return
+    #     except Exception as ex:
+    #         await ctx.send(f"Un erreur inconnue est survenue ! ({ex})")
+    #         return
+    #     finally:
+    #         await browser.close()
+    #     await ctx.send(file=discord.File("screen.png"))
 
     # Martine
     @commands.command(usage="martine imageName text")

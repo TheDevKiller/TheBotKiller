@@ -120,7 +120,6 @@ class Infos:
                             em.add_field(name=":clock10: Uptime", value="**" + uptimep.replace("week", "semaine").replace("day","jour").replace("hour","heure") + "**")
                         elif config[str(ctx.message.guild.id)]["lang"] == "en":
                             em.add_field(name=":clock10: Uptime", value="**" + uptimep+ "**")
-                        em.add_field(name="<:ubuntu:465194164548665345> OS", value="**Ubuntu 18.04 LTS**") # OS
                         em.add_field(name=getmsg(ctx, "Used Space"), value="**" + str(used) + "**" + "/" + "**" + str(total) + "** GB")
                         em.add_field(name=getmsg(ctx, "Battery"), value="**" + batterie + "**%")
                         await ctx.send(embed=em)
