@@ -64,7 +64,7 @@ class Fun:
         with open("accapture.json") as file:
             messages = json.loads(file.read())
         choice = random.choice(list(messages.keys()))
-        em = discord.Embed(title=f"Tu as attrapé un {choice}", description=messages[choice], color=0x00FF00)
+        em = discord.Embed(title="Tu as attrapé un " + choice, description=messages[choice], color=0x00FF00)
         await ctx.send(embed=em)
 
     # img2txt
@@ -165,13 +165,12 @@ class Fun:
         image = image.lower()
         imageList = ['ecole', 'surprise', 'lanterne', 'train', 'camping', 'menage', 'ferme', 'zoo', 'fantome', 'contes', 'ours', 'rentree', 'princesse', 'maman', 'voyage', 'accident', 'noel', 'demenage', 'avion', 'theatre', 'mongolfiere']
         if image not in imageList:
-            n = "\n"
-            await ctx.send(f"Liste des images disponibles:{n}{n}- {f'{n}- '.join(imageList)}")
+            await ctx.send("Liste des images disponibles:\n\n- " + '\n- '.join(imageList))
         else:
             for i, e in enumerate(imageList):
                 if e == image:
                     imageNbre = i
-            source = requests.get(f"http://www.retourdemartine.free.fr/create2.php?t={texte}&m={imageNbre+1}", headers={"User-Agent": "Un gentil bot discord"}).content
+            source = requests.get("http://www.retourdemartine.free.fr/create2.php?t=" + texte+ "&m=" + imageNbre+1, headers={"User-Agent": "Un gentil bot discord"}).content
             soup = BeautifulSoup(source, "html.parser")
             imgUrl = "http://www.retourdemartine.free.fr/" + soup.find("img", class_="blackborder")["src"]
             await ctx.send(imgUrl)
@@ -184,7 +183,7 @@ class Fun:
             for i, e in enumerate(pi):
                 if e == nbre[0]:
                     if pi[i:i+len(nbre)] == nbre:
-                        await ctx.send(f"Le nombre se trouve à la {i+1}ème décimale de pi")
+                        await ctx.send("Le nombre se trouve à la" + i+1 + "ème décimale de pi")
                         if i-5 < 0:
                             await ctx.send(pi[0:i+len(nbre)+5])
                         elif i+len(nbre)+5 > len(pi):
@@ -193,7 +192,7 @@ class Fun:
                             await ctx.send(pi[i-5:i+len(nbre)+5])
                         break
         else:
-            await ctx.send(f"Votre nombre n'est pas dans les {len(pi)} premières décimales de pi")
+            await ctx.send("Votre nombre n'est pas dans les " + len(pi) + " premières décimales de pi")
 
 def setup(bot):
         bot.add_cog(Fun(bot)) 

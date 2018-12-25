@@ -7,8 +7,8 @@ from discord.ext import commands
 import requests
 import qrcode
 import os
-import pytesseract
 from PIL import Image
+import pytesseract
 import json
 import random
 
@@ -66,7 +66,7 @@ class Tools:
                 async for message in ctx.history(limit=int(limit)+1):
                     await message.delete()
             else:
-                await ctx.send(f"Nique ta mère")
+                await ctx.send("Nique ta mère")
 
         # Todo
         @commands.command(usage="todo (add|remove|modify|view) [number] text")
@@ -110,7 +110,7 @@ class Tools:
                     # Create the formatted list and the embed
                     description = ""
                     for i, e in enumerate(dico[str(ctx.message.author.id)]):
-                        description += f"{i+1}. {e}\n"
+                        description += i+1 + ". " + e + "\n"
                     em = discord.Embed(title=getmsg(ctx, "Your To-Do list"), description=description, color=0xff6600)
                     # Send the embed
                     await ctx.send(embed=em)
@@ -152,7 +152,7 @@ class Tools:
         @commands.command(aliases=["bug"], brief="Signaler un bug", usage="(report|bug) message")
         async def report(self, ctx, *, arg):
                 thedevkiller = await self.bot.get_user_info(436105272310759426)
-                await thedevkiller.send(f"{arg}\n{ctx.message.author.name}")
+                await thedevkiller.send(arg + "\n" + ctx.message.author.name)
 
         # Traduire
         @commands.command(aliases=["traduire"], usage="(traduire|translate) (sourceLang|auto) targetLang string")
@@ -161,7 +161,7 @@ class Tools:
                 url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=" + ls + "&tl=" + lc + "&dt=t&q=" + cs
                 # Requête
                 cc = requests.get(url, headers={"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/60.0"}).json()[0][0][0]
-                await ctx.send(embed=discord.Embed(title="Traduction", description=f"{ls.capitalize()}: {cs.capitalize()}\n{lc.capitalize()}: {cc.capitalize()}", color=0x225bff))
+                await ctx.send(embed=discord.Embed(title="Traduction", description=ls.capitalize() + ": " + cs.capitalize() + "\n" + lc.capitalize() + ": " + cc.capitalize(), color=0x225bff))
 
         # QR
         @commands.command(aliases=["qr"], brief="Générateur de QR code", usage="(qr|qrcode) \"chaine\", la chaine doit être entre guillemets si il y a des espaces")
@@ -193,7 +193,7 @@ class Tools:
         @commands.command(brief="Synthèse vocale", usage="tts \"chaine\", la chaine doit être entre guillemets si il y a des espaces")
         async def tts(self, ctx, chaine):
             # Fichier
-            reponse = requests.get(f"https://tts.readspeaker.com/a/speak?key={secrets['tts']}&lang=fr_ca&voice=leo&text={chaine}").content
+            reponse = requests.get("https://tts.readspeaker.com/a/speak?key=" + secrets['tts'] + "&lang=fr_ca&voice=leo&text=" + chaine).content
             if reponse.decode().strip() == "ERROR: Needed credits exceeds available amount.":
                 await ctx.send(getmsg(ctx, "nottscredits"))
             else:

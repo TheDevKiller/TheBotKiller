@@ -16,7 +16,7 @@ def ri(string):
 		letters = "abcdefghijklmnopqrstuvwxyz"
 		numbers = "123456789"
 		if char in letters:
-			string[index] = f":regional_indicator_{char}:"
+			string[index] = ":regional_indicator_" + char + ":"
 		elif char in numbers:
 			emojis = \
 			{"1": ":one:",

@@ -80,7 +80,7 @@ async def on_ready():
             if re.match(r".*\.py.swp", fichier):
                 pass
             elif re.match(r".*\.py", fichier):
-                print(colored(f"Chargement de {fichier}", "white"))
+                print(colored("Chargement de " + fichier, "white"))
                 bot.load_extension("cogs." + fichier.replace(".py", ""))
         # Chargement de la config
         with open("config.json", "r") as fichier:
@@ -198,7 +198,7 @@ async def help(ctx, arg="defaultarg"):
             if commande.hidden == False:
                 if not commande.cog_name in dico:
                     dico[commande.cog_name] = []
-                dico[commande.cog_name].append(f"`{commande.name}`: {getmsg(ctx, commande.name)}")
+                dico[commande.cog_name].append("`" + commande.name + "`: " + getmsg(ctx, commande.name))
         for index, categorie in enumerate(dico):
             if categorie == None:
                 em.add_field(name="Main", value="\n".join(dico[categorie]))
@@ -214,7 +214,7 @@ async def help(ctx, arg="defaultarg"):
                     em.add_field(name="Aliases", value=", ".join(commande.aliases))
                 if isinstance(commande.usage, str):
                     n = "\n"
-                    em.add_field(name="Usage", value=f"`\n{command.usage}\n`")
+                    em.add_field(name="Usage", value="`\n" + command.usage + "\n`")
                 if isinstance(commande.cog_name, str):
                     em.add_field(name="Category", value=commande.cog_name)
                 await ctx.send(embed=em)
@@ -229,7 +229,7 @@ async def on_command(ctx):
             guild += word[0].upper()
     else:
         guild = ctx.message.guild.name
-    print(f"[{colored('COMMAND', 'green')}][{colored(time.asctime(), 'yellow')}]: {colored(guild, 'blue')}, {colored(ctx.message.author.name, 'red')}, {ctx.message.content}")
+    print("[" + colored("COMMAND", "green") + "][" + colored(time.asctime(), "yellow") + "]: " + colored(guild, 'blue') + ", " + colored(ctx.message.author.name, 'red') + ", " + ctx.message.content)
 
 # Web server
 app = Sanic()
@@ -268,9 +268,9 @@ async def index(req, servId, chanId, msg):
 async def index(req):
     dic = []
     for i, server in enumerate(bot.guilds):
-        dic.append({"name": server.name, "id": f"{server.id}", "channels": []})
+        dic.append({"name": server.name, "id": string(server.id), "channels": []})
         for channel in server.channels:
-            dic[i]["channels"].append({"name": channel.name, "id": f"{channel.id}"})
+            dic[i]["channels"].append({"name": channel.name, "id": string(channel.id)})
     return response.json(dic, headers={"Access-Control-Allow-Origin": "*"})
 
 # Test

@@ -74,9 +74,9 @@ class Games:
         else:
             resultat = "T'as perdu :smiley:"
         # Édition du message
-        em = discord.Embed(title=f"Résultat du sifumi entre {joueurShifumi.name} et </TheBotKiller>", color=0xff7400)
-        em.add_field(name="Tu as joué", value=f"{getmsg(react, jeuJoueur)} {jeuJoueur}")
-        em.add_field(name="J'ai joué", value=f"{getmsg(react, elementBot)} {elementBot}")
+        em = discord.Embed(title="Résultat du sifumi entre " + joueurShifumi.name + " et </TheBotKiller>", color=0xff7400)
+        em.add_field(name="Tu as joué", value=getmsg(react, jeuJoueur) + " " + jeuJoueur)
+        em.add_field(name="J'ai joué", value=getmsg(react, elementBot) + " " + elementBot)
         em.add_field(name="Résultat", value=resultat)
         await messageJoue.edit(embed=em)
 
@@ -103,7 +103,7 @@ class Games:
                 i += alumette.size[0]
             im.save("tmp/batons.png")
             await msgdelete.delete()
-            msgdelete = await ctx.send(f"{tour.name}, prend un, deux ou trois bâtons", file=discord.File("tmp/batons.png"))
+            msgdelete = await ctx.send(tour.name + ", prend un, deux ou trois bâtons", file=discord.File("tmp/batons.png"))
             def check(m):
                 return m.author == tour
             msg = await self.bot.wait_for("message", check=check)
@@ -123,7 +123,7 @@ class Games:
                 else:
                     await ctx.send("Oups, un problème est survenu lors du changement des tours")
             await msg.delete()
-        await ctx.send(f"{gagnant.name} a gagné")
+        await ctx.send(gagnant.name + "a gagné")
 
     # Simon Pocket
     @commands.command(usage="si")
@@ -159,20 +159,20 @@ class Games:
                         choice = random.choice(choix)
                 except:
                     pass
-                await msg.edit(content=f"<:{choice}>")
-                combinaisonAFaire.append(f"<:{choice}>")
+                await msg.edit(content="<:" + choice + ">")
+                combinaisonAFaire.append("<:" + choice + ">")
                 sleep(0.5)
             # Tours des réactions
             for reacTour in range(1, len(combinaisonAFaire)+1):
                 reac = await self.bot.wait_for("reaction_add", check=reacTourCheck)
-                combinaisonFaite.append(f"<:{reac[0].emoji.name}:{reac[0].emoji.id}>")
+                combinaisonFaite.append("<:" + reac[0].emoji.name + ":" + reac[0].emoji.id + ">")
                 try:
                     await msg.remove_reaction(reac[0].emoji, reac[1])
                 except discord.Forbidden:
                     pass
             tour += 1
             if combinaisonAFaire != combinaisonFaite:
-                await msg.edit(content=f"Mauvaise combinaison, partie terminée. Tu feras mieux la prochaine fois :wink:\nTu as tenu {tour-2} tours")
+                await msg.edit(content="Mauvaise combinaison, partie terminée. Tu feras mieux la prochaine fois :wink:\nTu as tenu" + tour-2 + "tours")
                 partie = False
 
     # POM
@@ -193,7 +193,7 @@ class Games:
         # Check si le max et min doivent être inversés
         if(minpom > maxpom):
             minpom, maxpom = maxpom, minpom
-        await ctx.send(f"Devine à quel nombre je pense entre {minpom} et {maxpom}")
+        await ctx.send("Devine à quel nombre je pense entre " + minpom + " et " + maxpom)
         # Nombre du bot & autres variables
         nbre = random.randint(int(minpom), int(maxpom))
         pomchan = ctx.message.channel
@@ -217,7 +217,7 @@ class Games:
         self.jRouge = await self.bot.get_user_info(int(arg.replace("<", "").replace(">", "").replace("@", "").replace("!", "")))
         # Joueur qui doit commencer
         self.jTour = random.choice([self.jJaune, self.jRouge])
-        await ctx.send(f"C'est à {self.jTour.mention} de commencer")
+        await ctx.send("C'est à " + self.jTour.mention + " de commencer")
         # Couleurs
         self.jaune = (241, 196, 15)
         self.rouge = (231, 76, 60)
@@ -265,9 +265,9 @@ class Games:
                 essais += 1
             elif nbreJoueur == nbre:
                 if essais <= 1:
-                    await message.channel.send(f"C'est ça, bien joué {message.author.mention} ! Tu as réussi en {essais} essais")
+                    await message.channel.send("C'est ça, bien joué " + message.author.mention + " ! Tu as réussi en " + essais + " essais")
                 else:
-                    await message.channel.send(f"C'est ça, bien joué {message.author.mention} ! Tu as réussi en {essais} essais")
+                    await message.channel.send("C'est ça, bien joué " + message.author.mention + " ! Tu as réussi en " + essais + " essais")
                 # Fin de la partie
                 plusoumoins = False
 	   # P4
@@ -308,11 +308,11 @@ class Games:
                                 if self.grillep4[coindex][caindex:caindex+4].count(self.jaune) == 4 or self.grillep4[coindex][caindex:caindex+4].count(self.rouge) == 4:
                                     if self.grillep4[coindex][caindex] == self.jaune:
                                         if self.p4 == True:
-                                            await message.channel.send(f"{self.jJaune.mention}, tu as gagné, bien joué !", file=discord.File("tmp/p4.png"))
+                                            await message.channel.send(self.jJaune.mention + ", tu as gagné, bien joué !", file=discord.File("tmp/p4.png"))
                                         self.p4 = False
                                     elif self.grillep4[coindex][caindex] == self.rouge:
                                         if self.p4 == True:
-                                            await message.channel.send(f"{self.jRouge.mention}, tu as gagné, bien joué !", file=discord.File("tmp/p4.png"))
+                                            await message.channel.send(self.jRouge.mention + ", tu as gagné, bien joué !", file=discord.File("tmp/p4.png"))
                                         self.p4 = False
                             except:
                                 pass
@@ -326,12 +326,12 @@ class Games:
                                 if ligne[index:index+4].count(self.jaune) == 4 or ligne[index:index+4].count(self.rouge) == 4:
                                     if ligne[index] == self.rouge:
                                         if self.p4 == True: 
-                                            await message.channel.send(f"{self.jRouge.mention}, tu as gagné, bien joué !")
+                                            await message.channel.send(self.jRouge.mention + ", tu as gagné, bien joué !")
                                         self.p4 = False
                                         break
                                     elif ligne[index] == self.jaune:
                                         if self.p4 == True: 
-                                            await message.channel.send(f"{self.jRouge.mention}, tu as gagné, bien joué !")
+                                            await message.channel.send(self.jRouge.mention + ", tu as gagné, bien joué !")
                                         self.p4 = False
                                         break                                
                     # Vérification des diagonales
@@ -348,19 +348,19 @@ class Games:
                                     print("le premier if passe")
                                     if diagonales[dindex][cindex] == self.rouge:
                                         if self.p4 == True: 
-                                            await message.channel.send(f"{self.jRouge.mention}, tu as gagné, bien joué !", file=discord.File("tmp/p4.png"))
+                                            await message.channel.send(self.jRouge.mention + ", tu as gagné, bien joué !", file=discord.File("tmp/p4.png"))
                                         self.p4 = False
                                         break
                                     elif diagonales[dindex][cindex] == self.jaune:
                                         print("le deuxième if passe")
                                         if self.p4 == True: 
-                                            await message.channel.send(f"{self.jRouge.mention}, tu as gagné, bien joué !", file=discord.File("tmp/p4.png"))
+                                            await message.channel.send(self.jRouge.mention + ", tu as gagné, bien joué !", file=discord.File("tmp/p4.png"))
                                         self.p4 = False
                                         break
                             except IndexError:
                                 pass
                     if self.p4 == True:
-                        await message.channel.send(f"À toi, {self.jTour.mention}", file=discord.File("tmp/p4.png"))
+                        await message.channel.send("À toi, " + self.jTour.mention, file=discord.File("tmp/p4.png"))
                     # Inversement de la grille
                     for element in self.grillep4:
                         element.reverse()
