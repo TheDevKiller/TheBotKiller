@@ -16,7 +16,7 @@ import random
 # Variables #
 #############
 
-with open("secrets.json", "rb") as secretsFile:
+with open("secrets.json", "r") as secretsFile:
         secrets = json.load(secretsFile)
 
 #############

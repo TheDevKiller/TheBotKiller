@@ -54,7 +54,7 @@ class NSFW:
                 # Vérification du channel
                 if ctx.message.channel.is_nsfw():
                         # URL
-                        lien = f"http://media.obutts.ru/{requests.Session().get('http://api.obutts.ru/butts/0/1/random/').json()[0]['preview']}"
+                        lien = "http://media.obutts.ru/" + requests.Session().get('http://api.obutts.ru/butts/0/1/random/').json()[0]['preview']}
                         await ctx.send(lien)
                 else:
                         await ctx.send("Tu vas choquer des gens :scream: Va dans un salon NSFW !")
@@ -63,14 +63,14 @@ class NSFW:
         async def boobs(self, ctx):
 
                 # URL
-                lien = f"http://media.oboobs.ru/{requests.Session().get('http://api.oboobs.ru/boobs/0/1/random').json()[0]['preview']}"
+                lien = "http://media.oboobs.ru/" + requests.Session().get('http://api.oboobs.ru/boobs/0/1/random').json()[0]['preview']}
                 
                 # Vérification du channel
                 if ctx.message.channel.is_nsfw():
                     await ctx.send(lien)
                 else:
                     await ctx.message.author.send(lien)
-                    await ctx.send(f"Je t'ai envoyé ça en MP {ctx.message.author.mention}, si tu veux ça dans le salon, va dans un salon NSFW ^^")
+                    await ctx.send("Je t'ai envoyé ça en MP " + ctx.message.author.mention + ", si tu veux ça dans le salon, va dans un salon NSFW ^^")
 
         # Yandere
         @commands.command(usage="yandere <query>")
@@ -82,7 +82,7 @@ class NSFW:
                 recherche = query.replace(" ", "+")
 
                 # URL
-                resultat = requests.get(f"https://yande.re/post.json?limit=42&tags={recherche}", headers={"User-Agent": "Je suis un gentil bot Discord qui vient en paix :)"}).json()
+                resultat = requests.get("https://yande.re/post.json?limit=42&tags=" + recherche, headers={"User-Agent": "Je suis un gentil bot Discord qui vient en paix :)"}).json()
                 
                 # Vérification du channel
                 if isinstance(ctx.message.channel, discord.DMChannel) or ctx.message.channel.is_nsfw():
