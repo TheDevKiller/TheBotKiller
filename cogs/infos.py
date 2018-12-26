@@ -108,8 +108,11 @@ class Infos:
                         OS = (distro.name() + " " + distro.version() + " " + distro.codename()).replace("Linux", "")
 
                                 # Batterie
-                        btoutput = subprocess.check_output(["upower", "-i", "/org/freedesktop/UPower/devices/battery_BAT1"]).decode()
-                        batterie = re.search("percentage:          (.{1,3})%", btoutput)[1]
+                        try:        
+                            btoutput = subprocess.check_output(["upower", "-i", "/org/freedesktop/UPower/devices/battery_BAT1"]).decode()
+                            batterie = re.search("percentage:          (.{1,3})%", btoutput)[1]
+                        except:
+                            batterie = "Non disponible"
                         em = discord.Embed(title=getmsg(ctx, "My PC - Infos"), color=color)
                         em.add_field(name=OSEmoji + " OS", value=OS)
                         em.add_field(name="<:level_slider:474325122904489984> Load Average", value=la) # Load Average

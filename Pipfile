@@ -19,7 +19,7 @@ websockets = "==6.0"
 yarl = "==1.2.6"
 zalgo-text = "==0.6"
 async_timeout = "==3.0.0"
-"discord.py" = {ref = "rewrite",extras = ["voice"],git = "https://github.com/Rapptz/discord.py"}
+"discord.py" = {ref = "rewrite",git = "https://github.com/Rapptz/discord.py",extras = ["voice"]}
 idna_ssl = "==1.1.0"
 termcolor = "*"
 sanic = "*"
@@ -28,6 +28,9 @@ qrcode = "*"
 pytesseract = "*"
 image = "*"
 pil = "*"
+distro = "*"
+bs4 = "*"
+pyppeteer = "*"
 
 [requires]
 python_version = "3.5"

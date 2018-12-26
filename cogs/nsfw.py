@@ -54,7 +54,7 @@ class NSFW:
                 # Vérification du channel
                 if ctx.message.channel.is_nsfw():
                         # URL
-                        lien = "http://media.obutts.ru/" + requests.Session().get('http://api.obutts.ru/butts/0/1/random/').json()[0]['preview']}
+                        lien = "http://media.obutts.ru/" + requests.Session().get('http://api.obutts.ru/butts/0/1/random/').json()[0]['preview']
                         await ctx.send(lien)
                 else:
                         await ctx.send("Tu vas choquer des gens :scream: Va dans un salon NSFW !")
@@ -63,7 +63,7 @@ class NSFW:
         async def boobs(self, ctx):
 
                 # URL
-                lien = "http://media.oboobs.ru/" + requests.Session().get('http://api.oboobs.ru/boobs/0/1/random').json()[0]['preview']}
+                lien = "http://media.oboobs.ru/" + requests.Session().get('http://api.oboobs.ru/boobs/0/1/random').json()[0]['preview']
                 
                 # Vérification du channel
                 if ctx.message.channel.is_nsfw():
