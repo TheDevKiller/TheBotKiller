@@ -69,108 +69,126 @@ bot.remove_command("help")
 # On ready
 @bot.event
 async def on_ready():
-        # Moi
-        global thedevkiller
-        thedevkiller = await bot.get_user_info(436105272310759426)
-        print(colored("Je suis connecté !", "white"))
-        # Présence
-        await bot.change_presence(status=discord.Status.dnd, activity=discord.Activity(name="&help", type=discord.ActivityType.listening), afk=False)
-        # Charger les cogs
-        for fichier in os.listdir("cogs"):
-            if re.match(r".*\.py.swp", fichier):
-                pass
-            elif re.match(r".*\.py", fichier):
-                print(colored("Chargement de " + fichier, "white"))
-                bot.load_extension("cogs." + fichier.replace(".py", ""))
-        # Chargement de la config
-        with open("config.json", "r") as fichier:
-            config = json.loads(fichier.read())
-        # Config par défaut
-        for server in bot.guilds:
-            if str(server.id) in config:
-                for param in defaultConfig:
-                    if not param in config[str(server.id)]:
-                        config[str(server.id)][param] = defaultConfig[param]
-            else:
-                config[str(server.id)] = defaultConfig
-        with open("config.json", "w") as fichier:
-            fichier.write(json.dumps(config, indent=4))
-        # Séparateur
-        print("------------")
+    # Moi
+    bot.owner = await bot.get_user_info(436105272310759426)
+    print(colored("Je suis connecté !", "white"))
+    # Présence
+    await bot.change_presence(status=discord.Status.dnd, activity=discord.Activity(name="&help", type=discord.ActivityType.listening), afk=False)
+    # Charger les cogs
+    for fichier in os.listdir("cogs"):
+        if re.match(r".*\.py.swp", fichier):
+            pass
+        elif re.match(r".*\.py", fichier):
+            print(colored("Chargement de " + fichier, "white"))
+            bot.load_extension("cogs." + fichier.replace(".py", ""))
+    # Chargement de la config
+    with open("config.json", "r") as fichier:
+        config = json.loads(fichier.read())
+    # Config par défaut
+    for server in bot.guilds:
+        if str(server.id) in config:
+            for param in defaultConfig:
+                if not param in config[str(server.id)]:
+                    config[str(server.id)][param] = defaultConfig[param]
+        else:
+            config[str(server.id)] = defaultConfig
+    with open("config.json", "w") as fichier:
+        fichier.write(json.dumps(config, indent=4))
+    # Séparateur
+    print("------------")
 
 # Halt
 @bot.command(name="halt", aliases=["shutdown"])
 async def halt(ctx):
-        if ctx.message.author == thedevkiller:
-            with open("config.json", "r") as fichier:
-                config = json.loads(fichier.read())
-            await ctx.send(getmsg(ctx, "I must get away"))
-            sys.exit(0)
-        else:
+    if ctx.message.author == bot.owner:
+        with open("config.json", "r") as fichier:
+            config = json.loads(fichier.read())
+        await ctx.send(getmsg(ctx, "I must get away"))
+        sys.exit(0)
+    else:
                 await ctx.send(trad[config[str(ctx.message.guild.id)]["lang"]]["youcant"])
 
 # Reboot
 @bot.command(name="reboot", usage="reboot")
 async def reboot(ctx):
-        if ctx.message.author == thedevkiller:
-                print("Je redémarre")
-                await ctx.send(getmsg(ctx, "I'll be back very soon"))
-                subprocess.call(["bash", "/home/thedevkiller/TheBotKiller/reboot.sh"])
-                sys.exit(0)
-        else:
-                await ctx.send(getmsg(ctx, "You can't do this"))
+    if ctx.message.author == bot.owner:
+        print("Je redémarre")
+        await ctx.send(getmsg(ctx, "I'll be back very soon"))
+        subprocess.call(["bash", "~/code/python/TheBotKiller/reboot.sh"])
+        sys.exit(0)
+    else:
+        await ctx.send(getmsg(ctx, "You can't do this"))
         
 # Load        
 @bot.command(name="load", aliases=["charge"])
 async def load(ctx, arg):
-        if ctx.message.author == thedevkiller:
-                try:
-                        bot.load_extension("cogs." + arg)
-                        await ctx.send(getmsg(ctx, "Module loaded").format(arg))  
-                except ModuleNotFoundError:
-                    await ctx.send(getmsg(ctx, "Sorry but I don't have this module"))
-        else:
-                await ctx.send(getmsg(ctx, "You can't do this"))
+    if ctx.message.author == bot.owner:
+        try:
+            bot.load_extension("cogs." + arg)
+            await ctx.send(getmsg(ctx, "Module loaded").format(arg))  
+        except ModuleNotFoundError:
+            await ctx.send(getmsg(ctx, "Sorry but I don't have this module"))
+    else:
+        await ctx.send(getmsg(ctx, "You can't do this"))
 
 # Reload
 @bot.command(name="reload", aliases=["recharge"])
 async def reload(ctx, arg):
-        if ctx.message.author == thedevkiller:
-                try:
-                        bot.unload_extension("cogs." + arg)
-                        bot.load_extension("cogs." + arg)
-                        await ctx.send(getmsg(ctx, "Module reloaded").format(arg))
-                except ModuleNotFoundError:
-                        await ctx.send(getmsg(ctx, "Sorry but I don't have this module"))
-        else:
-                await ctx.send(getmsg(ctx, "You can't do this"))
+    if ctx.message.author == bot.owner:
+        try:
+            bot.unload_extension("cogs." + arg)
+            bot.load_extension("cogs." + arg)
+            await ctx.send(getmsg(ctx, "Module reloaded").format(arg))
+        except ModuleNotFoundError:
+            await ctx.send(getmsg(ctx, "Sorry but I don't have this module"))
+    else:
+        await ctx.send(getmsg(ctx, "You can't do this"))
 
 # Unload
 @bot.command(name="unload", aliases=["décharge"])
 async def unload(ctx, arg):
-        if ctx.message.author == thedevkiller:
-                try:
-                        bot.unload_extension("cogs." + arg)
-                        await ctx.send(getmsg(ctx, "Module unloaded").format(arg))
-                except ModuleNotFoundError:
-                        await ctx.send(getmsg(ctx, "Module unloaded"))
-        else:
-                await ctx.send(getmsg(ctx, "Sorry but I don't have this module"))
+    if ctx.message.author == bot.owner:
+        try:
+            bot.unload_extension("cogs." + arg)
+            await ctx.send(getmsg(ctx, "Module unloaded").format(arg))
+        except ModuleNotFoundError:
+            await ctx.send(getmsg(ctx, "Module unloaded"))
+    else:
+        await ctx.send(getmsg(ctx, "Sorry but I don't have this module"))
+
+# Commande qui génère des erreurs
+@bot.command(name="error", aliases=["erreur"])
+async def error(ctx):
+    raise NameError("lol")
 
 # Erreurs
 @bot.event
 async def on_error(event, *args, **kwargs):
+    err = traceback.format_exc()
+    print(colored(err, "red"))
     try:
         message = args[0]
         await message.channel.send(getmsg(ctx, "An error happened"))
+        await bot.owner.send(err)
     except:
         pass
     try:
         commande = message.content.split(" ")[0]
     except: 
         commande = " "
-    err = traceback.format_exc()
-    print(colored(err, "red"))
+
+# Erreurs de commandes
+@bot.event
+async def on_command_error(ctx, ex):
+    if isinstance(ex, commands.CommandNotFound):
+        pass
+    elif isinstance(ex, commands.MissingRequiredArgument) or isinstance(ex, commands.BadArgument):
+        em = discord.Embed(title=getmsg(ctx, "Usage of the command"), description="`" + ctx.command.usage+ "`", color=0xEA2027)
+        em.set_footer(text=getmsg(ctx, "If you think this error is abnormal"))
+        await ctx.send(embed=em)
+    else:
+        await bot.owner.send("[" + ctx.command.name + "] " + str(ex))
+        await ctx.send(ex)
 
 ## Cogs chargées
 #@commands.command(name="cogs", aliases=["modules"], brief="Liste des modules")
@@ -222,13 +240,15 @@ async def help(ctx, arg="defaultarg"):
 # Logs
 @bot.event
 async def on_command(ctx):
-    #print(colored(f"[COMMAND][{time.asctime()}]: {ctx.message.content}, {ctx.message.author.name}, {ctx.message.guild}", "white"))
-    if len(ctx.message.guild.name) > 15:
-        guild = ""
-        for word in ctx.message.guild.name.split(" "):
-            guild += word[0].upper()
+    if ctx.message.guild:
+        if len(ctx.message.guild.name) > 15:
+            guild = ""
+            for word in ctx.message.guild.name.split(" "):
+                guild += word[0].upper()
+        else:
+            guild = ctx.message.guild.name
     else:
-        guild = ctx.message.guild.name
+        guild = "PM"
     print("[" + colored("COMMAND", "green") + "][" + colored(time.asctime(), "yellow") + "]: " + colored(guild, 'blue') + ", " + colored(ctx.message.author.name, 'red') + ", " + ctx.message.content)
 
 # Web server

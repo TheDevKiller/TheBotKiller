@@ -11,6 +11,7 @@ from PIL import Image
 import pytesseract
 import json
 import random
+import re
 
 #############
 # Variables #
@@ -186,6 +187,11 @@ class Tools:
                         ocrimage.write(image)
                 # OCR
                 texte = pytesseract.image_to_string(Image.open(fichier))
+                # 
+                for mention in ["@everyone", "@here", "<@.*>"]:
+                    if re.match(".*" + mention + ".*", texte):
+                        await ctx.send("...")
+                        return 1
                 await ctx.send(texte)
                 os.remove(fichier)
 
